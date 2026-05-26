@@ -16,7 +16,7 @@
 
   const map = L.map("map", { zoomControl: true }).setView(
     [M.current.lat, M.current.lng],
-    10
+    12
   );
 
   const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -42,10 +42,27 @@
     weight: 2,
     opacity: 0.5,
     dashArray: "6 8",
-  }).addTo(map);
+  });
+  const routeGroup = L.layerGroup([routeLayer]).addTo(map);
 
   const categoryGroup = L.layerGroup().addTo(map);
   const layersByKm = {};
+
+  // Base continuous track (always connects points)
+  if (M.track && M.track.length >= 2) {
+    const baseTrack = L.polyline(
+      M.track.map((p) => [p[0], p[1]]),
+      {
+        color: "#8b95a8",
+        weight: 3,
+        opacity: 0.35,
+        lineCap: "round",
+        lineJoin: "round",
+        smoothFactor: 1.0,
+      }
+    );
+    baseTrack.addTo(categoryGroup);
+  }
 
   segments.forEach((seg) => {
     if (!seg.points || seg.points.length < 2) return;
@@ -101,8 +118,73 @@
     .addTo(map)
     .bindPopup(popup);
 
-  if (M.bounds && M.bounds.length === 2) {
-    map.fitBounds(M.bounds, { padding: [40, 40] });
+  // Record pace marker (where the current record would be right now)
+  if (M.recordPace && M.recordPace.lat && M.recordPace.lng) {
+    const recIcon = L.divIcon({
+      className: "record-pin",
+      html: '<div class="pin-core"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });
+    L.marker([M.recordPace.lat, M.recordPace.lng], {
+      icon: recIcon,
+      zIndexOffset: 900,
+    })
+      .addTo(map)
+      .bindPopup(
+        `<b>Ritmo do record (referência)</b><br>` +
+          `Km ~${M.recordPace.km}<br>` +
+          `Hora: ${M.recordPace.time}<br>` +
+          `Alt: ${M.recordPace.alt} m`
+      );
+  }
+
+  // Calendar goal marker (where he would need to be now to finish by 31 May)
+  if (M.calendarPace && M.calendarPace.lat && M.calendarPace.lng) {
+    const goalIcon = L.divIcon({
+      className: "goal-pin",
+      html: '<div class="pin-core"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });
+    L.marker([M.calendarPace.lat, M.calendarPace.lng], {
+      icon: goalIcon,
+      zIndexOffset: 880,
+    })
+      .addTo(map)
+      .bindPopup(
+        `<b>Meta 31/05 (referência)</b><br>` +
+          `Onde teria de estar agora<br>` +
+          `Km ~${M.calendarPace.km}<br>` +
+          `Deadline: ${M.calendarPace.deadline}<br>`
+      );
+  }
+
+  // Calendar goal marker (realistic, using the prediction model)
+  if (M.calendarPaceRealistic && M.calendarPaceRealistic.lat && M.calendarPaceRealistic.lng) {
+    const goalRealIcon = L.divIcon({
+      className: "goal-real-pin",
+      html: '<div class="pin-core"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });
+    L.marker([M.calendarPaceRealistic.lat, M.calendarPaceRealistic.lng], {
+      icon: goalRealIcon,
+      zIndexOffset: 875,
+    })
+      .addTo(map)
+      .bindPopup(
+        `<b>Meta 31/05 (realista)</b><br>` +
+          `Onde teria de estar agora (modelo)<br>` +
+          `Km ~${M.calendarPaceRealistic.km}<br>` +
+          `Deadline: ${M.calendarPaceRealistic.deadline}<br>`
+      );
+  }
+
+  function recenterCurrent() {
+    map.setView([M.current.lat, M.current.lng], Math.max(map.getZoom(), 12), {
+      animate: true,
+    });
   }
 
   function refreshMapSize() {
@@ -148,8 +230,196 @@
       else map.removeLayer(layer);
     });
   }
-  bindToggle("layer-route", routeLayer);
+  // Hover on future route → predicted crossing time (model v3, from live GPS / now)
+  const futureRoute = M.futureRoute || {};
+  const futurePts = futureRoute.points || [];
+  const futureLine = futureRoute.line || futurePts.map((p) => [p.lat, p.lng]);
+  let futureGroup = null;
+  let clearEtaHoverFn = null;
+
+  if (futurePts.length >= 2 && futureLine.length >= 2) {
+    futureGroup = L.layerGroup().addTo(map);
+
+    const futureVisibleLine = L.polyline(futureLine, {
+      color: "#34d399",
+      weight: 6,
+      opacity: 0.72,
+      dashArray: "10 8",
+      lineCap: "round",
+      lineJoin: "round",
+      interactive: false,
+      className: "future-route-visible",
+    });
+    const futureHitLine = L.polyline(futureLine, {
+      color: "#34d399",
+      weight: 32,
+      opacity: 0.001,
+      interactive: true,
+      className: "future-route-hit",
+    });
+    futureGroup.addLayer(futureVisibleLine);
+    futureGroup.addLayer(futureHitLine);
+    futureHitLine.bringToFront();
+
+    const etaTooltip = L.tooltip({
+      permanent: false,
+      sticky: true,
+      direction: "top",
+      offset: [0, -12],
+      className: "map-eta-tooltip",
+    });
+
+    let hoverRaf = null;
+    let lastHoverKey = null;
+    let hoverActive = false;
+    const projKm = futureRoute.projectionKm ?? currentKm;
+
+    function parseMapTime(s) {
+      if (!s) return null;
+      const norm = String(s).trim().replace(" ", "T");
+      const d = new Date(norm.length <= 16 ? norm + ":00" : norm);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtRelativeFromNow(ms) {
+      if (ms < 0) return "já passou (actualizar dados)";
+      const h = Math.floor(ms / 3600000);
+      const m = Math.round((ms % 3600000) / 60000);
+      if (h >= 48) return "daqui a " + Math.round(h / 24) + " dias";
+      if (h >= 1) return "daqui a " + h + "h" + (m ? " " + m + "m" : "");
+      if (m >= 1) return "daqui a " + m + " min";
+      return "daqui a <1 min";
+    }
+
+    function snapRadiusM() {
+      return Math.max(280, 650 / Math.max(map.getZoom(), 9));
+    }
+
+    function closestOnSegment(latlng, a, b) {
+      const A = map.latLngToLayerPoint(a);
+      const B = map.latLngToLayerPoint(b);
+      const P = map.latLngToLayerPoint(latlng);
+      const abx = B.x - A.x;
+      const aby = B.y - A.y;
+      const ab2 = abx * abx + aby * aby;
+      let t = ab2 === 0 ? 0 : ((P.x - A.x) * abx + (P.y - A.y) * aby) / ab2;
+      t = Math.max(0, Math.min(1, t));
+      const H = L.point(A.x + abx * t, A.y + aby * t);
+      return { latlng: map.layerPointToLatLng(H), t };
+    }
+
+    function hitTestFuture(latlng) {
+      const snapM = snapRadiusM();
+      let best = null;
+      let bestD = snapM + 1;
+      for (let i = 0; i < futurePts.length - 1; i++) {
+        const a = futurePts[i];
+        const b = futurePts[i + 1];
+        const { latlng: closest, t } = closestOnSegment(
+          latlng,
+          L.latLng(a.lat, a.lng),
+          L.latLng(b.lat, b.lng)
+        );
+        const d = map.distance(latlng, closest);
+        if (d >= bestD) continue;
+        bestD = d;
+        const km = a.km + t * (b.km - a.km);
+        const ta = parseMapTime(a.timeIso || a.time);
+        const tb = parseMapTime(b.timeIso || b.time);
+        let timeMs = ta ? ta.getTime() : 0;
+        if (ta && tb) {
+          timeMs = ta.getTime() + t * (tb.getTime() - ta.getTime());
+        }
+        best = {
+          lat: closest.lat,
+          lng: closest.lng,
+          km: Math.round(km * 10) / 10,
+          timeMs,
+          timeShort: ta
+            ? new Date(timeMs).toLocaleString("pt-PT", {
+                weekday: "short",
+                day: "numeric",
+                month: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "—",
+        };
+      }
+      return best;
+    }
+
+    function fmtEtaContent(p) {
+      const remain = Math.max(0, p.km - projKm);
+      const rel = fmtRelativeFromNow(p.timeMs - Date.now());
+      return (
+        `<div class="map-eta-inner">` +
+        `<div class="map-eta-km">Km ${p.km}</div>` +
+        `<div class="map-eta-label">Passagem prevista</div>` +
+        `<div class="map-eta-time">${p.timeShort}</div>` +
+        `<div class="map-eta-rel">${rel}</div>` +
+        `<div class="map-eta-sub">+${remain.toFixed(1)} km · paragens incluídas · v3</div>` +
+        `</div>`
+      );
+    }
+
+    function showEtaHit(hit) {
+      const key = hit.km + "|" + hit.timeMs;
+      if (key !== lastHoverKey) {
+        etaTooltip
+          .setLatLng([hit.lat, hit.lng])
+          .setContent(fmtEtaContent(hit))
+          .addTo(map);
+        lastHoverKey = key;
+      } else {
+        etaTooltip.setLatLng([hit.lat, hit.lng]);
+      }
+      map.getContainer().style.cursor = "crosshair";
+      hoverActive = true;
+    }
+
+    function onFutureHover(e) {
+      if (hoverRaf) return;
+      hoverRaf = requestAnimationFrame(() => {
+        hoverRaf = null;
+        const hit = hitTestFuture(e.latlng);
+        if (!hit) {
+          if (hoverActive) clearEtaHover();
+          return;
+        }
+        showEtaHit(hit);
+      });
+    }
+
+    function clearEtaHover() {
+      if (hoverRaf) {
+        cancelAnimationFrame(hoverRaf);
+        hoverRaf = null;
+      }
+      map.closeTooltip(etaTooltip);
+      lastHoverKey = null;
+      hoverActive = false;
+      map.getContainer().style.cursor = "";
+    }
+    clearEtaHoverFn = clearEtaHover;
+
+    map.on("mousemove", onFutureHover);
+    map.on("mouseout", clearEtaHover);
+    futureHitLine.on("mousemove", onFutureHover);
+    futureHitLine.on("mouseout", clearEtaHover);
+  }
+
+  bindToggle("layer-route", routeGroup);
   bindToggle("layer-track", categoryGroup);
+  if (futureGroup) {
+    const futureToggle = document.getElementById("layer-future");
+    bindToggle("layer-future", futureGroup);
+    if (futureToggle) {
+      futureToggle.addEventListener("change", () => {
+        if (!futureToggle.checked && clearEtaHoverFn) clearEtaHoverFn();
+      });
+    }
+  }
 
   const splitsToggle = document.getElementById("layer-splits");
   if (splitsToggle) {
@@ -187,4 +457,6 @@
   }
 
   window.__travessiaMap = map;
+  window.__travessiaMapInvalidate = refreshMapSize;
+  window.__travessiaMapRecenter = recenterCurrent;
 })();

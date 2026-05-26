@@ -1,1 +1,8 @@
-￾挀愀挀栀攀⼀਀爀愀眀⼀਀⸀䐀匀开匀琀漀爀攀਀椀渀搀攀砀⸀栀琀洀氀⸀搀攀挀漀搀攀搀⸀琀砀琀਀
+cache/
+raw/
+.DS_Store
+index.html.decoded.txt
+history/predictions.jsonl
+history/latest_snapshot.json
+history/archive_index.txt
+history/predictions_*.jsonl

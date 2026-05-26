@@ -12,7 +12,8 @@ from pathlib import Path
 # Local km_splits module
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import km_splits as km
-from prediction_model import build_prediction
+from prediction_history import append_snapshot
+from prediction_model import build_prediction, estimate_finish_from_km
 from pace_categories import category_legend, summarize_categories
 
 DIR = Path(__file__).resolve().parent
@@ -210,21 +211,29 @@ def _split_index_for_along(along_m: float, splits: list) -> int:
     return len(splits) - 1
 
 
-def _finish_category_run(pts, idx_start, idx_end, splits, max_pts):
+def _finish_category_run(pts, idx_start, idx_end, splits, cat_id, max_pts):
     if len(pts) < 2:
         return None
     pts = downsample_line(pts, max_pts)
     from_km = splits[idx_start]["km"]
     to_km = splits[idx_end]["km"]
     end_s = splits[idx_end]
+    if cat_id and not end_s.get("unavailable") and not end_s.get("partial"):
+        color = end_s.get("categoryColor") or "#3d8bfd"
+        label = end_s.get("categoryLabel") or "Corrida"
+        cat = end_s.get("category") or cat_id
+    else:
+        color = "#5a6a82"
+        label = "Sem dados"
+        cat = "unknown"
     return {
         "km": to_km,
         "fromKm": from_km,
         "toKm": to_km,
         "kms": list(range(from_km, to_km + 1)),
-        "color": end_s.get("categoryColor", "#3d8bfd"),
-        "category": end_s.get("category", "corrida"),
-        "categoryLabel": end_s.get("categoryLabel", "Corrida"),
+        "color": color,
+        "category": cat,
+        "categoryLabel": label,
         "pace": end_s["pace"],
         "segment": end_s["segment_time"],
         "points": pts,
@@ -232,26 +241,25 @@ def _finish_category_run(pts, idx_start, idx_end, splits, max_pts):
 
 
 def build_category_segments(coords, dist_m, log, splits, max_pts=200):
-    """Trilho GPS contínuo: funde troços consecutivos da mesma categoria (sem buracos)."""
-    along_pts = []
-    for row in log:
-        lat, lon = float(row["Latitude"]), float(row["Longitude"])
-        along, off = km.distance_along_route(lat, lon, coords, dist_m)
-        if off > 250:
-            continue
-        along_pts.append((along, lat, lon))
-    along_pts.sort(key=lambda x: x[0])
-    if not along_pts or not splits:
+    """Trilho GPS contínuo: funde troços consecutivos da mesma categoria (sem gaps)."""
+    if not log or not splits:
         return []
 
     tagged = []
-    for along, lat, lon in along_pts:
+    prev_cat = "unknown"
+    prev_idx = 0
+    for row in log:
+        lat, lon = float(row["Latitude"]), float(row["Longitude"])
+        along, off = km.distance_along_route(lat, lon, coords, dist_m)
         idx = _split_index_for_along(along, splits)
         s = splits[idx]
-        if s.get("unavailable") or s.get("partial"):
-            cat = None
+        if off > 250 or s.get("unavailable") or s.get("partial") or not s.get("category"):
+            cat = prev_cat
+            idx = prev_idx
         else:
-            cat = s.get("category", "corrida")
+            cat = s.get("category", "unknown")
+        prev_cat = cat
+        prev_idx = idx
         tagged.append((lat, lon, idx, cat))
 
     runs = []
@@ -265,23 +273,139 @@ def build_category_segments(coords, dist_m, log, splits, max_pts=200):
             run_pts.append([lat, lon])
             idx_end = idx
         else:
-            if cur_cat is not None and len(run_pts) >= 2:
-                seg = _finish_category_run(run_pts, idx_start, idx_end, splits, max_pts)
+            if len(run_pts) >= 2:
+                seg = _finish_category_run(run_pts, idx_start, idx_end, splits, cur_cat, max_pts)
                 if seg:
                     runs.append(seg)
             cur_cat = cat
             idx_start = idx
             idx_end = idx
-            run_pts = [[lat, lon]]
+            # bridge segments with the last point so the line stays continuous
+            last_pt = run_pts[-1]
+            run_pts = [last_pt, [lat, lon]]
 
-    if cur_cat is not None and len(run_pts) >= 2:
-        seg = _finish_category_run(run_pts, idx_start, idx_end, splits, max_pts)
+    if len(run_pts) >= 2:
+        seg = _finish_category_run(run_pts, idx_start, idx_end, splits, cur_cat, max_pts)
         if seg:
             runs.append(seg)
     return runs
 
 
-def build_map_data(coords, dist_m, log, splits, live=None):
+def _interp_forecast_crossing(
+    forecast: list[dict],
+    km: float,
+    *,
+    anchor_km: float,
+    anchor_time: datetime,
+) -> datetime | None:
+    """Interpolate predicted crossing time at km along the official route."""
+    if not forecast:
+        return None
+    pts = sorted(forecast, key=lambda x: x["km"])
+    if km <= anchor_km:
+        return anchor_time
+    if km <= pts[0]["km"]:
+        k1 = pts[0]["km"]
+        t1 = datetime.strptime(pts[0]["predicted_crossing"], "%Y-%m-%d %H:%M")
+        if k1 <= anchor_km:
+            return t1
+        frac = (km - anchor_km) / (k1 - anchor_km)
+        return anchor_time + timedelta(seconds=frac * (t1 - anchor_time).total_seconds())
+    if km >= pts[-1]["km"]:
+        return datetime.strptime(pts[-1]["predicted_crossing"], "%Y-%m-%d %H:%M")
+    for i in range(len(pts) - 1):
+        a, b = pts[i], pts[i + 1]
+        if a["km"] <= km <= b["km"]:
+            ta = datetime.strptime(a["predicted_crossing"], "%Y-%m-%d %H:%M")
+            tb = datetime.strptime(b["predicted_crossing"], "%Y-%m-%d %H:%M")
+            if b["km"] == a["km"]:
+                return ta
+            frac = (km - a["km"]) / (b["km"] - a["km"])
+            return ta + timedelta(seconds=frac * (tb - ta).total_seconds())
+    return None
+
+
+def build_future_route_hover_points(
+    coords,
+    dist_m,
+    forecast: list[dict],
+    projection_km: float,
+    projection_time: datetime,
+    *,
+    step_m: float = 350,
+    max_pts: int = 900,
+) -> dict:
+    """Sample points ahead on the official route with model-predicted crossing times."""
+    if not forecast:
+        return {"points": [], "line": [], "scenario": "main", "fromKm": projection_km}
+
+    total_m = dist_m[-1]
+    start_m = float(projection_km) * 1000.0
+    remaining_m = total_m - start_m
+    if remaining_m <= 200:
+        return {
+            "points": [],
+            "line": [],
+            "scenario": "main",
+            "fromKm": round(projection_km, 1),
+            "projectionKm": round(projection_km, 1),
+            "projectionTime": projection_time.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+    step = max(250, min(step_m, remaining_m / max(2, max_pts - 1)))
+    points = []
+    m = start_m
+    while m <= total_m + 1:
+        km = m / 1000.0
+        crossing = _interp_forecast_crossing(
+            forecast,
+            km,
+            anchor_km=float(projection_km),
+            anchor_time=projection_time,
+        )
+        if not crossing:
+            break
+        lat, lon, _alt = pos_at_distance_m(coords, dist_m, min(m, total_m))
+        sec_from_proj = (crossing - projection_time).total_seconds()
+        points.append({
+            "lat": round(lat, 5),
+            "lng": round(lon, 5),
+            "km": round(km, 1),
+            "time": crossing.strftime("%Y-%m-%d %H:%M"),
+            "timeIso": crossing.strftime("%Y-%m-%d %H:%M:%S"),
+            "timeShort": crossing.strftime("%a %d/%m · %H:%M"),
+            "secondsFromProjection": round(sec_from_proj),
+        })
+        if m >= total_m:
+            break
+        m += step
+
+    finish = _interp_forecast_crossing(
+        forecast, total_m / 1000.0, anchor_km=float(projection_km), anchor_time=projection_time
+    )
+    return {
+        "points": points,
+        "line": [[p["lat"], p["lng"]] for p in points],
+        "scenario": "main",
+        "fromKm": round(projection_km, 1),
+        "projectionKm": round(projection_km, 1),
+        "projectionTime": projection_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "finishTime": finish.strftime("%Y-%m-%d %H:%M") if finish else None,
+    }
+
+
+def build_map_data(
+    coords,
+    dist_m,
+    log,
+    splits,
+    live=None,
+    goal=None,
+    *,
+    forecast=None,
+    projection_km: float = 0,
+    projection_time: datetime | None = None,
+):
     route_pts = [[float(c[1]), float(c[0])] for c in coords]
     route_ds = downsample_line(route_pts, 700)
 
@@ -350,12 +474,25 @@ def build_map_data(coords, dist_m, log, splits, live=None):
         [min(lats), min(lngs)],
         [max(lats), max(lngs)],
     ]
+    proj_time = projection_time or datetime.now()
+    future_route = build_future_route_hover_points(
+        coords,
+        dist_m,
+        forecast or [],
+        float(projection_km),
+        proj_time,
+    )
+
     return {
         "route": route_ds,
         "track": track_ds,
         "categorySegments": category_segments,
         "splits": split_pts,
         "current": current,
+        "recordPace": goal.get("recordPaceNow") if isinstance(goal, dict) else None,
+        "calendarPace": goal.get("calendarPaceNow") if isinstance(goal, dict) else None,
+        "calendarPaceRealistic": goal.get("calendarPaceNowRealistic") if isinstance(goal, dict) else None,
+        "futureRoute": future_route,
         "bounds": bounds,
     }
 
@@ -398,9 +535,144 @@ def build_analytics(
     first_gps_time = (
         first_sample[0].strftime("%Y-%m-%d %H:%M:%S") if first_sample else None
     )
+    proj_km = float(current_km)
+    proj_time = datetime.now()
+    if live:
+        if live.get("alongRouteKm") is not None:
+            proj_km = float(live["alongRouteKm"])
+        if live.get("gpsTime"):
+            try:
+                proj_time = km.parse_time(live["gpsTime"])
+            except Exception:
+                pass
+
     prediction = build_prediction(
-        available, profile_full, current_km, total_km, last["crossing_time"], race_start
+        available,
+        profile_full,
+        current_km,
+        total_km,
+        last["crossing_time"],
+        race_start,
+        projection_time=proj_time,
+        projection_km=proj_km,
     )
+
+    # --- Record goal ---
+    record_dur_s = int((9 * 24 + 2) * 3600 + 29 * 60)  # 9d 2h 29m
+    try:
+        start_dt = km.parse_time(race_start)
+    except Exception:
+        start_dt = km.parse_time(RACE_START)
+    record_deadline = start_dt + timedelta(seconds=record_dur_s)
+    # Public goal: finish by Sunday 31 May (end of day, local)
+    calendar_deadline = datetime(2026, 5, 31, 23, 59, 59)
+
+    remaining_km = max(0.1, total_km - current_km)
+    now_dt = datetime.now()
+    sec_left_record = max(0.0, (record_deadline - now_dt).total_seconds())
+    sec_left_calendar = max(0.0, (calendar_deadline - now_dt).total_seconds())
+    req_pace_record_s = sec_left_record / remaining_km
+    req_pace_calendar_s = sec_left_calendar / remaining_km
+    pred_finish_dt = None
+    if prediction.get("finishTime"):
+        try:
+            pred_finish_dt = km.parse_time(prediction["finishTime"])
+        except Exception:
+            try:
+                pred_finish_dt = datetime.strptime(prediction["finishTime"], "%Y-%m-%d %H:%M")
+            except Exception:
+                pred_finish_dt = None
+
+    def _fmt_pace(seconds_per_km: float) -> str:
+        if seconds_per_km <= 0:
+            return "—"
+        m = int(seconds_per_km // 60)
+        s = int(round(seconds_per_km - 60 * m))
+        return f"{m}:{s:02d}/km"
+
+    goal = {
+        "recordCurrent": "9d 2h 29m",
+        "recordDeadlineFromStart": record_deadline.strftime("%Y-%m-%d %H:%M:%S"),
+        "calendarDeadline": calendar_deadline.strftime("%Y-%m-%d %H:%M:%S"),
+        "requiredPaceRecord": _fmt_pace(req_pace_record_s),
+        "requiredPaceCalendar": _fmt_pace(req_pace_calendar_s),
+        "requiredClockPaceRecord": _fmt_pace(req_pace_record_s),
+        "requiredClockPaceCalendar": _fmt_pace(req_pace_calendar_s),
+        "hoursLeftCalendar": round(sec_left_calendar / 3600, 1),
+        "kmPerDayCalendar": round(remaining_km / max(1.0, sec_left_calendar) * 86400, 1),
+        "kmPerHourCalendar": round(remaining_km / max(1.0, sec_left_calendar) * 3600, 2),
+        "remainingKm": round(remaining_km, 1),
+    }
+
+    # Where the current record pace would be "now" (projected on the official route)
+    elapsed_s = max(0.0, (now_dt - start_dt).total_seconds())
+    record_km_now = min(total_km, (elapsed_s / max(1.0, record_dur_s)) * total_km)
+    rp_pos = pos_at_distance_m(coords, dist_m, record_km_now * 1000.0)
+    goal["recordPaceNow"] = {
+        "km": round(record_km_now, 1),
+        "lat": round(rp_pos[0], 6),
+        "lng": round(rp_pos[1], 6),
+        "alt": round(rp_pos[2], 1),
+        "time": now_dt.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    # Where he would need to be right now to finish by 31 May (linear reference)
+    cal_total_s = max(1.0, (calendar_deadline - start_dt).total_seconds())
+    cal_km_now = min(total_km, (elapsed_s / cal_total_s) * total_km)
+    cal_pos = pos_at_distance_m(coords, dist_m, cal_km_now * 1000.0)
+    goal["calendarPaceNow"] = {
+        "km": round(cal_km_now, 1),
+        "lat": round(cal_pos[0], 6),
+        "lng": round(cal_pos[1], 6),
+        "alt": round(cal_pos[2], 1),
+        "time": now_dt.strftime("%Y-%m-%d %H:%M:%S"),
+        "deadline": calendar_deadline.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    # Realistic reference: invert the model to find km_needed_now such that predicted finish <= deadline
+    try:
+        athlete_model = dict(prediction.get("performance") or {})
+        # ensure climb coeff present
+        athlete_model["climbSecPer100m"] = prediction.get("climbSecPer100m", athlete_model.get("climbSecPer100m"))
+        # Binary search in [current_km, total_km]
+        low = float(current_km)
+        high = float(int(total_km))
+        finish_low = estimate_finish_from_km(athlete_model, profile_full, low, total_km, now_dt, start_dt, "main")
+        finish_high = estimate_finish_from_km(athlete_model, profile_full, high, total_km, now_dt, start_dt, "main")
+        km_needed = None
+        if finish_low <= calendar_deadline:
+            km_needed = low
+        elif finish_high > calendar_deadline:
+            km_needed = None
+        else:
+            for _ in range(18):  # ~1e-5 of range
+                mid = (low + high) / 2.0
+                finish_mid = estimate_finish_from_km(
+                    athlete_model, profile_full, mid, total_km, now_dt, start_dt, "main"
+                )
+                if finish_mid <= calendar_deadline:
+                    high = mid
+                else:
+                    low = mid
+            km_needed = high
+
+        if km_needed is not None:
+            rpos = pos_at_distance_m(coords, dist_m, km_needed * 1000.0)
+            goal["calendarPaceNowRealistic"] = {
+                "km": round(km_needed, 1),
+                "lat": round(rpos[0], 6),
+                "lng": round(rpos[1], 6),
+                "alt": round(rpos[2], 1),
+                "time": now_dt.strftime("%Y-%m-%d %H:%M:%S"),
+                "deadline": calendar_deadline.strftime("%Y-%m-%d %H:%M:%S"),
+                "scenario": "main",
+            }
+    except Exception:
+        pass
+    if pred_finish_dt:
+        goal["predFinish"] = pred_finish_dt.strftime("%Y-%m-%d %H:%M:%S")
+        goal["deltaToCalendarMin"] = round((calendar_deadline - pred_finish_dt).total_seconds() / 60)
+        goal["deltaToRecordMin"] = round((record_deadline - pred_finish_dt).total_seconds() / 60)
     return {
         "updatedAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "athlete": {"name": ATHLETE, "bib": 1, "device": DEVICE},
@@ -413,6 +685,7 @@ def build_analytics(
             "firstSplitKm": available[0]["km"] if available else None,
             "partialKm": next((s["km"] for s in splits if s.get("partial")), None),
             "unavailableKmCount": sum(1 for s in splits if s.get("unavailable")),
+            "goal": goal,
         },
         "current": {
             "km": current_km,
@@ -428,7 +701,17 @@ def build_analytics(
         "routeProfileFull": profile_full,
         "prediction": prediction,
         "live": live,
-        "map": build_map_data(coords, dist_m, log, splits, live=live),
+        "map": build_map_data(
+            coords,
+            dist_m,
+            log,
+            splits,
+            live=live,
+            goal=goal,
+            forecast=prediction.get("forecast"),
+            projection_km=proj_km,
+            projection_time=proj_time,
+        ),
         "stats": {
             "fastest": min(available, key=lambda x: x["segment_time_s"]),
             "slowest": max(available, key=lambda x: x["segment_time_s"]),
@@ -588,6 +871,12 @@ def main() -> int:
         "window.ANALYTICS = " + json.dumps(analytics, ensure_ascii=False) + ";\n",
         encoding="utf-8",
     )
+
+    try:
+        hist_path = append_snapshot(analytics)
+        print(f"  Historico:  {hist_path.name} (+1 snapshot)")
+    except Exception as e:
+        print(f"  AVISO historico previsoes: {e}", file=sys.stderr)
 
     print()
     print(f"  Atleta:     {ATHLETE}")

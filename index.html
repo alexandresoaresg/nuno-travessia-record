@@ -30,6 +30,15 @@
   </header>
 
   <main>
+    <nav class="tabs" aria-label="Navegação">
+      <button class="tab active" data-tab="overview" type="button">Visão geral</button>
+      <button class="tab" data-tab="map" type="button">Mapa</button>
+      <button class="tab" data-tab="splits" type="button">Splits</button>
+      <button class="tab" data-tab="prediction" type="button">Objetivos</button>
+    </nav>
+
+    <div class="tab-panels">
+      <section class="tab-panel" data-panel="overview">
     <div class="grid-stats">
       <div class="stat-card" id="stat-km">
         <div class="label">Distância</div>
@@ -47,7 +56,12 @@
         <div class="sub">—</div>
       </div>
       <div class="stat-card" id="stat-pace">
-        <div class="label">Ritmo base</div>
+        <div class="label">Ritmo em movimento</div>
+        <div class="value">—</div>
+        <div class="sub">—</div>
+      </div>
+      <div class="stat-card" id="stat-goal">
+        <div class="label">Meta 31/05 · km/dia</div>
         <div class="value">—</div>
         <div class="sub">—</div>
       </div>
@@ -78,11 +92,14 @@
       </div>
     </section>
 
+      </section>
+
+      <section class="tab-panel" data-panel="map" hidden>
     <section class="map-section">
       <h2>Mapa interativo</h2>
       <div class="panel">
         <div class="map-layout">
-          <div id="map" style="min-height:480px;height:55vh;width:100%;"></div>
+          <div id="map"></div>
           <aside class="map-sidebar">
             <h3>Legenda</h3>
             <ul class="map-legend">
@@ -93,11 +110,13 @@
               <li><span class="swatch" style="background:#38bdf8"></span> Corrida leve</li>
               <li><span class="swatch" style="background:#a78bfa"></span> Andar</li>
               <li><span class="swatch" style="background:#f59e0b"></span> Paragem</li>
+              <li><span class="swatch route-future"></span> Percurso futuro (previsão)</li>
               <li><span class="swatch current"></span> Posição actual (API live)</li>
             </ul>
             <h3>Camadas</h3>
             <div class="map-layers">
               <label><input type="checkbox" id="layer-route" checked> Percurso</label>
+              <label><input type="checkbox" id="layer-future" checked> Previsão no mapa</label>
               <label><input type="checkbox" id="layer-track" checked> Trilho GPS</label>
               <label><input type="checkbox" id="layer-splits" checked> Splits por km</label>
             </div>
@@ -106,12 +125,17 @@
               <input type="range" id="map-timeline" min="0" value="0" />
               <span id="map-timeline-label">—</span>
             </div>
-            <p class="chart-caption" style="margin-top:1rem">Clica num marcador ou numa linha da tabela para centrar o mapa.</p>
+            <p class="chart-caption" style="margin-top:1rem">
+              Passa o rato sobre a linha <strong>verde</strong> (percurso futuro) — área de detecção alargada.
+              Hora prevista a partir do GPS live, com paragens estimadas pelo modelo v3.
+            </p>
           </aside>
         </div>
       </div>
     </section>
+      </section>
 
+      <section class="tab-panel" data-panel="splits" hidden>
     <section>
       <h2>Gráficos</h2>
       <div class="panel-row">
@@ -167,62 +191,104 @@
         </table>
       </div>
     </section>
+      </section>
 
-    <section class="prediction-section">
-      <details class="collapsible" id="prediction-details">
-        <summary class="collapsible-summary">
-          <span class="collapsible-title">Previsão de chegada</span>
-          <span class="collapsible-preview" id="prediction-preview">Modelo híbrido · clica para expandir</span>
-        </summary>
-        <div class="panel collapsible-body">
-          <div class="prediction-meta">
-            <span class="badge badge-science" id="pred-confidence">—</span>
-            <span class="badge" id="pred-blend-label">—</span>
-          </div>
-          <div class="prediction-insights">
-            <div class="insight-card" id="card-performance">
-              <h3>Performance real (GPS)</h3>
-              <ul class="insight-list" id="perf-stats"></ul>
+      <section class="tab-panel" data-panel="prediction" hidden>
+        <section class="conf-finish-hero panel" id="conf-finish-hero" aria-label="Previsão de chegada">
+          <p class="conf-finish-eyebrow">Previsão de chegada · modelo v3</p>
+          <p class="conf-finish-main" id="conf-finish-main">—</p>
+          <p class="conf-finish-sub" id="conf-finish-sub">—</p>
+          <div class="conf-finish-meta">
+            <div class="conf-finish-meta-item">
+              <span class="k">Cenário principal</span>
+              <span class="v" id="conf-finish-hours">—</span>
             </div>
-            <div class="insight-card" id="card-science">
-              <h3>Referência científica</h3>
-              <ul class="insight-list" id="science-stats"></ul>
-              <ul class="science-refs" id="science-refs"></ul>
+            <div class="conf-finish-meta-item">
+              <span class="k">Ritmo projectado</span>
+              <span class="v" id="conf-finish-kmday">—</span>
+            </div>
+            <div class="conf-finish-meta-item">
+              <span class="k">Intervalo</span>
+              <span class="v" id="conf-finish-range">—</span>
             </div>
           </div>
-          <div class="prediction-hero">
-            <div>
-              <div class="finish-time" id="finish-time">—</div>
-              <div id="finish-hours" class="finish-range">—</div>
-              <div id="finish-range" class="finish-range">—</div>
-              <div class="model-controls">
-                <div class="control-row">
-                  <label>Peso dados reais vs literatura <span class="control-val" id="sl-blend-val"></span></label>
-                  <input type="range" id="sl-blend" min="30" max="95" step="1" />
+          <p class="conf-finish-margins" id="conf-finish-margins">—</p>
+        </section>
+
+        <section class="confidence-section">
+          <h2>Confiança nos objetivos</h2>
+          <p class="confidence-lead">
+            Probabilidade de cumprir cada meta com base no <strong>cenário pessimista</strong> do modelo v3, km/dia
+            conservador e margem ao prazo. Se o pessimista falha 31/05, a confiança fica limitada mesmo com o principal a tempo.
+            O ritmo <em>em movimento</em> não se compara directamente com o orçamento de relógio (~18 min/km).
+          </p>
+
+          <div class="conf-grid">
+            <article class="panel conf-card" id="conf-card-calendar">
+              <header class="conf-card-head">
+                <h3>Terminar até domingo 31 de maio</h3>
+                <p class="conf-deadline" id="conf-cal-deadline">—</p>
+              </header>
+              <div class="conf-score-wrap">
+                <div class="conf-ring" id="conf-cal-ring" data-level="mid">
+                  <span class="conf-pct" id="conf-cal-pct">—</span>
                 </div>
-                <div class="control-row">
-                  <label>Ritmo base (ajuste fino) <span class="control-val" id="sl-base-val"></span></label>
-                  <input type="range" id="sl-base" min="5" max="14" step="0.1" />
+                <div class="conf-verdict" id="conf-cal-verdict">—</div>
+                <p class="conf-verdict-sub" id="conf-cal-verdict-sub">—</p>
+              </div>
+              <div class="conf-meter">
+                <div class="conf-meter-fill" id="conf-cal-meter"></div>
+              </div>
+              <ul class="conf-factors" id="conf-cal-factors"></ul>
+            </article>
+
+            <article class="panel conf-card" id="conf-card-record">
+              <header class="conf-card-head">
+                <h3>Bater o record</h3>
+                <p class="conf-deadline" id="conf-rec-deadline">—</p>
+              </header>
+              <div class="conf-score-wrap">
+                <div class="conf-ring" id="conf-rec-ring" data-level="mid">
+                  <span class="conf-pct" id="conf-rec-pct">—</span>
                 </div>
-                <div class="control-row">
-                  <label>Fadiga pessoal (%/km) <span class="control-val" id="sl-fatigue-val"></span></label>
-                  <input type="range" id="sl-fatigue" min="0" max="2" step="0.02" />
+                <div class="conf-verdict" id="conf-rec-verdict">—</div>
+                <p class="conf-verdict-sub" id="conf-rec-verdict-sub">—</p>
+              </div>
+              <div class="conf-meter">
+                <div class="conf-meter-fill" id="conf-rec-meter"></div>
+              </div>
+              <ul class="conf-factors" id="conf-rec-factors"></ul>
+            </article>
+          </div>
+
+          <div class="panel conf-main-detail" id="conf-main-detail"></div>
+
+          <div class="panel conf-scenarios">
+            <h3>Cenários (referência)</h3>
+            <p class="chart-caption">Comparado com cada prazo — margem positiva = chegada antes do limite.</p>
+            <div class="conf-scenario-table" id="conf-scenario-table"></div>
+          </div>
+
+          <details class="conf-advanced">
+            <summary>Dados de performance e método</summary>
+            <div class="conf-adv-body">
+              <div class="prediction-insights">
+                <div class="insight-card">
+                  <h3>Performance real (GPS)</h3>
+                  <ul class="insight-list" id="perf-stats"></ul>
                 </div>
-                <div class="control-row">
-                  <label>Penalização subida <span class="control-val" id="sl-climb-val"></span></label>
-                  <input type="range" id="sl-climb" min="8" max="45" step="1" />
+                <div class="insight-card">
+                  <h3>Referência científica</h3>
+                  <ul class="insight-list" id="science-stats"></ul>
+                  <ul class="science-refs" id="science-refs"></ul>
                 </div>
               </div>
               <p class="model-desc" id="model-desc">—</p>
             </div>
-            <div class="chart-box" style="min-width:280px">
-              <canvas id="chart-forecast"></canvas>
-              <p class="chart-caption">Ritmo previsto (cenário principal, cada 5 km)</p>
-            </div>
-          </div>
-        </div>
-      </details>
-    </section>
+          </details>
+        </section>
+      </section>
+    </div>
   </main>
 
   <footer>

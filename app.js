@@ -64,50 +64,63 @@
     updatedEl.textContent = foot;
   }
 
+
+  // --- Tabs ---
+  function setActiveTab(tabId) {
+    document.querySelectorAll(".tab").forEach((b) => {
+      b.classList.toggle("active", b.dataset.tab === tabId);
+    });
+    document.querySelectorAll(".tab-panel").forEach((p) => {
+      p.hidden = p.dataset.panel !== tabId;
+    });
+    try {
+      localStorage.setItem("travessiaTab", tabId);
+    } catch {}
+    if (tabId === "map") {
+      setTimeout(() => {
+        if (window.__travessiaMapInvalidate) window.__travessiaMapInvalidate();
+        if (window.__travessiaMapRecenter) window.__travessiaMapRecenter();
+      }, 50);
+    }
+    if (tabId === "splits" || tabId === "prediction") {
+      setTimeout(() => {
+        if (window.__travessiaRedrawCharts) window.__travessiaRedrawCharts();
+      }, 50);
+    }
+  }
+  document.querySelectorAll(".tab").forEach((btn) => {
+    btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+  });
+  let initialTab = "overview";
+  try {
+    const saved = localStorage.getItem("travessiaTab");
+    if (saved) initialTab = saved;
+  } catch {}
+  setActiveTab(initialTab);
+
   $("progress-pct").textContent = D.current.progressPct + "%";
   $("progress-km").textContent = currentKm + " / " + totalKm + " km";
   $("progress-fill").style.width = D.current.progressPct + "%";
 
-  const stats = [
-    ["stat-km", currentKm + " km", "Último split: km " + currentKm],
-    ["stat-remain", D.current.remainingKm + " km", "Faltam percorrer"],
-    ["stat-elapsed", D.current.elapsed, "Desde as 11:00"],
-    [
-      "stat-pace",
-      (D.prediction.performance?.weightedPaceMin || D.prediction.basePaceMin) + " min/km",
-      "Pace ponderado (dados reais)",
-    ],
-  ];
-  stats.forEach(([id, v, s]) => {
-    const el = $(id);
-    if (el) {
-      el.querySelector(".value").textContent = v;
-      el.querySelector(".sub").textContent = s;
-    }
-  });
-
-  // --- Hybrid prediction (athlete performance + ultra science priors) ---
+  // --- Prediction model v3 (mirrors prediction_model.py) ---
   const profileFull = D.routeProfileFull || D.routeProfile;
   const P = D.prediction;
   const perf = P.performance || {};
   const sci = P.science || {};
-  const SCI = {
-    climbSecPer100m: sci.climb_sec_per_100m || 18,
-    distanceFatiguePerKm: sci.distance_fatigue_per_km || 0.0012,
-    decayPer10km: sci.base_pace_decay_per_10km || 0.025,
-    nightFactor: sci.night_pace_factor || 1.08,
-    sleepOnsetH: sci.sleep_onset_hours || 36,
-    sleepStopMinPer6h: sci.sleep_stop_min_per_6h || 25,
-    paceFloor: sci.finish_pace_floor_factor || 2.8,
-    optFactor: sci.optimistic_factor || 0.92,
-    pesFactor: sci.pessimistic_factor || 1.14,
+  const caps = sci.caps || {};
+  const CAPS = {
+    fatiguePerKmMax: caps.fatigue_per_km_max ?? 0.0035,
+    decayPer10kmMax: caps.decay_per_10km_after_100_max ?? 0.035,
+    climbPrior: caps.climb_sec_per_100m_prior ?? 18,
   };
-
-  let params = {
-    athleteWeightPct: Math.round((P.athleteWeight || 0.75) * 100),
+  const params = {
     basePaceMin: perf.weightedPaceMin || P.basePaceMin,
-    fatiguePerKm: (P.fatigueRatePerKm || 0.002) * 100,
-    climbSecPer100m: P.climbSecPer100m || perf.climbSecPer100m || SCI.climbSecPer100m,
+    climbSecPer100m: P.climbSecPer100m || perf.climbSecPer100m || CAPS.climbPrior,
+    fatiguePerKm: perf.fatiguePerKm ?? P.fatigueRatePerKm ?? 0,
+    stopProb: perf.stopProbPerKm ?? (perf.stopRatioPct || 0) / 100,
+    avgStopSec: perf.medianStopSec ?? perf.avgStopSec ?? (perf.medianStopMin || perf.avgStopMin || 0) * 60,
+    nightFactor: perf.nightFactor ?? 1 + (perf.nightSlowdownPct || 0) / 100,
+    decayPer10k: perf.decayPer10kmAfter100 ?? 0,
   };
 
   function isNight(d) {
@@ -115,88 +128,482 @@
     return h >= 22 || h < 6;
   }
 
-  function athleteWeightFromPct(pct) {
-    return pct / 100;
+  function scenarioParams(scenario) {
+    const mov = perf.movingPaceSec || (perf.weightedPaceMin || P.basePaceMin) * 60 || 700;
+    if (scenario === "optimistic") {
+      return {
+        movingPaceS: perf.optimisticPaceSec || (perf.p25PaceMin || 0) * 60 || mov * 0.92,
+        fatiguePerKm: Math.min(CAPS.fatiguePerKmMax, params.fatiguePerKm * 0.55),
+        stopProb: Math.min(0.25, params.stopProb * 0.75),
+        avgStopS: params.avgStopSec * 0.85,
+        nightFactor: 1 + (params.nightFactor - 1) * 0.6,
+        decayPer10k: params.decayPer10k * 0.6,
+      };
+    }
+    if (scenario === "pessimistic") {
+      return {
+        movingPaceS: perf.pessimisticPaceSec || (perf.p75PaceMin || 0) * 60 || mov * 1.12,
+        fatiguePerKm: Math.min(CAPS.fatiguePerKmMax, params.fatiguePerKm * 1.35),
+        stopProb: Math.min(0.25, params.stopProb * 1.35),
+        avgStopS: (perf.avgStopSec || params.avgStopSec) * 1.15,
+        nightFactor: Math.max(params.nightFactor, 1.05),
+        decayPer10k: CAPS.decayPer10kmMax * 0.6,
+      };
+    }
+    return {
+      movingPaceS: mov,
+      fatiguePerKm: params.fatiguePerKm,
+      stopProb: params.stopProb,
+      avgStopS: params.avgStopSec,
+      nightFactor: params.nightFactor,
+      decayPer10k: 0,
+    };
   }
 
-  function paceForKm(km, ahead, crossing, elapsedH, scenario) {
-    const w = athleteWeightFromPct(params.athleteWeightPct);
-    const baseS = params.basePaceMin * 60;
-    const fatigueK = params.fatiguePerKm / 100;
+  function paceForKm(km, crossing, scenario, floorKmRef) {
+    const p = scenarioParams(scenario);
+    const ahead = km - floorKmRef;
     const seg = profileFull[km - 1] || { gain: 0, loss: 0 };
-
-    let paceBase = baseS;
-    let fatigue = fatigueK;
-    let climb = params.climbSecPer100m;
-    let nightF = 1 + (perf.nightSlowdownPct || 0) / 100;
-
-    if (scenario === "optimistic") {
-      paceBase = (perf.p25PaceMin || params.basePaceMin) * 60;
-      fatigue *= 0.6;
-      climb *= 0.85;
-    } else if (scenario === "pessimistic") {
-      paceBase = (perf.p75PaceMin || params.basePaceMin) * 60;
-      fatigue *= 1.35;
-      fatigue += SCI.distanceFatiguePerKm;
-      climb *= 1.2;
-      nightF = Math.max(SCI.nightFactor, nightF);
+    let fatigueMult = Math.min(1.4, 1 + p.fatiguePerKm * ahead);
+    if (scenario === "pessimistic" && km > 100 && p.decayPer10k > 0) {
+      const bands = Math.min(12, (km - 100) / 10);
+      fatigueMult = Math.min(1.55, fatigueMult * (1 + p.decayPer10k * 0.15 * bands));
     }
+    const climb = params.climbSecPer100m;
+    const terrain = climb * ((seg.gain || 0) / 100) - 0.25 * climb * ((seg.loss || 0) / 100);
+    let paceS = (1 - p.stopProb) * p.movingPaceS * fatigueMult + p.stopProb * p.avgStopS + terrain;
+    if (isNight(crossing)) paceS *= p.nightFactor;
+    return Math.min(Math.max(paceS, p.movingPaceS * 0.85), p.movingPaceS * 3);
+  }
 
-    const scienceBase = paceBase * (1.04 + 0.00008 * Math.max(0, currentKm - 50));
-    const blended = w * paceBase + (1 - w) * Math.min(scienceBase, paceBase * 1.18);
-
-    let decay = w * (1 + fatigue * ahead) + (1 - w) * (1 + SCI.distanceFatiguePerKm * ahead);
-    if (km > 100) {
-      decay *= 1 + (1 - w) * SCI.decayPer10km * ((km - 100) / 10);
-    }
-
-    const terrain =
-      climb * (seg.gain / 100) - 0.3 * climb * ((seg.loss || 0) / 100);
-    let paceS = blended * decay + terrain;
-
-    if (isNight(crossing)) paceS *= w * nightF + (1 - w) * SCI.nightFactor;
-
-    if (elapsedH >= SCI.sleepOnsetH) {
-      const extra = elapsedH - SCI.sleepOnsetH;
-      paceS += ((SCI.sleepStopMinPer6h / 60) * (extra / 6) / Math.max(1, ahead)) * 60;
-    }
-
-    return Math.min(Math.max(paceS, blended * 0.75), blended * SCI.paceFloor);
+  function projectionAnchor() {
+    const projKm = P.projectionKm != null ? P.projectionKm : currentKm;
+    const projStr =
+      P.projectionTime ||
+      (D.live && D.live.gpsTime) ||
+      D.current.lastCrossing;
+    const projTime = new Date(String(projStr).replace(" ", "T"));
+    const floorKm = Math.floor(projKm);
+    return { projKm, projTime, floorKm };
   }
 
   function predictFinish(scenario) {
     let cum = 0;
     const forecast = [];
-    const lastCross = new Date(D.current.lastCrossing.replace(" ", "T"));
-    const start = new Date((D.event.startTime || D.current.lastCrossing).replace(" ", "T"));
-    let t = lastCross;
+    const { projKm, projTime, floorKm } = projectionAnchor();
+    let t = projTime;
+    const remainingKm = Math.max(0, totalKm - projKm);
+    let nightKm = 0;
+    let climbSecTotal = 0;
+    const sc = scenario || "main";
 
-    for (let km = currentKm + 1; km <= Math.floor(totalKm); km++) {
-      const ahead = km - currentKm;
-      const elapsedH = (t.getTime() - start.getTime()) / 3600000;
-      const paceS = paceForKm(km, ahead, t, elapsedH, scenario || "main");
-      cum += paceS;
-      t = new Date(lastCross.getTime() + cum * 1000);
-      if (ahead % 5 === 0 || km === Math.floor(totalKm)) {
-        forecast.push({ km, paceMin: paceS / 60, gain: (profileFull[km - 1] || {}).gain || 0 });
+    const nextKm = Math.floor(projKm) + 1;
+    if (nextKm <= Math.floor(totalKm)) {
+      const distKm = nextKm - projKm;
+      if (distKm > 1e-6) {
+        const paceS = paceForKm(nextKm, t, sc, floorKm);
+        cum += paceS * distKm;
+        t = new Date(projTime.getTime() + cum * 1000);
       }
     }
 
+    for (let km = nextKm + 1; km <= Math.floor(totalKm); km++) {
+      const ahead = km - floorKm;
+      const paceS = paceForKm(km, t, sc, floorKm);
+      cum += paceS;
+      if (isNight(t)) nightKm += 1;
+      const seg = profileFull[km - 1] || { gain: 0, loss: 0 };
+      climbSecTotal += params.climbSecPer100m * ((seg.gain || 0) / 100);
+      t = new Date(projTime.getTime() + cum * 1000);
+      if (ahead % 5 === 0 || km === Math.floor(totalKm)) {
+        forecast.push({ km, paceMin: paceS / 60, gain: seg.gain || 0 });
+      }
+    }
+    const hours = cum / 3600;
     return {
       finish: t,
-      hours: cum / 3600,
+      hours,
+      days: hours / 24,
       forecast,
+      stats: {
+        remainingKm,
+        avgPaceMin: remainingKm > 0 ? cum / 60 / remainingKm : 0,
+        kmPerDay: hours > 0 ? remainingKm / (hours / 24) : 0,
+        kmPerHour: hours > 0 ? remainingKm / hours : 0,
+        nightKm,
+        nightKmPct: remainingKm > 0 ? (nightKm / remainingKm) * 100 : 0,
+        climbSecTotal,
+        climbMinPerKm: remainingKm > 0 ? climbSecTotal / 60 / remainingKm : 0,
+      },
     };
   }
 
-  function fmtDate(d) {
-    return d.toLocaleString("pt-PT", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  function fmtPaceMin(min) {
+    if (!Number.isFinite(min) || min <= 0) return "—";
+    const m = Math.floor(min);
+    const s = Math.round((min - m) * 60);
+    return m + ":" + String(s).padStart(2, "0") + "/km";
+  }
+
+  function fmtNum(n, d) {
+    return Number.isFinite(n) ? n.toFixed(d) : "—";
+  }
+
+  function updateOverviewStats(mainFinish) {
+    const g = D.event && D.event.goal;
+    const mov = perf.weightedPaceMin || P.movingPaceMin || P.basePaceMin;
+    const main = mainFinish || predictFinish("main");
+    const clockProj = main.stats.avgPaceMin;
+    const clockReqStr = g?.requiredClockPaceCalendar || g?.requiredPaceCalendar;
+    const reqKmDay = g?.kmPerDayCalendar;
+    const projKmDay = main.stats.kmPerDay;
+    const gapKmDay = reqKmDay != null && projKmDay != null ? projKmDay - reqKmDay : null;
+
+    const kmEl = $("stat-km");
+    if (kmEl) {
+      kmEl.querySelector(".value").textContent = currentKm + " km";
+      kmEl.querySelector(".sub").textContent = "Último split: km " + currentKm;
+    }
+    const remEl = $("stat-remain");
+    if (remEl) {
+      remEl.querySelector(".value").textContent = D.current.remainingKm + " km";
+      remEl.querySelector(".sub").textContent = "Faltam percorrer";
+    }
+    const elEl = $("stat-elapsed");
+    if (elEl) {
+      elEl.querySelector(".value").textContent = D.current.elapsed;
+      elEl.querySelector(".sub").textContent = "Desde as 11:00";
+    }
+    const paceEl = $("stat-pace");
+    if (paceEl) {
+      paceEl.querySelector(".value").textContent = fmtPaceMin(mov);
+      paceEl.querySelector(".sub").textContent =
+        "Só km em movimento · global corrido " + fmtPaceMin(perf.overallPaceMin);
+    }
+    const goalEl = $("stat-goal");
+    if (goalEl && g) {
+      goalEl.querySelector(".value").textContent =
+        fmtNum(projKmDay, 1) + " vs " + fmtNum(reqKmDay, 1) + " km/dia";
+      const gapTxt =
+        gapKmDay != null
+          ? (gapKmDay >= 0 ? "+" : "") + fmtNum(gapKmDay, 1) + " km/dia · "
+          : "";
+      goalEl.querySelector(".sub").textContent =
+        gapTxt +
+        "Relógio previsto " +
+        fmtPaceMin(clockProj) +
+        " · orçamento 31/05 " +
+        (clockReqStr || "—");
+    }
+  }
+
+  function fmtHM(mins) {
+    const m = Math.abs(mins);
+    const h = Math.floor(m / 60);
+    const mm = m % 60;
+    return (mins < 0 ? "−" : "+") + h + "h" + (mm ? " " + mm + "m" : "");
+  }
+
+  function marginMinutes(deadlineStr, finishDt) {
+    return Math.round(
+      (new Date(deadlineStr.replace(" ", "T")) - finishDt) / 60000
+    );
+  }
+
+  function probFromMargin(marginMin, scaleMin) {
+    return 1 / (1 + Math.exp((-marginMin / scaleMin) * 4));
+  }
+
+  function confidenceLevel(pct) {
+    if (pct >= 65) return "high";
+    if (pct >= 35) return "mid";
+    return "low";
+  }
+
+  function confidenceLabel(pct) {
+    if (pct >= 65) return "Boa confiança";
+    if (pct >= 35) return "Confiança moderada";
+    return "Baixa confiança";
+  }
+
+  function requiredKmPerDay(deadlineStr, remainingKm) {
+    const dl = new Date(deadlineStr.replace(" ", "T"));
+    const hoursLeft = (dl - new Date()) / 3600000;
+    if (hoursLeft <= 0 || !remainingKm) return null;
+    return remainingKm / (hoursLeft / 24);
+  }
+
+  function computeGoalConfidence(opts) {
+    const { deadlineStr, referenceKm, requiredPaceStr, requiredKmDay, finishes } = opts;
+    const mOpt = marginMinutes(deadlineStr, finishes.optimistic.finish);
+    const mMain = marginMinutes(deadlineStr, finishes.main.finish);
+    const mPes = marginMinutes(deadlineStr, finishes.pessimistic.finish);
+
+    const proven = provenPaceStats();
+    const projectedKmDay = finishes.main?.stats?.kmPerDay;
+    const demonstratedCandidates = [
+      proven.kmDay40,
+      proven.kmDayGlobal,
+      projectedKmDay,
+    ].filter((v) => v != null && Number.isFinite(v) && v > 0);
+    const demonstrated =
+      demonstratedCandidates.length > 0
+        ? Math.min(...demonstratedCandidates)
+        : null;
+    const reqKmDay = requiredKmDay;
+
+    let pct;
+
+    if (mPes >= 720) {
+      pct = 92 + Math.min(5, Math.floor((mPes - 720) / 360));
+    } else if (mPes >= 360) {
+      pct = 86 + Math.min(6, Math.floor((mPes - 360) / 60));
+    } else if (mPes >= 180) {
+      pct = 78 + Math.min(8, Math.floor((mPes - 180) / 30));
+    } else if (mPes >= 60) {
+      pct = 68 + Math.min(10, Math.floor((mPes - 60) / 12));
+    } else if (mPes >= 0) {
+      pct = 58 + Math.min(10, Math.floor(mPes / 6));
+    } else if (mPes >= -180) {
+      pct = 42 + Math.min(18, Math.floor((mMain + 180) / 25));
+    } else if (mPes >= -720) {
+      pct = 22 + Math.min(22, Math.floor((mMain + 360) / 30));
+    } else if (mMain >= 0) {
+      pct = 36 + Math.min(22, Math.floor(mMain / 12));
+    } else {
+      pct = 8 + Math.min(14, Math.floor(Math.max(0, mMain + 720) / 90));
+    }
+
+    if (demonstrated != null && reqKmDay != null && reqKmDay > 0) {
+      const demoRatio = demonstrated / reqKmDay;
+      if (mPes >= 0) {
+        if (demoRatio >= 1.2) pct += 6;
+        else if (demoRatio >= 1.05) pct += 3;
+        else if (demoRatio >= 0.92) pct += 0;
+        else if (demoRatio >= 0.8) pct -= 8;
+        else pct -= 18;
+      } else if (mPes >= -360) {
+        if (demoRatio >= 1.15) pct += 3;
+        else if (demoRatio < 0.9) pct -= 10;
+      } else {
+        if (demoRatio < 1.0) pct -= 12;
+      }
+    }
+
+    const reqSec = requiredPaceStr ? parsePaceStr(requiredPaceStr) : null;
+    const projClockMin = finishes.main?.stats?.avgPaceMin;
+    const projSec = projClockMin != null ? projClockMin * 60 : null;
+    if (reqSec && projSec) {
+      const headroom = (reqSec - projSec) / reqSec;
+      if (headroom > 0.08) pct += 6;
+      else if (headroom > 0.02) pct += 3;
+      else if (headroom < -0.08) pct -= Math.min(18, Math.round(-headroom * 35));
+    }
+
+    if (
+      mPes >= 0 &&
+      mMain >= 0 &&
+      demonstrated != null &&
+      reqKmDay != null &&
+      demonstrated >= reqKmDay * 1.05
+    ) {
+      const floorDemo =
+        52 +
+        Math.min(28, Math.floor(mMain / 15) + (demonstrated / reqKmDay - 1) * 22);
+      pct = Math.max(pct, floorDemo);
+    }
+
+    if (mPes < 0) {
+      let cap = 72;
+      if (mPes < -180) cap = mMain >= 0 ? 65 : 50;
+      if (mPes < -720) cap = mMain >= 0 ? 58 : 40;
+      if (mPes < -1200) cap = mMain >= 0 ? 52 : 34;
+      if (mMain < 0) cap = Math.min(cap, 30);
+      pct = Math.min(pct, cap);
+    }
+
+    if (mPes < 180 && perf.stopRatioPct > 12) {
+      pct -= Math.min(8, Math.round((perf.stopRatioPct - 12) * 1.2));
+    }
+
+    pct = Math.round(Math.max(5, Math.min(92, pct)));
+
+    const factors = [
+      {
+        k: "Cenário pessimista",
+        v: fmtHM(mPes) + " vs prazo",
+        cls: mPes >= 180 ? "good" : mPes >= 0 ? "warn" : "bad",
+      },
+      {
+        k: "Cenário principal",
+        v: fmtHM(mMain) + " vs prazo",
+        cls: mMain >= 0 ? "good" : mMain >= -180 ? "warn" : "bad",
+      },
+    ];
+
+    if (demonstrated != null && reqKmDay != null) {
+      const demoRatio = demonstrated / reqKmDay;
+      factors.push({
+        k: "Km/dia (conservador) vs meta",
+        v:
+          fmtNum(demonstrated, 1) +
+          " km/dia vs " +
+          fmtNum(reqKmDay, 1) +
+          " necessários (" +
+          (demoRatio >= 1 ? "+" : "") +
+          Math.round((demoRatio - 1) * 100) +
+          "%)",
+        cls: demoRatio >= 1.1 ? "good" : demoRatio >= 0.9 ? "warn" : "bad",
+      });
+    }
+
+    if (reqSec && projSec) {
+      const gapPct = Math.round(((projSec - reqSec) / reqSec) * 100);
+      factors.push({
+        k: "Ritmo de relógio (previsão vs orçamento)",
+        v:
+          fmtPaceMin(projClockMin) +
+          " vs " +
+          requiredPaceStr +
+          (gapPct ? ` (${gapPct > 0 ? "+" : ""}${gapPct}% mais lento)` : ""),
+        cls: gapPct <= 3 ? "good" : gapPct <= 12 ? "warn" : "bad",
+      });
+    }
+
+    if (referenceKm != null) {
+      const kmAhead = currentKm - referenceKm;
+      factors.push({
+        k: "Posição no percurso",
+        v: (kmAhead >= 0 ? "+" : "") + kmAhead.toFixed(1) + " km vs ritmo alvo",
+        cls: kmAhead >= 5 ? "good" : kmAhead >= -5 ? "warn" : "bad",
+      });
+    }
+
+    let verdictSub;
+    if (pct >= 80) {
+      verdictSub =
+        mPes >= 0
+          ? "Até no pior cenário ainda chegas com folga ao prazo."
+          : "Cenário principal a tempo, mas o pessimista falha o prazo — incerteza relevante.";
+    } else if (pct >= 60) {
+      verdictSub =
+        "Boa probabilidade para um amador nesta distância, com alguma incerteza em fadiga ou paragens.";
+    } else if (pct >= 40) {
+      verdictSub = "Possível, mas é preciso manter ritmo e evitar atrasos longos.";
+    } else {
+      verdictSub = "Risco elevado: ritmo demonstrado ou cenários abaixo do necessário.";
+    }
+
+    return {
+      pct,
+      level: confidenceLevel(pct),
+      label: confidenceLabel(pct),
+      verdictSub,
+      factors,
+      margins: { opt: mOpt, main: mMain, pes: mPes },
+    };
+  }
+
+  function parsePaceStr(s) {
+    const m = String(s).match(/(\d+):(\d+)\/km/);
+    return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
+  }
+
+  function renderConfidenceCard(prefix, conf, deadlineLabel) {
+    const ring = $(prefix + "-ring");
+    if (ring) ring.dataset.level = conf.level;
+    const pctEl = $(prefix + "-pct");
+    if (pctEl) pctEl.textContent = conf.pct + "%";
+    const verdict = $(prefix + "-verdict");
+    if (verdict) verdict.textContent = conf.label;
+    const sub = $(prefix + "-verdict-sub");
+    if (sub) sub.textContent = conf.verdictSub;
+    const meter = $(prefix + "-meter");
+    if (meter) meter.style.width = conf.pct + "%";
+    const dl = $(prefix + "-deadline");
+    if (dl) dl.textContent = deadlineLabel;
+    const factorsEl = $(prefix + "-factors");
+    if (factorsEl) {
+      factorsEl.innerHTML = conf.factors
+        .map((f) => `<li><span class="k">${f.k}</span><span class="v ${f.cls || ""}">${f.v}</span></li>`)
+        .join("");
+    }
+  }
+
+  function provenPaceStats() {
+    const start = new Date((D.event.startTime || D.current.lastCrossing).replace(" ", "T"));
+    const lastCross = new Date(D.current.lastCrossing.replace(" ", "T"));
+    const elapsedH = (lastCross - start) / 3600000;
+    let kmAt40 = null;
+    for (const s of D.splits || []) {
+      if (s.unavailable || s.partial || !s.crossing_time) continue;
+      const h = (new Date(s.crossing_time.replace(" ", "T")) - start) / 3600000;
+      if (h <= 40) kmAt40 = s.km;
+    }
+    return {
+      kmDayGlobal: elapsedH > 0 ? currentKm / (elapsedH / 24) : null,
+      kmAt40,
+      kmDay40: kmAt40 != null ? (kmAt40 / 40) * 24 : null,
+      weightedKmDay: params.basePaceMin > 0 ? (24 * 60) / params.basePaceMin : null,
+    };
+  }
+
+  function buildMainScenarioDetail(main) {
+    const g = D.event.goal;
+    const st = main.stats;
+    const mainP = scenarioParams("main");
+    const proven = provenPaceStats();
+    const reqKmDayCal = g?.kmPerDayCalendar;
+    const gapCal = reqKmDayCal != null && st.kmPerDay != null ? st.kmPerDay - reqKmDayCal : null;
+    const mCal = g?.calendarDeadline ? marginMinutes(g.calendarDeadline, main.finish) : null;
+    const mRec = g?.recordDeadlineFromStart ? marginMinutes(g.recordDeadlineFromStart, main.finish) : null;
+    return {
+      proven,
+      gapCal,
+      reqKmDayCal,
+      blocks: [
+        {
+          title: "O que já demonstrou (GPS)",
+          rows: [
+            ["Média global", fmtNum(proven.kmDayGlobal, 1) + " km/dia"],
+            ["Primeiras ~40 h", fmtNum(proven.kmAt40, 0) + " km · " + fmtNum(proven.kmDay40, 1) + " km/dia"],
+            ["Ritmo recente", fmtPaceMin(params.basePaceMin) + " ≈ " + fmtNum(proven.weightedKmDay, 1) + " km/dia"],
+            ["Meta 31/05", (reqKmDayCal || "—") + " km/dia"],
+          ],
+        },
+        {
+          title: "Projectado (cenário principal v3)",
+          rows: [
+            ["Km/dia à frente", fmtNum(st.kmPerDay, 1) + " km/dia"],
+            ["Ritmo médio efectivo", fmtPaceMin(st.avgPaceMin)],
+            ["Chegada", main.finish.toLocaleString("pt-PT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })],
+            ["vs 31/05", mCal != null ? fmtHM(mCal) : "—"],
+            ["vs record", mRec != null ? fmtHM(mRec) : "—"],
+          ],
+        },
+        {
+          title: "Parâmetros medidos",
+          rows: [
+            ["Paragens", (mainP.stopProb * 100).toFixed(1) + "% × " + fmtNum(mainP.avgStopS / 60, 0) + " min (mediana)"],
+            ["Fadiga", (mainP.fatiguePerKm * 100).toFixed(3) + "%/km (cap lit. " + (CAPS.fatiguePerKmMax * 100).toFixed(2) + "%)"],
+            ["Noite", "×" + fmtNum(mainP.nightFactor, 2)],
+            ["Subida", params.climbSecPer100m + " s/100m D+"],
+          ],
+        },
+      ],
+      sampleRows: (main.forecast || []).slice(0, 8).map((f) => `<tr><td>${f.km}</td><td>${fmtPaceMin(f.paceMin)}</td><td>${f.gain || 0} m</td></tr>`).join(""),
+    };
+  }
+
+  function renderMainScenarioDetail(main) {
+    const panel = $("conf-main-detail");
+    if (!panel) return;
+    const { blocks, sampleRows, proven, gapCal, reqKmDayCal } = buildMainScenarioDetail(main);
+    panel.innerHTML = `<h3>Cenário principal — modelo v3</h3>
+      <p class="chart-caption conf-callout">Calibrado no percurso do Nuno (${fmtNum(proven.kmDay40, 0)} km/dia nas primeiras 40 h). Projecta <strong>${fmtNum(main.stats.kmPerDay, 1)} km/dia</strong> — meta 31/05: ${reqKmDayCal} km/dia (${gapCal >= 0 ? "+" : ""}${fmtNum(gapCal, 1)} km/dia).</p>
+      <p class="chart-caption">E[min/km] = (1−p_paragem)×ritmo×fadiga×noite + p_paragem×duração + subida. Sem penalização fixa de sono.</p>
+      <div class="conf-detail-grid">${blocks.map((b) => `<div class="conf-detail-block"><h4>${b.title}</h4><ul class="conf-detail-rows">${b.rows.map(([k,v]) => `<li><span class="k">${k}</span><span class="v">${v}</span></li>`).join("")}</ul></div>`).join("")}</div>
+      <details class="conf-detail-sample"><summary>Ritmo de 5 em 5 km</summary><table><thead><tr><th>Km</th><th>Ritmo</th><th>D+</th></tr></thead><tbody>${sampleRows}</tbody></table></details>`;
   }
 
   function renderInsightPanels() {
@@ -204,108 +611,129 @@
     const sciEl = $("science-stats");
     const refsEl = $("science-refs");
     if (!perfEl || !sciEl) return;
-
-    const perfRows = [
-      ["Ritmo ponderado (30 km)", (perf.weightedPaceMin || "—") + " min/km"],
-      ["Ritmo global corrido", (perf.overallPaceMin || "—") + " min/km"],
-      ["Mediana em movimento", (perf.medianPaceMin || "—") + " min/km"],
-      ["Faixa P25–P75", (perf.p25PaceMin || "—") + " – " + (perf.p75PaceMin || "—")],
-      ["Fadiga início→fim", (perf.fatiguePctEarlyLate || "—") + "%"],
-      ["Km com paragem", (perf.stopRatioPct || "—") + "%"],
-      ["Paragem média", (perf.avgStopMin || "—") + " min"],
-      ["Mais lento à noite", (perf.nightSlowdownPct || "0") + "%"],
-      ["Subida aprendida", (perf.climbSecPer100m || P.climbSecPer100m || "—") + " s/100m D+"],
-    ];
-    perfEl.innerHTML = perfRows
-      .map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`)
-      .join("");
-
-    const sciRows = [
-      ["Decaimento / 10 km (>100 km)", (SCI.decayPer10km * 100).toFixed(1) + "%"],
-      ["Fadiga distância (literatura)", (SCI.distanceFatiguePerKm * 100).toFixed(2) + "%/km"],
-      ["Subida referência", SCI.climbSecPer100m + " s/100m D+"],
-      ["Factor nocturno", "+" + Math.round((SCI.nightFactor - 1) * 100) + "%"],
-      ["Sono (após " + SCI.sleepOnsetH + " h)", "+" + SCI.sleepStopMinPer6h + " min/6h"],
-    ];
-    sciEl.innerHTML = sciRows
-      .map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`)
-      .join("");
-
+    perfEl.innerHTML = [
+      ["Ritmo ponderado", (perf.weightedPaceMin || "—") + " min/km"],
+      ["Mediana movimento", (perf.medianPaceMin || "—") + " min/km"],
+      ["P25–P75", (perf.p25PaceMin || "—") + " – " + (perf.p75PaceMin || "—")],
+      ["Paragens", (perf.stopRatioPct || "—") + "% · mediana " + (perf.medianStopMin || perf.avgStopMin || "—") + " min"],
+      ["Fadiga medida", ((perf.fatiguePerKm || 0) * 100).toFixed(3) + "%/km"],
+      ["Noite", "+" + (perf.nightSlowdownPct || 0) + "%"],
+      ["Subida", (perf.climbSecPer100m || P.climbSecPer100m) + " s/100m D+"],
+    ].map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`).join("");
+    sciEl.innerHTML = [
+      ["Cap fadiga", (CAPS.fatiguePerKmMax * 100).toFixed(2) + "%/km"],
+      ["Cap decaimento >100 km", (CAPS.decayPer10kmMax * 100).toFixed(1) + "%/10 km"],
+      ["Subida prior (Minetti)", CAPS.climbPrior + " s/100m"],
+    ].map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`).join("");
     if (refsEl && sci.sources) {
       refsEl.innerHTML = sci.sources
-        .map((s) => `<li><strong>${s.id}</strong>: ${s.note}</li>`)
+        .map((s) => {
+          const t = s.title || s.id;
+          const link = s.url ? `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${t}</a>` : `<strong>${t}</strong>`;
+          return `<li>${link}: ${s.note}</li>`;
+        })
         .join("");
     }
-
-    const conf = $("pred-confidence");
-    const blend = $("pred-blend-label");
-    if (conf) conf.textContent = "Confiança ~" + (P.confidencePct || "—") + "%";
-    if (blend)
-      blend.textContent =
-        "Mix " +
-        params.athleteWeightPct +
-        "% real / " +
-        (100 - params.athleteWeightPct) +
-        "% literatura";
     const desc = $("model-desc");
-    if (desc)
-      desc.innerHTML =
-        (P.model || "") +
-        ". Com mais km percorridos, o peso dos <strong>dados reais</strong> aumenta. " +
-        "Cenários otimista/pessimista usam P25/P75 do ritmo e fadiga ajustada.";
-  }
-
-  function updatePrediction() {
-    const main = predictFinish("main");
-    const opt = predictFinish("optimistic");
-    const pes = predictFinish("pessimistic");
-
-    $("finish-time").textContent = fmtDate(main.finish);
-    $("finish-hours").textContent =
-      "~" + main.hours.toFixed(1) + " h (" + (main.hours / 24).toFixed(1) + " dias)";
-    $("finish-range").textContent =
-      "Otimista: " +
-      fmtDate(opt.finish) +
-      " · Pessimista: " +
-      fmtDate(pes.finish);
-    const preview = $("prediction-preview");
-    if (preview) {
-      preview.textContent =
-        fmtDate(main.finish) + " · ~" + main.hours.toFixed(0) + " h restantes";
+    if (desc) {
+      desc.innerHTML = `<strong>${P.model || "Modelo v3"}</strong> (v${P.modelVersion || 3}). ${(P.modelParams && P.modelParams.description) || ""} Fontes com links abaixo.`;
     }
-    drawForecastChart(main.forecast);
+  }
+
+  function fmtFinishDate(dt) {
+    if (!dt || !(dt instanceof Date) || Number.isNaN(dt.getTime())) return "—";
+    try {
+      const datePart = dt.toLocaleDateString("pt-PT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+      const timePart = dt.toLocaleTimeString("pt-PT", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return datePart.charAt(0).toUpperCase() + datePart.slice(1) + " · " + timePart;
+    } catch {
+      return String(dt).replace("T", " · ");
+    }
+  }
+
+  function renderFinishHero(finishes, g) {
+    if (!$("conf-finish-hero") || !finishes?.main) return;
+    const main = finishes.main;
+    const opt = finishes.optimistic;
+    const pes = finishes.pessimistic;
+    const mCal = marginMinutes(g.calendarDeadline, main.finish);
+    const mRec = marginMinutes(g.recordDeadlineFromStart, main.finish);
+
+    $("conf-finish-main").textContent = fmtFinishDate(main.finish);
+    $("conf-finish-sub").textContent =
+      "~" +
+      fmtNum(main.hours, 1) +
+      " h restantes (" +
+      fmtNum(main.days, 1) +
+      " dias) · km " +
+      currentKm +
+      " / " +
+      totalKm;
+
+    $("conf-finish-hours").textContent =
+      fmtNum(main.hours, 1) + " h · " + fmtNum(main.days, 1) + " dias";
+    $("conf-finish-kmday").textContent = fmtNum(main.stats.kmPerDay, 1) + " km/dia";
+    $("conf-finish-range").textContent =
+      fmtFinishDate(opt.finish) + " → " + fmtFinishDate(pes.finish);
+
+    const marginsEl = $("conf-finish-margins");
+    if (marginsEl) {
+      const calClass = mCal >= 0 ? "" : mCal >= -180 ? "warn" : "bad";
+      const recClass = mRec >= 0 ? "" : mRec >= -180 ? "warn" : "bad";
+      marginsEl.innerHTML =
+        'Margem vs <strong>31/05</strong>: <span class="' +
+        calClass +
+        '">' +
+        fmtHM(mCal) +
+        '</span> (principal) · vs <strong>record</strong>: <span class="' +
+        recClass +
+        '">' +
+        fmtHM(mRec) +
+        "</span>";
+    }
+  }
+
+  function updateConfidence() {
+    const g = D.event && D.event.goal;
+    if (!g) return;
+    const finishes = {
+      main: predictFinish("main"),
+      optimistic: predictFinish("optimistic"),
+      pessimistic: predictFinish("pessimistic"),
+    };
+    renderFinishHero(finishes, g);
+    const calConf = computeGoalConfidence({ deadlineStr: g.calendarDeadline, referenceKm: g.calendarPaceNow?.km, requiredPaceStr: g.requiredPaceCalendar, requiredKmDay: g.kmPerDayCalendar, finishes });
+    const recConf = computeGoalConfidence({ deadlineStr: g.recordDeadlineFromStart, referenceKm: g.recordPaceNow?.km, requiredPaceStr: g.requiredPaceRecord, requiredKmDay: requiredKmPerDay(g.recordDeadlineFromStart, g.remainingKm), finishes });
+    renderConfidenceCard("conf-cal", calConf, "Prazo 31/05 23:59 · " + g.remainingKm + " km restantes");
+    renderConfidenceCard("conf-rec", recConf, "Record " + (g.recordCurrent || "") + " · limite " + (g.recordDeadlineFromStart || "").replace(" ", " · "));
+    const table = $("conf-scenario-table");
+    if (table) {
+      const row = (label, a, b) => `<div class="conf-scenario-row"><span>${label}</span><span class="cell ${a >= 0 ? "good" : "bad"}">31/05: ${fmtHM(a)}</span><span class="cell ${b >= 0 ? "good" : "bad"}">Record: ${fmtHM(b)}</span></div>`;
+      table.innerHTML = `<div class="conf-scenario-row head"><span>Cenário</span><span>vs 31/05</span><span>vs record</span></div>` + row("Optimista", calConf.margins.opt, recConf.margins.opt) + row("Principal", calConf.margins.main, recConf.margins.main) + row("Pessimista", calConf.margins.pes, recConf.margins.pes);
+    }
+    renderMainScenarioDetail(finishes.main);
     renderInsightPanels();
+    updateOverviewStats(finishes.main);
   }
 
-  function bindSlider(id, key, fmt) {
-    const input = $(id);
-    const label = $(id + "-val");
-    if (!input || !label) return;
-    input.value = params[key];
-    label.textContent = fmt(params[key]);
-    input.addEventListener("input", () => {
-      params[key] = parseFloat(input.value);
-      label.textContent = fmt(params[key]);
-      updatePrediction();
-    });
-  }
-  bindSlider("sl-blend", "athleteWeightPct", (v) => v + "%");
-  bindSlider("sl-base", "basePaceMin", (v) => v.toFixed(1) + " min/km");
-  bindSlider("sl-fatigue", "fatiguePerKm", (v) => v.toFixed(2) + "%/km");
-  bindSlider("sl-climb", "climbSecPer100m", (v) => v.toFixed(0) + " s/100m D+");
-  renderInsightPanels();
-  updatePrediction();
-
-  const predictionDetails = $("prediction-details");
-  if (predictionDetails) {
-    predictionDetails.addEventListener("toggle", () => {
-      if (predictionDetails.open) updatePrediction();
-    });
+  try {
+    updateConfidence();
+  } catch (err) {
+    console.error("updateConfidence:", err);
   }
 
   // --- Charts ---
   function setupCanvas(canvas, height) {
+    if (!canvas || !canvas.parentElement) return null;
     const rect = canvas.parentElement.getBoundingClientRect();
+    if (!rect.width || rect.width < 80) return null;
     const dpr = window.devicePixelRatio || 1;
     canvas.width = rect.width * dpr;
     canvas.height = height * dpr;
@@ -317,17 +745,22 @@
 
   function drawPaceChart() {
     const canvas = $("chart-pace");
-    const { ctx, w, h } = setupCanvas(canvas, 220);
-    const splits = D.splits.filter((s) => !s.unavailable && !s.partial);
+    const s = setupCanvas(canvas, 220);
+    if (!s) return;
+    const { ctx, w, h } = s;
+    const splits = D.splits.filter((x) => !x.unavailable && !x.partial);
+    if (!splits.length) return;
     const pad = { l: 44, r: 16, t: 16, b: 32 };
-    const maxP = Math.max(...splits.map((s) => s.segment_time_s / 60), 12);
+    const paces = splits.map((x) => x.segment_time_s / 60);
+    const sorted = [...paces].sort((a, b) => a - b);
+    const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
+    const maxP = Math.max(p95 * 1.05, 12);
     const minKm = splits[0].km;
     const maxKm = splits[splits.length - 1].km;
 
     ctx.fillStyle = "#151920";
     ctx.fillRect(0, 0, w, h);
 
-    // grid
     ctx.strokeStyle = "#2a3344";
     ctx.lineWidth = 1;
     for (let p = 0; p <= maxP; p += 5) {
@@ -342,15 +775,15 @@
     }
 
     const barW = Math.max(2, ((w - pad.l - pad.r) / splits.length) * 0.7);
-    splits.forEach((s) => {
-      const pace = s.segment_time_s / 60;
+    splits.forEach((seg) => {
+      const pace = seg.segment_time_s / 60;
       const x =
         pad.l +
-        ((s.km - minKm) / (maxKm - minKm)) * (w - pad.l - pad.r) -
+        ((seg.km - minKm) / (maxKm - minKm)) * (w - pad.l - pad.r) -
         barW / 2;
       const bh = (pace / maxP) * (h - pad.t - pad.b);
       const y = h - pad.b - bh;
-      ctx.fillStyle = s.categoryColor || "#3d8bfd";
+      ctx.fillStyle = seg.categoryColor || "#3d8bfd";
       ctx.fillRect(x, y, barW, bh);
     });
 
@@ -366,7 +799,9 @@
 
   function drawElevChart() {
     const canvas = $("chart-elev");
-    const { ctx, w, h } = setupCanvas(canvas, 200);
+    const s = setupCanvas(canvas, 200);
+    if (!s) return;
+    const { ctx, w, h } = s;
     const prof = D.routeProfile;
     const pad = { l: 44, r: 16, t: 16, b: 28 };
     const maxKm = prof[prof.length - 1].km;
@@ -394,7 +829,6 @@
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // current position
     const cx = pad.l + (currentKm / maxKm) * (w - pad.l - pad.r);
     ctx.strokeStyle = "#22c55e";
     ctx.lineWidth = 2;
@@ -414,41 +848,20 @@
     ctx.fillText("m", 8, pad.t + 10);
   }
 
-  function drawForecastChart(forecast) {
-    const canvas = $("chart-forecast");
-    if (!forecast.length) return;
-    const { ctx, w, h } = setupCanvas(canvas, 160);
-    const pad = { l: 40, r: 12, t: 12, b: 28 };
-    const maxP = Math.max(...forecast.map((f) => f.paceMin), 12);
-
-    ctx.fillStyle = "#151920";
-    ctx.fillRect(0, 0, w, h);
-    const minK = forecast[0].km;
-    const maxK = forecast[forecast.length - 1].km;
-
-    ctx.strokeStyle = "#22c55e";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    forecast.forEach((f, i) => {
-      const x = pad.l + ((f.km - minK) / (maxK - minK)) * (w - pad.l - pad.r);
-      const y = pad.t + (1 - f.paceMin / maxP) * (h - pad.t - pad.b);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    ctx.fillStyle = "#8b95a8";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("Ritmo previsto (min/km) — próximos km", pad.l, h - 6);
-  }
-
-  drawPaceChart();
-  drawElevChart();
-
-  window.addEventListener("resize", () => {
+  window.__travessiaRedrawCharts = function () {
     drawPaceChart();
     drawElevChart();
-    updatePrediction();
+    try {
+      updateConfidence();
+    } catch (err) {
+      console.error("updateConfidence:", err);
+    }
+  };
+
+  window.__travessiaRedrawCharts();
+
+  window.addEventListener("resize", () => {
+    window.__travessiaRedrawCharts();
   });
 
   // --- Table ---
