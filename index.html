@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travessia — Análise Nuno Faria</title>
+  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+<body>
+  <div id="data-refresh-overlay" class="data-refresh-overlay" hidden>
+    <div class="data-refresh-box">
+      <div class="data-refresh-spinner"></div>
+      <p class="data-refresh-title">A actualizar dados</p>
+      <p class="data-refresh-status" id="data-refresh-status">A ligar à API Stop&Go…</p>
+    </div>
+  </div>
+  <header>
+    <div>
+      <h1 id="athlete-name">Nuno Faria</h1>
+      <p class="meta" id="event-name">Travessia</p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Progresso</span>
+        <span><span id="progress-pct">0</span>% · <span id="progress-km">0</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid-stats">
+      <div class="stat-card" id="stat-km">
+        <div class="label">Distância</div>
+        <div class="value">—</div>
+        <div class="sub">—</div>
+      </div>
+      <div class="stat-card" id="stat-remain">
+        <div class="label">Restante</div>
+        <div class="value">—</div>
+        <div class="sub">—</div>
+      </div>
+      <div class="stat-card" id="stat-elapsed">
+        <div class="label">Tempo decorrido</div>
+        <div class="value">—</div>
+        <div class="sub">—</div>
+      </div>
+      <div class="stat-card" id="stat-pace">
+        <div class="label">Ritmo base</div>
+        <div class="value">—</div>
+        <div class="sub">—</div>
+      </div>
+    </div>
+
+    <section class="live-section" id="live-section" hidden>
+      <div class="live-strip">
+        <div class="live-card live-card-primary">
+          <div class="label">Último GPS (ao vivo)</div>
+          <div class="value" id="live-gps-time">—</div>
+          <div class="sub" id="live-gps-lag">—</div>
+        </div>
+        <div class="live-card">
+          <div class="label">Bateria actual</div>
+          <div class="value" id="live-battery">—</div>
+          <div class="sub" id="live-status">—</div>
+        </div>
+        <div class="live-card">
+          <div class="label">Posição no percurso</div>
+          <div class="value" id="live-position">—</div>
+          <div class="sub" id="live-coords">—</div>
+        </div>
+        <div class="live-card live-card-muted">
+          <div class="label">Histórico (trackersLog)</div>
+          <div class="value live-small" id="live-log-time">—</div>
+          <div class="sub">Splits e ritmo usam este log (~1 h de atraso)</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="prediction-section">
+      <h2>Previsão de chegada</h2>
+      <div class="panel">
+        <div class="prediction-meta">
+          <span class="badge badge-science" id="pred-confidence">—</span>
+          <span class="badge" id="pred-blend-label">—</span>
+        </div>
+        <div class="prediction-insights">
+          <div class="insight-card" id="card-performance">
+            <h3>Performance real (GPS)</h3>
+            <ul class="insight-list" id="perf-stats"></ul>
+          </div>
+          <div class="insight-card" id="card-science">
+            <h3>Referência científica</h3>
+            <ul class="insight-list" id="science-stats"></ul>
+            <ul class="science-refs" id="science-refs"></ul>
+          </div>
+        </div>
+        <div class="prediction-hero">
+          <div>
+            <div class="finish-time" id="finish-time">—</div>
+            <div id="finish-hours" class="finish-range">—</div>
+            <div id="finish-range" class="finish-range">—</div>
+            <div class="model-controls">
+              <div class="control-row">
+                <label>Peso dados reais vs literatura <span class="control-val" id="sl-blend-val"></span></label>
+                <input type="range" id="sl-blend" min="30" max="95" step="1" />
+              </div>
+              <div class="control-row">
+                <label>Ritmo base (ajuste fino) <span class="control-val" id="sl-base-val"></span></label>
+                <input type="range" id="sl-base" min="5" max="14" step="0.1" />
+              </div>
+              <div class="control-row">
+                <label>Fadiga pessoal (%/km) <span class="control-val" id="sl-fatigue-val"></span></label>
+                <input type="range" id="sl-fatigue" min="0" max="2" step="0.02" />
+              </div>
+              <div class="control-row">
+                <label>Penalização subida <span class="control-val" id="sl-climb-val"></span></label>
+                <input type="range" id="sl-climb" min="8" max="45" step="1" />
+              </div>
+            </div>
+            <p class="model-desc" id="model-desc">—</p>
+          </div>
+          <div class="chart-box" style="min-width:280px">
+            <canvas id="chart-forecast"></canvas>
+            <p class="chart-caption">Ritmo previsto (cenário principal, cada 5 km)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-section">
+      <h2>Mapa interativo</h2>
+      <div class="panel">
+        <div class="map-layout">
+          <div id="map" style="min-height:480px;height:55vh;width:100%;"></div>
+          <aside class="map-sidebar">
+            <h3>Legenda</h3>
+            <ul class="map-legend">
+              <li><span class="swatch route"></span> Percurso oficial</li>
+              <li><span class="swatch track"></span> Trilho GPS</li>
+              <li><span class="swatch" style="background:#22c55e"></span> Corrida forte</li>
+              <li><span class="swatch" style="background:#3d8bfd"></span> Corrida</li>
+              <li><span class="swatch" style="background:#38bdf8"></span> Corrida leve</li>
+              <li><span class="swatch" style="background:#a78bfa"></span> Andar</li>
+              <li><span class="swatch" style="background:#f59e0b"></span> Paragem</li>
+              <li><span class="swatch current"></span> Posição actual (API live)</li>
+            </ul>
+            <h3>Camadas</h3>
+            <div class="map-layers">
+              <label><input type="checkbox" id="layer-route" checked> Percurso</label>
+              <label><input type="checkbox" id="layer-track" checked> Trilho GPS</label>
+              <label><input type="checkbox" id="layer-splits" checked> Splits por km</label>
+            </div>
+            <div class="map-timeline-wrap">
+              <h3>Replay GPS</h3>
+              <input type="range" id="map-timeline" min="0" value="0" />
+              <span id="map-timeline-label">—</span>
+            </div>
+            <p class="chart-caption" style="margin-top:1rem">Clica num marcador ou numa linha da tabela para centrar o mapa.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Gráficos</h2>
+      <div class="panel-row">
+        <div class="panel chart-box">
+          <canvas id="chart-pace"></canvas>
+          <p class="chart-caption">Tempo por km (real). Laranja: paragens; verde: mais rápido.</p>
+        </div>
+        <div class="panel chart-box">
+          <canvas id="chart-elev"></canvas>
+          <p class="chart-caption">Perfil altimétrico do percurso (642 km). Linha verde: posição actual.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Destaques</h2>
+      <div class="panel" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><span class="badge">Mais rápido</span><p id="fastest-km" style="margin-top:0.5rem"></p></div>
+        <div><span class="badge">Mais lento</span><p id="slowest-km" style="margin-top:0.5rem"></p></div>
+      </div>
+      <p class="chart-caption" style="margin-top:0.75rem">
+        Nota: o log GPS começa às 11:00, mas no <strong>percurso oficial</strong> o primeiro ponto válido já está no km ~10 — os km 1–9 aparecem como «sem dados». O km 10 (troço parcial desde o primeiro GPS) aparece só como referência — sem categoria e fora de estatísticas.
+      </p>
+    </section>
+
+    <section>
+      <h2>Splits por quilómetro</h2>
+      <div class="category-block panel" style="margin-bottom:1rem">
+        <h3 class="subheading">Categorias por ritmo</h3>
+        <ul class="category-legend-list" id="category-legend"></ul>
+        <div class="category-summary" id="category-summary"></div>
+      </div>
+      <div class="filters">
+        <input type="text" id="search-km" placeholder="Filtrar km…" />
+        <select id="filter-category">
+          <option value="all">Todas as categorias</option>
+        </select>
+      </div>
+      <div class="panel" style="overflow-x:auto;max-height:420px;overflow-y:auto">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="km">Km</th>
+              <th data-sort="category">Categoria</th>
+              <th>Hora</th>
+              <th data-sort="segment_time_s">Tempo km</th>
+              <th>Ritmo</th>
+              <th data-sort="battery_pct">Bateria</th>
+              <th data-sort="elapsed_time_s">Acumulado</th>
+            </tr>
+          </thead>
+          <tbody id="splits-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="updated-at">—</span> · Dados: api.stopandgo.pro · Atualizado a partir do tracking ao vivo
+    <a href="https://gps.stopandgo.pro/4?unit=metric&id_evento=4" style="color:#3d8bfd">Mapa live</a>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="boot.js"></script>
+</body>
+</html>
