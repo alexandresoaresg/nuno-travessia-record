@@ -8,6 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from goal_confidence import build_model_reliability_summary, compute_goal_confidence
+
 HISTORY_DIR = Path(__file__).resolve().parent / "history"
 JSONL_PATH = HISTORY_DIR / "predictions.jsonl"
 LATEST_PATH = HISTORY_DIR / "latest_snapshot.json"
@@ -58,6 +60,7 @@ def proven_pace_stats(
     race_start: str,
     last_crossing: str,
     weighted_pace_min: float | None,
+    recent_pace_min: float | None = None,
 ) -> dict[str, float | None]:
     start = _parse_dt(race_start) or _parse_dt(last_crossing)
     last = _parse_dt(last_crossing)
@@ -76,128 +79,13 @@ def proven_pace_stats(
             km_at40 = s["km"]
 
     elapsed_h = (last - start).total_seconds() / 3600
+    recent_km_day = round((24 * 60) / recent_pace_min, 2) if recent_pace_min else None
     return {
         "kmDayGlobal": round(current_km / (elapsed_h / 24), 2) if elapsed_h > 0 else None,
         "kmAt40": float(km_at40) if km_at40 is not None else None,
         "kmDay40": round((km_at40 / 40) * 24, 2) if km_at40 is not None else None,
         "weightedKmDay": round((24 * 60) / weighted_pace_min, 2) if weighted_pace_min else None,
-    }
-
-
-def compute_goal_confidence(
-    *,
-    deadline_str: str,
-    required_pace_str: str | None,
-    required_km_day: float | None,
-    reference_km: float | None,
-    current_km: int,
-    finishes: dict[str, dict[str, Any]],
-    performance: dict[str, Any],
-) -> dict[str, Any]:
-    weighted = performance.get("weightedPaceMin")
-    m_opt = _margin_minutes(deadline_str, finishes.get("optimistic", {}).get("finish"))
-    m_main = _margin_minutes(deadline_str, finishes.get("main", {}).get("finish"))
-    m_pes = _margin_minutes(deadline_str, finishes.get("pessimistic", {}).get("finish"))
-    if m_pes is None or m_main is None:
-        return {"pct": None, "margins": {}}
-
-    proven = finishes.get("_proven") or {}
-    main_sc = finishes.get("main") or {}
-    projected_km_day = main_sc.get("kmPerDay")
-    demonstrated_candidates = [
-        proven.get("kmDay40"),
-        proven.get("kmDayGlobal"),
-        projected_km_day,
-    ]
-    demonstrated_candidates = [
-        float(v) for v in demonstrated_candidates if v is not None and float(v) > 0
-    ]
-    demonstrated = min(demonstrated_candidates) if demonstrated_candidates else None
-    req_km_day = required_km_day
-
-    pct = 0
-    if m_pes >= 720:
-        pct = 92 + min(5, (m_pes - 720) // 360)
-    elif m_pes >= 360:
-        pct = 86 + min(6, (m_pes - 360) // 60)
-    elif m_pes >= 180:
-        pct = 78 + min(8, (m_pes - 180) // 30)
-    elif m_pes >= 60:
-        pct = 68 + min(10, (m_pes - 60) // 12)
-    elif m_pes >= 0:
-        pct = 58 + min(10, m_pes // 6)
-    elif m_pes >= -180:
-        pct = 42 + min(18, (m_main + 180) // 25)
-    elif m_pes >= -720:
-        pct = 22 + min(22, (m_main + 360) // 30)
-    elif m_main >= 0:
-        pct = 36 + min(22, m_main // 12)
-    else:
-        pct = 8 + min(14, max(0, m_main + 720) // 90)
-
-    if demonstrated is not None and req_km_day and req_km_day > 0:
-        demo_ratio = demonstrated / req_km_day
-        if m_pes >= 0:
-            if demo_ratio >= 1.2:
-                pct += 6
-            elif demo_ratio >= 1.05:
-                pct += 3
-            elif demo_ratio >= 0.92:
-                pass
-            elif demo_ratio >= 0.8:
-                pct -= 8
-            else:
-                pct -= 18
-        elif m_pes >= -360:
-            if demo_ratio >= 1.15:
-                pct += 3
-            elif demo_ratio < 0.9:
-                pct -= 10
-        elif demo_ratio < 1.0:
-            pct -= 12
-
-    req_sec = _parse_pace_sec(required_pace_str)
-    km_day_proj = main_sc.get("kmPerDay")
-    proj_sec = (24 * 3600 / km_day_proj) if km_day_proj and km_day_proj > 0 else None
-    if req_sec and proj_sec:
-        headroom = (req_sec - proj_sec) / req_sec
-        if headroom > 0.08:
-            pct += 6
-        elif headroom > 0.02:
-            pct += 3
-        elif headroom < -0.08:
-            pct -= min(18, round(-headroom * 35))
-
-    if (
-        m_pes >= 0
-        and m_main >= 0
-        and demonstrated is not None
-        and req_km_day
-        and demonstrated >= req_km_day * 1.05
-    ):
-        floor_demo = 52 + min(28, int(m_main / 15) + int((demonstrated / req_km_day - 1) * 22))
-        pct = max(pct, floor_demo)
-
-    if m_pes < 0:
-        cap = 72
-        if m_pes < -180:
-            cap = 65 if m_main >= 0 else 50
-        if m_pes < -720:
-            cap = 58 if m_main >= 0 else 40
-        if m_pes < -1200:
-            cap = 52 if m_main >= 0 else 34
-        if m_main < 0:
-            cap = min(cap, 30)
-        pct = min(pct, cap)
-
-    stop_ratio = performance.get("stopRatioPct") or 0
-    if m_pes < 180 and stop_ratio > 12:
-        pct -= min(8, round((stop_ratio - 12) * 1.2))
-
-    pct = round(max(5, min(92, pct)))
-    return {
-        "pct": pct,
-        "margins": {"optimistic": m_opt, "main": m_main, "pessimistic": m_pes},
+        "recentKmDay": recent_km_day,
     }
 
 
@@ -235,6 +123,7 @@ def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
         (analytics.get("event") or {}).get("startTime") or "",
         current.get("lastCrossing") or "",
         perf.get("weightedPaceMin") or pred.get("basePaceMin"),
+        perf.get("recentPaceMin"),
     )
 
     finishes = _scenario_finishes(pred)
@@ -243,14 +132,26 @@ def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
     remaining = float(goal.get("remainingKm") or current.get("remainingKm") or 0)
     rec_km_day = _required_km_per_day(goal.get("recordDeadlineFromStart", ""), remaining)
 
+    stale_h = pred.get("dataStaleHours")
+    anchor = pred.get("projectionAnchor")
+    regime_info = pred.get("regime") or {}
+    regime = regime_info.get("regime") if isinstance(regime_info, dict) else regime_info
+    conf_kw = dict(
+        finishes=finishes,
+        performance=perf,
+        data_stale_hours=stale_h,
+        projection_anchor=anchor,
+        confidence_pct=pred.get("confidencePct"),
+        regime=regime,
+        forecast_suspended=bool(pred.get("forecastSuspended")),
+    )
     cal_conf = compute_goal_confidence(
         deadline_str=goal.get("calendarDeadline", ""),
         required_pace_str=goal.get("requiredPaceCalendar"),
         required_km_day=goal.get("kmPerDayCalendar"),
         reference_km=(goal.get("calendarPaceNow") or {}).get("km"),
         current_km=int(current.get("km") or 0),
-        finishes=finishes,
-        performance=perf,
+        **conf_kw,
     )
     rec_conf = compute_goal_confidence(
         deadline_str=goal.get("recordDeadlineFromStart", ""),
@@ -258,9 +159,9 @@ def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
         required_km_day=rec_km_day,
         reference_km=(goal.get("recordPaceNow") or {}).get("km"),
         current_km=int(current.get("km") or 0),
-        finishes=finishes,
-        performance=perf,
+        **conf_kw,
     )
+    model_reliability = build_model_reliability_summary(pred, perf)
 
     sci = pred.get("science") or {}
     caps = sci.get("caps") if isinstance(sci.get("caps"), dict) else {}
@@ -296,6 +197,7 @@ def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
         "performance": perf,
         "scenarios": {k: v for k, v in finishes.items() if not k.startswith("_")},
         "confidence": {"calendar": cal_conf, "record": rec_conf},
+        "modelReliability": model_reliability,
         "proven": proven,
         "forecastSample": (pred.get("forecast") or [])[:12],
     }

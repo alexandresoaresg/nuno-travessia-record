@@ -12,6 +12,6 @@ if lsof -ti ":$PORT" >/dev/null 2>&1; then
 fi
 
 echo "Servidor: http://127.0.0.1:$PORT"
-echo "Refresh automatico ao carregar a pagina (via serve.py)"
+echo "Background: GPS live cada 60s · dados completos cada 5 min"
 echo "(Ctrl+C para parar)"
 exec python3 "$DIR/serve.py" "$PORT"

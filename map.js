@@ -11,6 +11,8 @@
   }
 
   const M = D.map;
+  const pred = D.prediction || {};
+  const modelVer = pred.modelVersion || 4;
   const currentKm = D.current.km;
   const segments = M.categorySegments || [];
 
@@ -111,12 +113,45 @@
   if (M.current.logTime && M.current.source !== "trackersLog") {
     popup += `<br><span style="opacity:.75">Últ. trackersLog: ${M.current.logTime}</span>`;
   }
-  L.marker([M.current.lat, M.current.lng], {
+  const currentMarker = L.marker([M.current.lat, M.current.lng], {
     icon: currentIcon,
     zIndexOffset: 1000,
   })
     .addTo(map)
     .bindPopup(popup);
+
+  function livePopupHtml(cur) {
+    const liveKm = cur.alongRouteKm;
+    const kmLabel =
+      liveKm != null
+        ? `Km percurso ~${liveKm} (split oficial: ${currentKm})`
+        : `Km split oficial: ${currentKm}`;
+    let html =
+      `<b>Posição actual</b> (${cur.source || "GPS"})<br>` +
+      `${kmLabel}<br>` +
+      `GPS: <b>${cur.time || cur.gpsTime || "—"}</b><br>` +
+      `Alt: ${cur.alt} m`;
+    if (cur.battery) html += `<br>Bateria: ${cur.battery}`;
+    if (cur.speed != null) html += `<br>Vel.: ${cur.speed} km/h`;
+    return html;
+  }
+
+  window.travessiaUpdateMapLive = function (patch) {
+    const cur = patch.mapCurrent || patch;
+    if (!cur || !cur.lat) return;
+    currentMarker.setLatLng([cur.lat, cur.lng]);
+    currentMarker.setPopupContent(livePopupHtml(cur));
+    M.current = cur;
+  };
+
+  window.travessiaMapReload = function (mapData) {
+    if (!mapData) return;
+    Object.assign(M, mapData);
+    if (mapData.current) {
+      currentMarker.setLatLng([mapData.current.lat, mapData.current.lng]);
+      currentMarker.setPopupContent(livePopupHtml(mapData.current));
+    }
+  };
 
   // Record pace marker (where the current record would be right now)
   if (M.recordPace && M.recordPace.lat && M.recordPace.lng) {
@@ -175,7 +210,7 @@
       .addTo(map)
       .bindPopup(
         `<b>Meta 31/05 (realista)</b><br>` +
-          `Onde teria de estar agora (modelo)<br>` +
+          `Onde teria de estar agora (modelo v${modelVer})<br>` +
           `Km ~${M.calendarPaceRealistic.km}<br>` +
           `Deadline: ${M.calendarPaceRealistic.deadline}<br>`
       );
@@ -230,7 +265,7 @@
       else map.removeLayer(layer);
     });
   }
-  // Hover on future route → predicted crossing time (model v3, from live GPS / now)
+  // Hover on future route → predicted crossing time (model v4 forecast, GPS anchor)
   const futureRoute = M.futureRoute || {};
   const futurePts = futureRoute.points || [];
   const futureLine = futureRoute.line || futurePts.map((p) => [p.lat, p.lng]);
@@ -352,13 +387,16 @@
     function fmtEtaContent(p) {
       const remain = Math.max(0, p.km - projKm);
       const rel = fmtRelativeFromNow(p.timeMs - Date.now());
+      const sub = pred.forecastSuspended
+        ? `Forecast suspenso (paragem longa) · modelo v${modelVer}`
+        : `+${remain.toFixed(1)} km · ritmo recente + paragens · v${modelVer}`;
       return (
         `<div class="map-eta-inner">` +
         `<div class="map-eta-km">Km ${p.km}</div>` +
-        `<div class="map-eta-label">Passagem prevista</div>` +
+        `<div class="map-eta-label">Passagem prevista (v${modelVer})</div>` +
         `<div class="map-eta-time">${p.timeShort}</div>` +
         `<div class="map-eta-rel">${rel}</div>` +
-        `<div class="map-eta-sub">+${remain.toFixed(1)} km · paragens incluídas · v3</div>` +
+        `<div class="map-eta-sub">${sub}</div>` +
         `</div>`
       );
     }

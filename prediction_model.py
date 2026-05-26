@@ -1,5 +1,12 @@
 """
-Travessia prediction model v3 — athlete-calibrated, literature-bounded.
+Travessia prediction model v4 — athlete-calibrated, literature-bounded.
+
+v4 adds (on top of v3):
+- Recent moving-pace window (last ~15 km) for short-horizon forecasts
+- Long-stop regime detection (paragem/sono >= 60 min)
+- GPS-aware projection anchor when splits are stale
+- Suspended km-a-km forecast during active long stops
+- Stale-data penalty on model confidence
 
 Primary signal: GPS km splits already run (pace, stops, night, climb response).
 Literature sets caps and shape, not large additive penalties.
@@ -20,6 +27,13 @@ from datetime import datetime, timedelta
 from typing import Any
 
 MOVING_THRESHOLD_S = 900  # 15 min/km segment treated as stop
+LONG_STOP_THRESHOLD_S = 3600  # 60 min — sleep / long break
+RECENT_WINDOW_KM = 15
+SHORT_HORIZON_KM = 24  # blend recent pace for km ahead within this band
+STALE_SPLIT_HOURS = 3.0
+STALE_CONFIDENCE_CAP = 45
+RECENT_PACE_BLEND = 0.65  # short horizon: recent vs global (main)
+POST_STOP_RECENT_BLEND = 0.78
 
 # Literature caps (applied to athlete-measured coefficients)
 CAPS = {
@@ -35,8 +49,8 @@ CAPS = {
 
 SCIENCE = {
     "label": "Literatura ultramaratona (100 km – multi-dia)",
-    "modelVersion": 3,
-    "modelName": "Calibrado no percurso do atleta, limites da literatura",
+    "modelVersion": 4,
+    "modelName": "Janela recente, paragens longas, ancora GPS",
     "sources": [
         {
             "id": "lambert2004",
@@ -99,6 +113,128 @@ def _percentile(vals: list[float], p: float) -> float:
 def _is_night_hour(dt: datetime) -> bool:
     h = dt.hour
     return h >= 22 or h < 6
+
+
+def _parse_dt(s: str | None) -> datetime | None:
+    if not s:
+        return None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+        try:
+            return datetime.strptime(str(s).strip(), fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def recent_moving_pace_sec(splits: list[dict], current_km: int, window_km: int = RECENT_WINDOW_KM) -> float | None:
+    """Weighted pace from last `window_km` moving segments."""
+    usable = [
+        s
+        for s in splits
+        if not s.get("unavailable")
+        and not s.get("partial")
+        and s["segment_time_s"] < MOVING_THRESHOLD_S
+        and s["km"] <= current_km
+    ]
+    if not usable:
+        return None
+    tail = usable[-window_km:]
+    weights = [math.exp((s["km"] - current_km) / 6.0) for s in tail]
+    wsum = sum(weights)
+    return sum(s["segment_time_s"] * w for s, w in zip(tail, weights)) / wsum
+
+
+def detect_regime(
+    splits: list[dict],
+    current_km: int,
+    last_crossing: str,
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Classify pacing regime for short-horizon behaviour."""
+    now = now or datetime.now()
+    split_time = _parse_dt(last_crossing)
+    stale_h = (
+        (now - split_time).total_seconds() / 3600.0 if split_time else 999.0
+    )
+
+    usable = [s for s in splits if not s.get("unavailable") and not s.get("partial")]
+    last_seg = usable[-1] if usable else None
+
+    regime = "normal"
+    forecast_suspended = False
+    last_stop_km = None
+    last_stop_min = None
+    note = None
+
+    if last_seg and last_seg["segment_time_s"] >= LONG_STOP_THRESHOLD_S:
+        last_stop_km = last_seg["km"]
+        last_stop_min = round(last_seg["segment_time_s"] / 60, 1)
+        if last_seg["km"] >= current_km:
+            regime = "in_long_stop"
+            forecast_suspended = True
+            note = f"Paragem longa em curso no km {last_stop_km} (~{last_stop_min:.0f} min)"
+        else:
+            moved_since = [
+                s
+                for s in usable
+                if s["km"] > last_stop_km
+                and s["segment_time_s"] < MOVING_THRESHOLD_S
+            ]
+            if len(moved_since) < 3:
+                regime = "post_stop"
+                note = f"Retoma apos paragem km {last_stop_km} — ritmo recente priorizado"
+            else:
+                regime = "normal"
+                note = f"Paragem km {last_stop_km} ja absorvida ({len(moved_since)} km movimento)"
+
+    if stale_h > STALE_SPLIT_HOURS:
+        note = (note + "; " if note else "") + f"Splits com {stale_h:.1f}h de atraso"
+
+    return {
+        "regime": regime,
+        "forecastSuspended": forecast_suspended,
+        "dataStaleHours": round(stale_h, 2),
+        "dataStale": stale_h > STALE_SPLIT_HOURS,
+        "lastStopKm": last_stop_km,
+        "lastStopMin": last_stop_min,
+        "note": note,
+    }
+
+
+def resolve_projection(
+    *,
+    current_km: int,
+    last_crossing: str,
+    live: dict | None,
+    projection_km: float | None,
+    projection_time: datetime | None,
+    now: datetime | None = None,
+) -> tuple[float, datetime, str, float]:
+    """Pick projection anchor: fresher of split vs live GPS."""
+    now = now or datetime.now()
+    split_time = _parse_dt(last_crossing) or now
+    proj_km = float(projection_km if projection_km is not None else current_km)
+    proj_time = projection_time or split_time
+    anchor = "split"
+
+    if live:
+        live_t = _parse_dt(live.get("gpsTime"))
+        if live.get("alongRouteKm") is not None:
+            along = float(live["alongRouteKm"])
+            if along >= float(current_km) - 0.5:
+                proj_km = max(float(current_km), along)
+        if live_t and live_t >= split_time:
+            proj_time = live_t
+            anchor = "gps_live"
+
+    if proj_time < split_time:
+        proj_time = split_time
+    if proj_km < float(current_km):
+        proj_km = float(current_km)
+
+    stale_h = (now - split_time).total_seconds() / 3600.0
+    return proj_km, proj_time, anchor, stale_h
 
 
 def analyze_athlete(splits: list[dict], current_km: int, race_start: str) -> dict[str, Any]:
@@ -166,8 +302,13 @@ def analyze_athlete(splits: list[dict], current_km: int, race_start: str) -> dic
     # Keep a small optional band decay for scenarios only (not double-counted in main).
     decay_per_10k = 0.0
 
+    recent_sec = recent_moving_pace_sec(splits, current_km) or weighted_pace
+
     return {
         "kmCompleted": current_km,
+        "recentPaceSec": recent_sec,
+        "recentPaceMin": round(recent_sec / 60, 2),
+        "recentWindowKm": RECENT_WINDOW_KM,
         "movingSegments": len(moving),
         "stoppedSegments": len(stopped),
         "stopRatioPct": round(100 * stop_ratio, 1),
@@ -258,6 +399,24 @@ def _scenario_params(athlete: dict, scenario: str) -> dict[str, float]:
     }
 
 
+def _effective_moving_pace_s(
+    p: dict[str, float],
+    athlete: dict,
+    ahead_km: float,
+    regime: str,
+) -> float:
+    """Blend global calibrated pace with recent window for short horizon / post-stop."""
+    global_p = p["moving_pace_s"]
+    recent = athlete.get("recentPaceSec") or global_p
+    if regime == "in_long_stop":
+        return global_p
+    if regime == "post_stop":
+        return POST_STOP_RECENT_BLEND * recent + (1.0 - POST_STOP_RECENT_BLEND) * global_p
+    if ahead_km <= SHORT_HORIZON_KM:
+        return RECENT_PACE_BLEND * recent + (1.0 - RECENT_PACE_BLEND) * global_p
+    return global_p
+
+
 def _pace_for_km(
     km_i: int,
     current_km: int,
@@ -265,9 +424,11 @@ def _pace_for_km(
     profile_seg: dict,
     crossing_dt: datetime,
     scenario: str,
+    *,
+    regime: str = "normal",
 ) -> float:
     """
-    Expected seconds for km_i (v3).
+    Expected seconds for km_i (v4).
 
     E[time] = (1 − p_stop) × pace_mov × fatigue × night + p_stop × avg_stop + terrain
 
@@ -275,6 +436,8 @@ def _pace_for_km(
     """
     p = _scenario_params(athlete, scenario)
     ahead = km_i - current_km
+    p = dict(p)
+    p["moving_pace_s"] = _effective_moving_pace_s(p, athlete, ahead, regime)
 
     # Linear fatigue from athlete regression; cap ~40% total slowdown (Lambert ~15% late-race band).
     fatigue_mult = min(1.4, 1.0 + p["fatigue_per_km"] * ahead)
@@ -308,12 +471,18 @@ def _run_scenario(
     projection_km: float,
     total_km: float,
     projection_time: datetime,
+    *,
+    regime: str = "normal",
+    forecast_suspended: bool = False,
 ) -> tuple[float, list[dict]]:
     """Simulate remaining route from projection_km at projection_time."""
     cum = 0.0
     forecast: list[dict] = []
     floor_km = int(math.floor(projection_km + 1e-9))
     total_km_i = int(total_km)
+
+    if forecast_suspended and scenario == "main":
+        return 0.0, []
 
     def _append_forecast(km_i: int, pace_s: float, seg: dict) -> None:
         t_cross = projection_time + timedelta(seconds=cum)
@@ -337,7 +506,9 @@ def _run_scenario(
                 else {"gain": 0, "loss": 0, "elevation": 0}
             )
             t_at_seg = projection_time + timedelta(seconds=cum)
-            pace_s = _pace_for_km(next_km, floor_km, athlete, seg, t_at_seg, scenario)
+            pace_s = _pace_for_km(
+                next_km, floor_km, athlete, seg, t_at_seg, scenario, regime=regime
+            )
             cum += pace_s * dist_km
             ahead = next_km - floor_km
             if ahead % 5 == 0 or next_km == total_km_i or dist_km < 0.999:
@@ -350,7 +521,9 @@ def _run_scenario(
             else {"gain": 0, "loss": 0, "elevation": 0}
         )
         t_at_seg = projection_time + timedelta(seconds=cum)
-        pace_s = _pace_for_km(km_i, floor_km, athlete, seg, t_at_seg, scenario)
+        pace_s = _pace_for_km(
+            km_i, floor_km, athlete, seg, t_at_seg, scenario, regime=regime
+        )
         cum += pace_s
         ahead = km_i - floor_km
         if ahead % 5 == 0 or km_i == total_km_i:
@@ -369,35 +542,58 @@ def build_prediction(
     *,
     projection_time: datetime | None = None,
     projection_km: float | None = None,
+    live: dict | None = None,
+    as_of: datetime | None = None,
 ) -> dict[str, Any]:
     athlete = analyze_athlete(splits, current_km, race_start)
     athlete["climbSecPer100m"] = estimate_climb_coeff(splits, profile_full)
 
-    try:
-        split_time = datetime.strptime(last_crossing, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        split_time = datetime.strptime(last_crossing, "%Y-%m-%d %H:%M")
+    now = as_of or projection_time or datetime.now()
+    regime_info = detect_regime(splits, current_km, last_crossing, now=now)
+    regime = regime_info["regime"]
+    forecast_suspended = regime_info["forecastSuspended"]
 
-    proj_time = projection_time or split_time
-    proj_km = float(projection_km if projection_km is not None else current_km)
-    if proj_time < split_time:
-        proj_time = split_time
-    if proj_km < float(current_km):
-        proj_km = float(current_km)
+    proj_km, proj_time, anchor, stale_h = resolve_projection(
+        current_km=current_km,
+        last_crossing=last_crossing,
+        live=live,
+        projection_km=projection_km,
+        projection_time=projection_time,
+        now=now,
+    )
 
     try:
-        start = datetime.strptime(race_start, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        start = split_time
+        start = _parse_dt(race_start) or proj_time
+    except Exception:
+        start = proj_time
 
     cum_main, forecast = _run_scenario(
-        "main", athlete, profile_full, proj_km, total_km, proj_time
+        "main",
+        athlete,
+        profile_full,
+        proj_km,
+        total_km,
+        proj_time,
+        regime=regime,
+        forecast_suspended=forecast_suspended,
     )
     cum_opt, _ = _run_scenario(
-        "optimistic", athlete, profile_full, proj_km, total_km, proj_time
+        "optimistic",
+        athlete,
+        profile_full,
+        proj_km,
+        total_km,
+        proj_time,
+        regime=regime,
     )
     cum_pes, _ = _run_scenario(
-        "pessimistic", athlete, profile_full, proj_km, total_km, proj_time
+        "pessimistic",
+        athlete,
+        profile_full,
+        proj_km,
+        total_km,
+        proj_time,
+        regime=regime,
     )
 
     finish = proj_time + timedelta(seconds=cum_main)
@@ -414,20 +610,28 @@ def build_prediction(
 
     pace_iqr = athlete["p75PaceMin"] - athlete["p25PaceMin"]
     confidence = max(40, min(92, 90 - pace_iqr * 3 - athlete["stopRatioPct"] * 0.25))
+    if regime_info["dataStale"] and not (live and anchor == "gps_live"):
+        confidence = min(confidence, STALE_CONFIDENCE_CAP)
 
     main_params = _scenario_params(athlete, "main")
+    moving_min = athlete["movingPaceSec"] / 60
+    recent_min = athlete["recentPaceMin"]
+    clock_pace_min = round((hours_main * 60) / remaining_km, 2) if remaining_km > 0 else None
 
     return {
         "model": SCIENCE["modelName"],
         "modelVersion": SCIENCE["modelVersion"],
+        "regime": regime_info,
+        "dataStaleHours": regime_info["dataStaleHours"],
+        "forecastSuspended": forecast_suspended,
+        "projectionAnchor": anchor,
+        "recentPaceMin": recent_min,
         "athleteWeight": 1.0,
         "scienceWeight": 0.0,
         "confidencePct": round(confidence, 0),
-        "movingPaceMin": round(athlete["movingPaceSec"] / 60, 2),
-        "basePaceMin": round(athlete["movingPaceSec"] / 60, 2),
-        "projectedClockPaceMin": (
-            round((hours_main * 60) / remaining_km, 2) if remaining_km > 0 else None
-        ),
+        "movingPaceMin": round(moving_min, 2),
+        "basePaceMin": round(moving_min, 2),
+        "projectedClockPaceMin": clock_pace_min,
         "fatigueRatePerKm": athlete["fatiguePerKm"],
         "climbSecPer100m": athlete["climbSecPer100m"],
         "kmPerDayProjected": round(km_per_day, 1),
@@ -454,7 +658,10 @@ def build_prediction(
         "performance": athlete,
         "science": SCIENCE,
         "modelParams": {
-            "description": "E[min/km] = (1−p_paragem)×ritmo_mov×fadiga×noite + p_paragem×duração_paragem + terreno",
+            "description": (
+                "v4: ritmo recente (15 km) no horizonte curto; paragens >=60 min suspendem forecast; "
+                "E[min/km] = (1−p)×ritmo×fadiga×noite + p×paragem + terreno"
+            ),
             "main": {
                 "movingPaceMin": round(main_params["moving_pace_s"] / 60, 2),
                 "stopProbPerKm": main_params["stop_prob"],
@@ -463,6 +670,7 @@ def build_prediction(
                 "decayPer10kmAfter100": main_params["decay_per_10k"],
                 "nightFactor": main_params["night_factor"],
                 "climbSecPer100m": athlete["climbSecPer100m"],
+                "recentPaceMin": recent_min,
             },
         },
         "scenarios": {

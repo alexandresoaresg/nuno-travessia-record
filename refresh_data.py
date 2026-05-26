@@ -12,9 +12,12 @@ from pathlib import Path
 # Local km_splits module
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import km_splits as km
-from prediction_history import append_snapshot
+from background_pipeline import enqueue, enqueue_snapshot
 from prediction_model import build_prediction, estimate_finish_from_km
 from pace_categories import category_legend, summarize_categories
+from route_landmarks import snap_landmarks_to_route
+from day_analysis import build_days
+from confidence_curve import build_confidence_curve
 
 DIR = Path(__file__).resolve().parent
 DATA_DIR = DIR / "cache"
@@ -54,14 +57,20 @@ def raw_file_suffix(data: bytes) -> str:
     return ".bin"
 
 
-def save_raw_api_file(stem: str, raw: bytes) -> Path:
-    """Persist exact API response bytes under project raw/ (latest + timestamped copy)."""
+def _save_raw_timestamped(stem: str, raw: bytes, ext: str) -> None:
+    """Archive copy with timestamp (background only)."""
     RAW_DIR.mkdir(exist_ok=True)
-    ext = raw_file_suffix(raw)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     (RAW_DIR / f"{stem}_{ts}{ext}").write_bytes(raw)
+
+
+def save_raw_api_file(stem: str, raw: bytes) -> Path:
+    """Persist API response: latest sync, timestamped archive in background."""
+    RAW_DIR.mkdir(exist_ok=True)
+    ext = raw_file_suffix(raw)
     latest = RAW_DIR / f"{stem}_latest{ext}"
     latest.write_bytes(raw)
+    enqueue(_save_raw_timestamped, stem, raw, ext)
     return latest
 
 
@@ -555,6 +564,7 @@ def build_analytics(
         race_start,
         projection_time=proj_time,
         projection_km=proj_km,
+        live=live,
     )
 
     # --- Record goal ---
@@ -699,7 +709,26 @@ def build_analytics(
         "categorySummary": summarize_categories(splits),
         "routeProfile": chart_profile,
         "routeProfileFull": profile_full,
+        "routeLandmarks": snap_landmarks_to_route(coords, dist_m),
+        "days": build_days(
+            splits,
+            race_start=race_start,
+            current_km=current_km,
+            profile_full=profile_full,
+            goal_km_per_day=goal.get("kmPerDayCalendar"),
+        ),
         "prediction": prediction,
+        "confidenceCurve": build_confidence_curve(
+            splits,
+            profile_full,
+            total_km=total_km,
+            race_start=race_start,
+            goal=goal,
+            step_km=5,
+            prediction=prediction,
+            current_km=current_km,
+            last_crossing=last["crossing_time"],
+        ),
         "live": live,
         "map": build_map_data(
             coords,

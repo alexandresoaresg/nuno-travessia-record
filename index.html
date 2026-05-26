@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Travessia — Análise Nuno Faria</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body>
@@ -19,6 +19,7 @@
     <div>
       <h1 id="athlete-name">Nuno Faria</h1>
       <p class="meta" id="event-name">Travessia</p>
+      <p class="meta meta-model" id="model-version">Previsões: modelo v4</p>
     </div>
     <div class="progress-wrap">
       <div class="progress-label">
@@ -34,6 +35,7 @@
       <button class="tab active" data-tab="overview" type="button">Visão geral</button>
       <button class="tab" data-tab="map" type="button">Mapa</button>
       <button class="tab" data-tab="splits" type="button">Splits</button>
+      <button class="tab" data-tab="days" type="button">Dias</button>
       <button class="tab" data-tab="prediction" type="button">Objetivos</button>
     </nav>
 
@@ -127,7 +129,7 @@
             </div>
             <p class="chart-caption" style="margin-top:1rem">
               Passa o rato sobre a linha <strong>verde</strong> (percurso futuro) — área de detecção alargada.
-              Hora prevista a partir do GPS live, com paragens estimadas pelo modelo v3.
+              Hora prevista a partir do GPS live, com paragens estimadas pelo modelo v4.
             </p>
           </aside>
         </div>
@@ -143,9 +145,13 @@
           <canvas id="chart-pace"></canvas>
           <p class="chart-caption">Tempo por km (real). Laranja: paragens; verde: mais rápido.</p>
         </div>
-        <div class="panel chart-box">
+        <div class="panel chart-box chart-box-clickable" id="chart-elev-box" role="button" tabindex="0" aria-label="Abrir perfil altimétrico em ecrã inteiro">
           <canvas id="chart-elev"></canvas>
-          <p class="chart-caption">Perfil altimétrico do percurso (642 km). Linha verde: posição actual.</p>
+          <p class="chart-caption">Perfil altimétrico do percurso (642 km). Linha verde: posição actual. <span class="chart-hint">Clique para ampliar</span></p>
+          <label class="elev-cities-toggle">
+            <input type="checkbox" id="elev-show-cities" checked />
+            <span>Cidades de referência no perfil</span>
+          </label>
         </div>
       </div>
     </section>
@@ -193,9 +199,21 @@
     </section>
       </section>
 
+      <section class="tab-panel" data-panel="days" hidden>
+        <section class="days-section">
+          <h2>Análise por dia</h2>
+          <p class="days-lead" id="days-lead">—</p>
+          <div class="panel days-chart-panel">
+            <canvas id="chart-days-km" height="160"></canvas>
+            <p class="chart-caption">Km percorridos em movimento por dia (entre paragens noturnas ≥60 min).</p>
+          </div>
+          <div class="days-grid" id="days-grid"></div>
+        </section>
+      </section>
+
       <section class="tab-panel" data-panel="prediction" hidden>
         <section class="conf-finish-hero panel" id="conf-finish-hero" aria-label="Previsão de chegada">
-          <p class="conf-finish-eyebrow">Previsão de chegada · modelo v3</p>
+          <p class="conf-finish-eyebrow">Previsão de chegada · modelo v4</p>
           <p class="conf-finish-main" id="conf-finish-main">—</p>
           <p class="conf-finish-sub" id="conf-finish-sub">—</p>
           <div class="conf-finish-meta">
@@ -218,10 +236,19 @@
         <section class="confidence-section">
           <h2>Confiança nos objetivos</h2>
           <p class="confidence-lead">
-            Probabilidade de cumprir cada meta com base no <strong>cenário pessimista</strong> do modelo v3, km/dia
-            conservador e margem ao prazo. Se o pessimista falha 31/05, a confiança fica limitada mesmo com o principal a tempo.
+            Probabilidade de cumprir cada meta: escada face ao <strong>cenário pessimista</strong> e km/dia conservador,
+            depois ajustada pela <strong>fiabilidade do ritmo</strong> (modelo v4), regime de paragens e frescura dos dados.
+            A percentagem dos cartões não é a mesma que a fiabilidade dos dados abaixo.
             O ritmo <em>em movimento</em> não se compara directamente com o orçamento de relógio (~18 min/km).
           </p>
+
+          <div class="panel chart-box conf-evolution-chart">
+            <h3 class="conf-evolution-title">Evolução da confiança por km</h3>
+            <canvas id="chart-conf-evolution"></canvas>
+            <p class="chart-caption" id="conf-evolution-caption">
+              Confiança híbrida para 31/05 (verde) e record (azul), recalculada a cada ~5 km com o modelo v4 no momento do split.
+            </p>
+          </div>
 
           <div class="conf-grid">
             <article class="panel conf-card" id="conf-card-calendar">
@@ -261,6 +288,17 @@
             </article>
           </div>
 
+          <article class="panel conf-reliability" id="conf-model-reliability">
+            <header class="conf-reliability-head">
+              <h3>Fiabilidade dos dados (modelo v4)</h3>
+              <p class="conf-reliability-pct-wrap">
+                <span class="conf-reliability-pct" id="conf-model-pct">—</span>
+              </p>
+            </header>
+            <p class="conf-reliability-desc" id="conf-model-desc">—</p>
+            <ul class="conf-factors" id="conf-model-factors"></ul>
+          </article>
+
           <div class="panel conf-main-detail" id="conf-main-detail"></div>
 
           <div class="panel conf-scenarios">
@@ -291,9 +329,36 @@
     </div>
   </main>
 
+  <div id="elev-modal" class="elev-modal" hidden aria-hidden="true">
+    <div class="elev-modal-backdrop" data-elev-close></div>
+    <div class="elev-modal-panel" role="dialog" aria-modal="true" aria-labelledby="elev-modal-title">
+      <header class="elev-modal-header">
+        <h2 id="elev-modal-title">Perfil altimétrico</h2>
+        <p class="elev-modal-meta" id="elev-modal-meta">—</p>
+        <label class="elev-cities-toggle elev-cities-toggle-modal">
+          <input type="checkbox" id="elev-show-cities-modal" checked />
+          <span>Cidades</span>
+        </label>
+        <button type="button" class="elev-modal-close" id="elev-modal-close" aria-label="Fechar">×</button>
+      </header>
+      <div class="elev-modal-chart chart-box" id="elev-modal-chart">
+        <canvas id="chart-elev-large"></canvas>
+        <div class="elev-tooltip" id="elev-tooltip" hidden></div>
+      </div>
+      <p class="chart-caption elev-modal-caption">
+        Move o rato sobre o perfil para explorar km e altitude. A linha verde marca a posição actual.
+        <kbd>Esc</kbd> para fechar.
+      </p>
+    </div>
+  </div>
+
   <footer>
-    <span id="updated-at">—</span> · Dados: api.stopandgo.pro · Atualizado a partir do tracking ao vivo
-    <a href="https://gps.stopandgo.pro/4?unit=metric&id_evento=4" style="color:#3d8bfd">Mapa live</a>
+    <span id="updated-at">—</span>
+    <span class="footer-countdowns" id="footer-countdowns" hidden>
+      · Próx. posição <strong id="countdown-live" title="Actualização GPS live">—</strong>
+      · Próx. dados <strong id="countdown-full" title="Actualização completa (splits, previsões)">—</strong>
+    </span>
+    · <a href="https://gps.stopandgo.pro/4?unit=metric&id_evento=4">Mapa live</a>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

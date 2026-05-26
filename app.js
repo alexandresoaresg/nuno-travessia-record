@@ -1,10 +1,10 @@
 (function () {
-  const D = window.ANALYTICS;
+  let D = window.ANALYTICS;
   if (!D) return;
 
   const $ = (id) => document.getElementById(id);
-  const totalKm = D.event.totalKm;
-  const currentKm = D.current.km;
+  let totalKm = D.event.totalKm;
+  let currentKm = D.current.km;
 
   // --- DOM init ---
   $("athlete-name").textContent = D.athlete.name;
@@ -82,7 +82,15 @@
         if (window.__travessiaMapRecenter) window.__travessiaMapRecenter();
       }, 50);
     }
-    if (tabId === "splits" || tabId === "prediction") {
+    if (tabId === "splits" || tabId === "prediction" || tabId === "days") {
+      if (tabId === "prediction") {
+        try {
+          const lc = window.__travessiaLastConf;
+          drawConfidenceEvolutionChart(lc && lc.cal, lc && lc.rec);
+        } catch (err) {
+          console.error("drawConfidenceEvolutionChart:", err);
+        }
+      }
       setTimeout(() => {
         if (window.__travessiaRedrawCharts) window.__travessiaRedrawCharts();
       }, 50);
@@ -102,10 +110,35 @@
   $("progress-km").textContent = currentKm + " / " + totalKm + " km";
   $("progress-fill").style.width = D.current.progressPct + "%";
 
-  // --- Prediction model v3 (mirrors prediction_model.py) ---
-  const profileFull = D.routeProfileFull || D.routeProfile;
-  const P = D.prediction;
-  const perf = P.performance || {};
+  // --- Prediction model v4 (mirrors prediction_model.py) ---
+  let profileFull = D.routeProfileFull || D.routeProfile;
+  let P = D.prediction;
+  let perf = P.performance || {};
+  const V4 = {
+    recentBlend: 0.65,
+    postStopBlend: 0.78,
+    shortHorizonKm: 24,
+    staleHours: 3,
+    staleCap: 45,
+  };
+  function getRegimeInfo() {
+    return P.regime || {};
+  }
+  function getRegime() {
+    return getRegimeInfo().regime || "normal";
+  }
+
+  function updateModelBadge() {
+    const el = $("model-version");
+    if (!el || !P) return;
+    const stale =
+      P.dataStaleHours != null && P.dataStaleHours > V4.staleHours
+        ? ` · splits há ${fmtNum(P.dataStaleHours, 1)}h`
+        : "";
+    el.textContent =
+      `Previsões: ${P.model || "modelo v4"} (v${P.modelVersion || 4})${stale}`;
+  }
+
   const sci = P.science || {};
   const caps = sci.caps || {};
   const CAPS = {
@@ -130,6 +163,7 @@
 
   function scenarioParams(scenario) {
     const mov = perf.movingPaceSec || (perf.weightedPaceMin || P.basePaceMin) * 60 || 700;
+    const recent = perf.recentPaceSec || mov;
     if (scenario === "optimistic") {
       return {
         movingPaceS: perf.optimisticPaceSec || (perf.p25PaceMin || 0) * 60 || mov * 0.92,
@@ -152,6 +186,7 @@
     }
     return {
       movingPaceS: mov,
+      recentPaceS: recent,
       fatiguePerKm: params.fatiguePerKm,
       stopProb: params.stopProb,
       avgStopS: params.avgStopSec,
@@ -160,9 +195,24 @@
     };
   }
 
+  function effectiveMovingPaceS(p, ahead) {
+    const globalP = p.movingPaceS;
+    const recent = p.recentPaceS || globalP;
+    const r = getRegime();
+    if (r === "in_long_stop") return globalP;
+    if (r === "post_stop") {
+      return V4.postStopBlend * recent + (1 - V4.postStopBlend) * globalP;
+    }
+    if (ahead <= V4.shortHorizonKm) {
+      return V4.recentBlend * recent + (1 - V4.recentBlend) * globalP;
+    }
+    return globalP;
+  }
+
   function paceForKm(km, crossing, scenario, floorKmRef) {
-    const p = scenarioParams(scenario);
+    const p = { ...scenarioParams(scenario) };
     const ahead = km - floorKmRef;
+    p.movingPaceS = effectiveMovingPaceS(p, ahead);
     const seg = profileFull[km - 1] || { gain: 0, loss: 0 };
     let fatigueMult = Math.min(1.4, 1 + p.fatiguePerKm * ahead);
     if (scenario === "pessimistic" && km > 100 && p.decayPer10k > 0) {
@@ -187,10 +237,87 @@
     return { projKm, projTime, floorKm };
   }
 
+  function parseFinishDt(isoOrStr) {
+    if (!isoOrStr) return null;
+    const norm = String(isoOrStr).trim().replace(" ", "T");
+    const d = new Date(norm.length <= 16 ? norm + ":00" : norm);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  /** Use server v4 outputs (single source of truth). */
+  function finishFromServer(scenario) {
+    if ((P.modelVersion || 0) < 4) return null;
+    const sc = (P.scenarios && P.scenarios[scenario]) || {};
+    let finishStr = P.finishTimeIso || P.finishTime;
+    if (scenario === "optimistic") {
+      finishStr = P.optimisticFinishIso || P.optimisticFinish;
+    } else if (scenario === "pessimistic") {
+      finishStr = P.pessimisticFinishIso || P.pessimisticFinish;
+    }
+    const finish = parseFinishDt(finishStr);
+    if (!finish) return null;
+
+    const projKm = P.projectionKm != null ? P.projectionKm : currentKm;
+    const remainingKm = Math.max(0, totalKm - projKm);
+    const hours = sc.hours ?? P.remainingHours ?? 0;
+    const kmPerDay = sc.kmPerDay ?? P.kmPerDayProjected ?? 0;
+    const clockMin =
+      P.projectedClockPaceMin ??
+      (remainingKm > 0 && hours > 0 ? (hours * 60) / remainingKm : null);
+
+    const serverForecast = (P.forecast || [])
+      .filter((f) => !f.scenario || f.scenario === scenario)
+      .map((f) => ({
+        km: f.km,
+        paceMin: f.predicted_pace_min,
+        gain: f.gain,
+      }));
+
+    return {
+      finish,
+      hours,
+      days: hours / 24,
+      forecast: serverForecast,
+      fromServer: true,
+      stats: {
+        remainingKm,
+        avgPaceMin: clockMin,
+        kmPerDay,
+        kmPerHour: hours > 0 ? remainingKm / hours : 0,
+        nightKm: 0,
+        nightKmPct: 0,
+        climbSecTotal: 0,
+        climbMinPerKm: 0,
+      },
+    };
+  }
+
   function predictFinish(scenario) {
+    const srv = finishFromServer(scenario);
+    if (srv) return srv;
+
     let cum = 0;
     const forecast = [];
     const { projKm, projTime, floorKm } = projectionAnchor();
+    if (P.forecastSuspended && scenario === "main") {
+      const remainingKm = Math.max(0, totalKm - projKm);
+      return {
+        finish: projTime,
+        hours: 0,
+        days: 0,
+        forecast: [],
+        stats: {
+          remainingKm,
+          avgPaceMin: 0,
+          kmPerDay: 0,
+          kmPerHour: 0,
+          nightKm: 0,
+          nightKmPct: 0,
+          climbSecTotal: 0,
+          climbMinPerKm: 0,
+        },
+      };
+    }
     let t = projTime;
     const remainingKm = Math.max(0, totalKm - projKm);
     let nightKm = 0;
@@ -252,11 +379,12 @@
   function updateOverviewStats(mainFinish) {
     const g = D.event && D.event.goal;
     const mov = perf.weightedPaceMin || P.movingPaceMin || P.basePaceMin;
+    const recent = perf.recentPaceMin || mov;
     const main = mainFinish || predictFinish("main");
-    const clockProj = main.stats.avgPaceMin;
+    const clockProj = P.projectedClockPaceMin ?? main.stats.avgPaceMin;
     const clockReqStr = g?.requiredClockPaceCalendar || g?.requiredPaceCalendar;
     const reqKmDay = g?.kmPerDayCalendar;
-    const projKmDay = main.stats.kmPerDay;
+    const projKmDay = P.kmPerDayProjected ?? main.stats.kmPerDay;
     const gapKmDay = reqKmDay != null && projKmDay != null ? projKmDay - reqKmDay : null;
 
     const kmEl = $("stat-km");
@@ -278,7 +406,12 @@
     if (paceEl) {
       paceEl.querySelector(".value").textContent = fmtPaceMin(mov);
       paceEl.querySelector(".sub").textContent =
-        "Só km em movimento · global corrido " + fmtPaceMin(perf.overallPaceMin);
+        "Recente " +
+        fmtPaceMin(perf.recentPaceMin || mov) +
+        " · mov. " +
+        fmtPaceMin(mov) +
+        " · relogio " +
+        fmtPaceMin(perf.overallPaceMin);
     }
     const goalEl = $("stat-goal");
     if (goalEl && g) {
@@ -333,8 +466,75 @@
     return remainingKm / (hoursLeft / 24);
   }
 
+  const HYBRID = {
+    modelMin: 0.72,
+    modelMax: 1.0,
+    regime: { normal: 1, post_stop: 0.94, in_long_stop: 0.88 },
+    staleHours: 3,
+    dataStaleNoGps: 0.78,
+    dataStaleGps: 0.94,
+  };
+
+  function modelReliabilityFactor(confidencePct) {
+    if (confidencePct == null) return 0.88;
+    const pct = Math.max(40, Math.min(92, confidencePct));
+    return HYBRID.modelMin + ((pct - 40) / 52) * (HYBRID.modelMax - HYBRID.modelMin);
+  }
+
+  function regimeConfidenceFactor(regime, forecastSuspended) {
+    let f = HYBRID.regime[regime] != null ? HYBRID.regime[regime] : 1;
+    if (forecastSuspended) f = Math.min(f, 0.9);
+    return f;
+  }
+
+  function dataReliabilityFactor(dataStaleHours, projectionAnchor) {
+    if (dataStaleHours == null || dataStaleHours <= HYBRID.staleHours) return 1;
+    if (projectionAnchor === "gps_live") return HYBRID.dataStaleGps;
+    return HYBRID.dataStaleNoGps;
+  }
+
+  function applyGoalConfidenceHybrid(basePct, opts) {
+    const modelF = modelReliabilityFactor(opts.modelReliabilityPct);
+    const regimeF = regimeConfidenceFactor(opts.regime, opts.forecastSuspended);
+    const dataF = dataReliabilityFactor(opts.dataStaleHours, opts.projectionAnchor);
+    const pct = Math.round(
+      Math.max(5, Math.min(92, basePct * modelF * regimeF * dataF))
+    );
+    return {
+      pct,
+      basePct: Math.round(basePct),
+      modelReliabilityPct:
+        opts.modelReliabilityPct != null ? Math.round(opts.modelReliabilityPct) : null,
+      modelFactor: Math.round(modelF * 1000) / 1000,
+      regimeFactor: Math.round(regimeF * 1000) / 1000,
+      dataFactor: Math.round(dataF * 1000) / 1000,
+    };
+  }
+
+  function regimeLabel(regime, forecastSuspended) {
+    const labels = {
+      normal: "Normal",
+      post_stop: "Recuperação pós-paragem longa",
+      in_long_stop: "Paragem longa activa",
+    };
+    let t = labels[regime] || regime || "Normal";
+    if (forecastSuspended) t += " · previsão km a km suspensa";
+    return t;
+  }
+
   function computeGoalConfidence(opts) {
-    const { deadlineStr, referenceKm, requiredPaceStr, requiredKmDay, finishes } = opts;
+    const {
+      deadlineStr,
+      referenceKm,
+      requiredPaceStr,
+      requiredKmDay,
+      finishes,
+      dataStaleHours,
+      projectionAnchor,
+      modelReliabilityPct,
+      regime,
+      forecastSuspended,
+    } = opts;
     const mOpt = marginMinutes(deadlineStr, finishes.optimistic.finish);
     const mMain = marginMinutes(deadlineStr, finishes.main.finish);
     const mPes = marginMinutes(deadlineStr, finishes.pessimistic.finish);
@@ -343,6 +543,7 @@
     const projectedKmDay = finishes.main?.stats?.kmPerDay;
     const demonstratedCandidates = [
       proven.kmDay40,
+      proven.recentKmDay,
       proven.kmDayGlobal,
       projectedKmDay,
     ].filter((v) => v != null && Number.isFinite(v) && v > 0);
@@ -426,9 +627,32 @@
       pct -= Math.min(8, Math.round((perf.stopRatioPct - 12) * 1.2));
     }
 
-    pct = Math.round(Math.max(5, Math.min(92, pct)));
+    const basePct = Math.round(Math.max(5, Math.min(92, pct)));
+    const hybrid = applyGoalConfidenceHybrid(basePct, {
+      modelReliabilityPct: modelReliabilityPct != null ? modelReliabilityPct : P.confidencePct,
+      regime: regime || getRegime(),
+      forecastSuspended: !!forecastSuspended,
+      dataStaleHours,
+      projectionAnchor,
+    });
+    pct = hybrid.pct;
 
     const factors = [
+      {
+        k: "Probabilidade face ao prazo (base)",
+        v: basePct + "% antes do ajuste v4",
+        cls: "warn",
+      },
+      {
+        k: "Ajuste fiabilidade do ritmo",
+        v:
+          "×" +
+          hybrid.modelFactor +
+          (hybrid.modelReliabilityPct != null
+            ? " (modelo " + hybrid.modelReliabilityPct + "%)"
+            : ""),
+        cls: hybrid.modelFactor >= 0.95 ? "good" : hybrid.modelFactor >= 0.85 ? "warn" : "bad",
+      },
       {
         k: "Cenário pessimista",
         v: fmtHM(mPes) + " vs prazo",
@@ -470,6 +694,38 @@
       });
     }
 
+    if (perf.recentPaceMin != null) {
+      factors.push({
+        k: "Ritmo recente (15 km)",
+        v:
+          fmtPaceMin(perf.recentPaceMin) +
+          " vs global " +
+          fmtPaceMin(perf.weightedPaceMin),
+        cls:
+          perf.recentPaceMin <= (perf.weightedPaceMin || 99) * 1.05 ? "good" : "warn",
+      });
+    }
+
+    if (hybrid.regimeFactor < 1) {
+      factors.push({
+        k: "Regime v4",
+        v: regimeLabel(regime || getRegime(), forecastSuspended) + " ×" + hybrid.regimeFactor,
+        cls: "warn",
+      });
+    }
+    if (hybrid.dataFactor < 1) {
+      factors.push({
+        k: "Frescura dos dados",
+        v:
+          "×" +
+          hybrid.dataFactor +
+          (dataStaleHours != null
+            ? " · último split há " + fmtNum(dataStaleHours, 1) + " h"
+            : ""),
+        cls: projectionAnchor === "gps_live" ? "warn" : "bad",
+      });
+    }
+
     if (referenceKm != null) {
       const kmAhead = currentKm - referenceKm;
       factors.push({
@@ -496,12 +752,241 @@
 
     return {
       pct,
+      basePct: hybrid.basePct,
+      hybrid,
       level: confidenceLevel(pct),
       label: confidenceLabel(pct),
       verdictSub,
       factors,
       margins: { opt: mOpt, main: mMain, pes: mPes },
     };
+  }
+
+  function buildModelReliabilityPanel() {
+    const pct = P.confidencePct;
+    const perfLocal = P.performance || {};
+    const factors = [];
+    const p25 = perfLocal.p25PaceMin;
+    const p75 = perfLocal.p75PaceMin;
+    if (p25 != null && p75 != null) {
+      const iqr = Math.round((p75 - p25) * 10) / 10;
+      factors.push({
+        k: "Variabilidade do ritmo (IQR)",
+        v: iqr + " min/km",
+        cls: iqr <= 4 ? "good" : iqr <= 7 ? "warn" : "bad",
+      });
+    }
+    if (perfLocal.stopRatioPct != null) {
+      factors.push({
+        k: "Tempo em paragem",
+        v: fmtNum(perfLocal.stopRatioPct, 1) + "% do percurso",
+        cls:
+          perfLocal.stopRatioPct <= 12
+            ? "good"
+            : perfLocal.stopRatioPct <= 18
+              ? "warn"
+              : "bad",
+      });
+    }
+    factors.push({
+      k: "Regime v4",
+      v: regimeLabel(getRegime(), P.forecastSuspended),
+      cls: getRegime() === "normal" && !P.forecastSuspended ? "good" : "warn",
+    });
+    if (P.dataStaleHours != null) {
+      factors.push({
+        k: "Idade dos splits",
+        v:
+          fmtNum(P.dataStaleHours, 1) +
+          " h · âncora " +
+          (P.projectionAnchor || "splits"),
+        cls:
+          P.dataStaleHours <= HYBRID.staleHours
+            ? "good"
+            : P.projectionAnchor === "gps_live"
+              ? "warn"
+              : "bad",
+      });
+    }
+    let desc =
+      "Estabilidade do ritmo medido e frescura dos dados — não mede directamente a probabilidade de cumprir 31/05.";
+    if (pct != null && pct < 55) {
+      desc += " Sinal fraco: os cartões de meta são ajustados para baixo.";
+    } else if (
+      P.dataStaleHours != null &&
+      P.dataStaleHours > HYBRID.staleHours &&
+      P.projectionAnchor !== "gps_live"
+    ) {
+      desc += " Splits antigos sem GPS live: confiança nas metas reduzida.";
+    }
+    return { pct: pct != null ? Math.round(pct) : null, desc, factors };
+  }
+
+  function upsertConfidenceCurvePoint(pts, km, calPct, recPct) {
+    const out = pts.filter((p) => p.km !== km);
+    out.push({
+      km,
+      calendarPct: calPct,
+      recordPct: recPct,
+      isCurrent: true,
+    });
+    out.sort((a, b) => a.km - b.km);
+    return out;
+  }
+
+  function drawConfidenceEvolutionChart(calConf, recConf) {
+    const canvas = $("chart-conf-evolution");
+    const cap = $("conf-evolution-caption");
+    const curve = D.confidenceCurve;
+    if (!canvas) return;
+    if (!curve || !curve.points || !curve.points.length) {
+      if (cap) {
+        cap.textContent =
+          "Sem histórico por km — corre refresh_data.py ou aguarda a próxima actualização completa.";
+      }
+      return;
+    }
+    const kmNow =
+      P.projectionKm != null ? Math.round(P.projectionKm * 10) / 10 : currentKm;
+    let pts = curve.points.slice();
+    if (calConf && recConf && calConf.pct != null) {
+      pts = upsertConfidenceCurvePoint(pts, Math.round(kmNow), calConf.pct, recConf.pct);
+    } else if (curve.current) {
+      pts = upsertConfidenceCurvePoint(
+        pts,
+        curve.current.km,
+        curve.current.calendarPct,
+        curve.current.recordPct
+      );
+    }
+    const s = setupCanvas(canvas, 220);
+    if (!s) return;
+    const { ctx, w, h } = s;
+    const pad = { l: 44, r: 16, t: 28, b: 32 };
+    const plotW = w - pad.l - pad.r;
+    const plotH = h - pad.t - pad.b;
+    const minKm = pts[0].km;
+    const maxKm = Math.max(pts[pts.length - 1].km, kmNow, minKm + 1);
+
+    ctx.fillStyle = "#151920";
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = "#2a3344";
+    ctx.lineWidth = 1;
+    ctx.font = "10px sans-serif";
+    ctx.fillStyle = "#8b95a8";
+    for (let pct = 0; pct <= 100; pct += 25) {
+      const y = pad.t + (1 - pct / 100) * plotH;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(w - pad.r, y);
+      ctx.stroke();
+      ctx.fillText(pct + "%", 6, y + 4);
+    }
+
+    const xAt = (km) => pad.l + ((km - minKm) / (maxKm - minKm)) * plotW;
+    const yAt = (pct) => pad.t + (1 - pct / 100) * plotH;
+
+    function drawLine(key, color, width) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      let started = false;
+      for (const p of pts) {
+        const v = p[key];
+        if (v == null) continue;
+        const x = xAt(p.km);
+        const y = yAt(v);
+        if (!started) {
+          ctx.moveTo(x, y);
+          started = true;
+        } else ctx.lineTo(x, y);
+      }
+      if (started) ctx.stroke();
+    }
+
+    drawLine("recordPct", "rgba(96, 165, 250, 0.85)", 2);
+    drawLine("calendarPct", "rgba(34, 197, 94, 0.95)", 2.5);
+
+    const cx = xAt(kmNow);
+    ctx.strokeStyle = "#22c55e";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(cx, pad.t);
+    ctx.lineTo(cx, h - pad.b);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const currentPt = pts.find((p) => p.isCurrent) || pts[pts.length - 1];
+    const calNow =
+      calConf && calConf.pct != null ? calConf.pct : currentPt.calendarPct;
+    const recNow =
+      recConf && recConf.pct != null ? recConf.pct : currentPt.recordPct;
+    if (calNow != null) {
+      ctx.fillStyle = "#22c55e";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, yAt(calNow), 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    if (recNow != null) {
+      ctx.fillStyle = "#60a5fa";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, yAt(recNow), 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.font = "10px sans-serif";
+    ctx.fillStyle = "#8b95a8";
+    ctx.fillText("km", w / 2 - 8, h - 6);
+
+    ctx.font = "11px sans-serif";
+    ctx.fillStyle = "#22c55e";
+    ctx.fillText("■ 31/05", pad.l, 14);
+    ctx.fillStyle = "#60a5fa";
+    ctx.fillText("■ Record", pad.l + 52, 14);
+
+    if (cap) {
+      let txt =
+        (curve.label || "") +
+        (curve.stepKm ? " Amostra a cada " + curve.stepKm + " km." : "");
+      if (calConf && calConf.pct != null) {
+        txt +=
+          " Ponto km " +
+          Math.round(kmNow) +
+          ": cartões " +
+          calConf.pct +
+          "% / record " +
+          (recConf && recConf.pct != null ? recConf.pct + "%" : "—") +
+          ".";
+      }
+      cap.textContent = txt;
+    }
+  }
+
+  function renderModelReliabilityPanel() {
+    const panel = $("conf-model-reliability");
+    if (!panel) return;
+    const info = buildModelReliabilityPanel();
+    const pctEl = $("conf-model-pct");
+    if (pctEl) pctEl.textContent = info.pct != null ? info.pct + "%" : "—";
+    const descEl = $("conf-model-desc");
+    if (descEl) descEl.textContent = info.desc;
+    const factorsEl = $("conf-model-factors");
+    if (factorsEl) {
+      factorsEl.innerHTML = info.factors
+        .map(
+          (f) =>
+            `<li><span class="k">${f.k}</span><span class="v ${f.cls || ""}">${f.v}</span></li>`
+        )
+        .join("");
+    }
   }
 
   function parsePaceStr(s) {
@@ -540,11 +1025,13 @@
       const h = (new Date(s.crossing_time.replace(" ", "T")) - start) / 3600000;
       if (h <= 40) kmAt40 = s.km;
     }
+    const recentMin = perf.recentPaceMin || params.basePaceMin;
     return {
       kmDayGlobal: elapsedH > 0 ? currentKm / (elapsedH / 24) : null,
       kmAt40,
       kmDay40: kmAt40 != null ? (kmAt40 / 40) * 24 : null,
       weightedKmDay: params.basePaceMin > 0 ? (24 * 60) / params.basePaceMin : null,
+      recentKmDay: recentMin > 0 ? (24 * 60) / recentMin : null,
     };
   }
 
@@ -567,15 +1054,29 @@
           rows: [
             ["Média global", fmtNum(proven.kmDayGlobal, 1) + " km/dia"],
             ["Primeiras ~40 h", fmtNum(proven.kmAt40, 0) + " km · " + fmtNum(proven.kmDay40, 1) + " km/dia"],
-            ["Ritmo recente", fmtPaceMin(params.basePaceMin) + " ≈ " + fmtNum(proven.weightedKmDay, 1) + " km/dia"],
+            [
+              "Ritmo recente (15 km)",
+              fmtPaceMin(perf.recentPaceMin) +
+                " ≈ " +
+                fmtNum(proven.recentKmDay, 1) +
+                " km/dia",
+            ],
+            [
+              "Ritmo global mov.",
+              fmtPaceMin(params.basePaceMin) +
+                " ≈ " +
+                fmtNum(proven.weightedKmDay, 1) +
+                " km/dia",
+            ],
             ["Meta 31/05", (reqKmDayCal || "—") + " km/dia"],
           ],
         },
         {
-          title: "Projectado (cenário principal v3)",
+          title: "Projectado (cenário principal v4)",
           rows: [
             ["Km/dia à frente", fmtNum(st.kmPerDay, 1) + " km/dia"],
-            ["Ritmo médio efectivo", fmtPaceMin(st.avgPaceMin)],
+            ["Ritmo relógio previsto", fmtPaceMin(P.projectedClockPaceMin ?? st.avgPaceMin)],
+            ["Ritmo movimento (modelo)", fmtPaceMin(P.movingPaceMin || perf.recentPaceMin)],
             ["Chegada", main.finish.toLocaleString("pt-PT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })],
             ["vs 31/05", mCal != null ? fmtHM(mCal) : "—"],
             ["vs record", mRec != null ? fmtHM(mRec) : "—"],
@@ -591,7 +1092,15 @@
           ],
         },
       ],
-      sampleRows: (main.forecast || []).slice(0, 8).map((f) => `<tr><td>${f.km}</td><td>${fmtPaceMin(f.paceMin)}</td><td>${f.gain || 0} m</td></tr>`).join(""),
+      sampleRows: (P.forecast || main.forecast || [])
+        .filter((f) => f.predicted_pace_min != null || f.paceMin != null)
+        .slice(0, 12)
+        .map((f) => {
+          const pace = f.predicted_pace_min ?? f.paceMin;
+          const t = f.predicted_crossing || f.predicted_crossing_iso || "";
+          return `<tr><td>${f.km}</td><td>${fmtPaceMin(pace)}</td><td>${t ? t.split(" ")[1] || t : "—"}</td><td>${f.gain || 0} m</td></tr>`;
+        })
+        .join(""),
     };
   }
 
@@ -599,11 +1108,19 @@
     const panel = $("conf-main-detail");
     if (!panel) return;
     const { blocks, sampleRows, proven, gapCal, reqKmDayCal } = buildMainScenarioDetail(main);
-    panel.innerHTML = `<h3>Cenário principal — modelo v3</h3>
+    const ri = getRegimeInfo();
+    const regimeLine = ri.note
+      ? `<p class="chart-caption warn">${ri.note}</p>`
+      : "";
+    const suspendedLine = P.forecastSuspended
+      ? `<p class="chart-caption warn">Previsão km-a-km suspensa — paragem longa em curso.</p>`
+      : "";
+    panel.innerHTML = `<h3>Cenário principal — modelo v4</h3>
+      ${regimeLine}${suspendedLine}
       <p class="chart-caption conf-callout">Calibrado no percurso do Nuno (${fmtNum(proven.kmDay40, 0)} km/dia nas primeiras 40 h). Projecta <strong>${fmtNum(main.stats.kmPerDay, 1)} km/dia</strong> — meta 31/05: ${reqKmDayCal} km/dia (${gapCal >= 0 ? "+" : ""}${fmtNum(gapCal, 1)} km/dia).</p>
-      <p class="chart-caption">E[min/km] = (1−p_paragem)×ritmo×fadiga×noite + p_paragem×duração + subida. Sem penalização fixa de sono.</p>
+      <p class="chart-caption">v4: janela recente 15 km no horizonte curto; paragens ≥60 min; âncora GPS se splits atrasados.</p>
       <div class="conf-detail-grid">${blocks.map((b) => `<div class="conf-detail-block"><h4>${b.title}</h4><ul class="conf-detail-rows">${b.rows.map(([k,v]) => `<li><span class="k">${k}</span><span class="v">${v}</span></li>`).join("")}</ul></div>`).join("")}</div>
-      <details class="conf-detail-sample"><summary>Ritmo de 5 em 5 km</summary><table><thead><tr><th>Km</th><th>Ritmo</th><th>D+</th></tr></thead><tbody>${sampleRows}</tbody></table></details>`;
+      <details class="conf-detail-sample"><summary>Previsão km-a-km (modelo v4)</summary><table><thead><tr><th>Km</th><th>Ritmo</th><th>Hora</th><th>D+</th></tr></thead><tbody>${sampleRows || "<tr><td colspan=\"4\">Sem previsão (paragem ou dados em falta)</td></tr>"}</tbody></table></details>`;
   }
 
   function renderInsightPanels() {
@@ -612,6 +1129,7 @@
     const refsEl = $("science-refs");
     if (!perfEl || !sciEl) return;
     perfEl.innerHTML = [
+      ["Ritmo recente (15 km)", (perf.recentPaceMin || "—") + " min/km"],
       ["Ritmo ponderado", (perf.weightedPaceMin || "—") + " min/km"],
       ["Mediana movimento", (perf.medianPaceMin || "—") + " min/km"],
       ["P25–P75", (perf.p25PaceMin || "—") + " – " + (perf.p75PaceMin || "—")],
@@ -636,7 +1154,7 @@
     }
     const desc = $("model-desc");
     if (desc) {
-      desc.innerHTML = `<strong>${P.model || "Modelo v3"}</strong> (v${P.modelVersion || 3}). ${(P.modelParams && P.modelParams.description) || ""} Fontes com links abaixo.`;
+      desc.innerHTML = `<strong>${P.model || "Modelo v4"}</strong> (v${P.modelVersion || 4}). ${(P.modelParams && P.modelParams.description) || ""} Fontes com links abaixo.`;
     }
   }
 
@@ -687,6 +1205,15 @@
     if (marginsEl) {
       const calClass = mCal >= 0 ? "" : mCal >= -180 ? "warn" : "bad";
       const recClass = mRec >= 0 ? "" : mRec >= -180 ? "warn" : "bad";
+      let regimeNote = "";
+      const ri = getRegimeInfo();
+      if (ri.note) {
+        regimeNote = '<br><span class="warn">' + ri.note + "</span>";
+      }
+      if (P.forecastSuspended) {
+        regimeNote +=
+          '<br><span class="warn">Previsao km-a-km suspensa (paragem longa em curso).</span>';
+      }
       marginsEl.innerHTML =
         'Margem vs <strong>31/05</strong>: <span class="' +
         calClass +
@@ -696,7 +1223,8 @@
         recClass +
         '">' +
         fmtHM(mRec) +
-        "</span>";
+        "</span>" +
+        regimeNote;
     }
   }
 
@@ -709,10 +1237,33 @@
       pessimistic: predictFinish("pessimistic"),
     };
     renderFinishHero(finishes, g);
-    const calConf = computeGoalConfidence({ deadlineStr: g.calendarDeadline, referenceKm: g.calendarPaceNow?.km, requiredPaceStr: g.requiredPaceCalendar, requiredKmDay: g.kmPerDayCalendar, finishes });
-    const recConf = computeGoalConfidence({ deadlineStr: g.recordDeadlineFromStart, referenceKm: g.recordPaceNow?.km, requiredPaceStr: g.requiredPaceRecord, requiredKmDay: requiredKmPerDay(g.recordDeadlineFromStart, g.remainingKm), finishes });
+    const confOpts = {
+      finishes,
+      dataStaleHours: P.dataStaleHours,
+      projectionAnchor: P.projectionAnchor,
+      modelReliabilityPct: P.confidencePct,
+      regime: getRegime(),
+      forecastSuspended: P.forecastSuspended,
+    };
+    const calConf = computeGoalConfidence({
+      deadlineStr: g.calendarDeadline,
+      referenceKm: g.calendarPaceNow?.km,
+      requiredPaceStr: g.requiredPaceCalendar,
+      requiredKmDay: g.kmPerDayCalendar,
+      ...confOpts,
+    });
+    const recConf = computeGoalConfidence({
+      deadlineStr: g.recordDeadlineFromStart,
+      referenceKm: g.recordPaceNow?.km,
+      requiredPaceStr: g.requiredPaceRecord,
+      requiredKmDay: requiredKmPerDay(g.recordDeadlineFromStart, g.remainingKm),
+      ...confOpts,
+    });
+    renderModelReliabilityPanel();
     renderConfidenceCard("conf-cal", calConf, "Prazo 31/05 23:59 · " + g.remainingKm + " km restantes");
     renderConfidenceCard("conf-rec", recConf, "Record " + (g.recordCurrent || "") + " · limite " + (g.recordDeadlineFromStart || "").replace(" ", " · "));
+    window.__travessiaLastConf = { cal: calConf, rec: recConf };
+    drawConfidenceEvolutionChart(calConf, recConf);
     const table = $("conf-scenario-table");
     if (table) {
       const row = (label, a, b) => `<div class="conf-scenario-row"><span>${label}</span><span class="cell ${a >= 0 ? "good" : "bad"}">31/05: ${fmtHM(a)}</span><span class="cell ${b >= 0 ? "good" : "bad"}">Record: ${fmtHM(b)}</span></div>`;
@@ -725,6 +1276,7 @@
 
   try {
     updateConfidence();
+    updateModelBadge();
   } catch (err) {
     console.error("updateConfidence:", err);
   }
@@ -797,60 +1349,588 @@
     ctx.restore();
   }
 
-  function drawElevChart() {
-    const canvas = $("chart-elev");
-    const s = setupCanvas(canvas, 200);
-    if (!s) return;
-    const { ctx, w, h } = s;
-    const prof = D.routeProfile;
-    const pad = { l: 44, r: 16, t: 16, b: 28 };
-    const maxKm = prof[prof.length - 1].km;
+  const elevProfile = () => D.routeProfile || [];
+  const DEFAULT_ROUTE_LANDMARKS = [
+    { km: 24, name: "Viana do Castelo", major: true },
+    { km: 51, name: "Barcelos", major: false },
+    { km: 92, name: "Porto", major: true },
+    { km: 160, name: "Aveiro", major: true },
+    { km: 220, name: "Figueira da Foz", major: false },
+    { km: 271, name: "Leiria", major: true },
+    { km: 342, name: "Santarém", major: true },
+    { km: 479, name: "Grândola", major: false },
+    { km: 571, name: "Zambujeira do Mar", major: false },
+    { km: 642, name: "Sagres", major: true },
+  ];
+  function routeLandmarks() {
+    return D.routeLandmarks && D.routeLandmarks.length ? D.routeLandmarks : DEFAULT_ROUTE_LANDMARKS;
+  }
+  let elevShowCities = true;
+  try {
+    elevShowCities = localStorage.getItem("travessiaElevCities") !== "0";
+  } catch {}
+  let elevLargeHoverKm = null;
+  let elevLargeLayout = null;
+
+  function citiesForElevChart(large) {
+    if (!elevShowCities) return [];
+    const all = routeLandmarks();
+    return large ? all : all.filter((c) => c.major);
+  }
+
+  function nearestLandmark(km, maxDelta) {
+    let best = null;
+    let bestD = maxDelta;
+    for (const c of routeLandmarks()) {
+      const d = Math.abs(c.km - km);
+      if (d < bestD) {
+        bestD = d;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  function drawElevCityMarkers(ctx, opts, layout, prof) {
+    const cities = citiesForElevChart(opts.large);
+    if (!cities.length) return;
+    const { pad, w, h, xAtKm, yAtAlt } = layout;
+    const plotH = h - pad.t - pad.b;
+    let flip = false;
+    for (const city of cities) {
+      const x = xAtKm(city.km);
+      const pt = elevAtKm(city.km, prof);
+      const yOn = pt ? yAtAlt(pt.elevation) : pad.t + plotH * 0.35;
+
+      ctx.save();
+      ctx.strokeStyle = city.major ? "rgba(148, 163, 184, 0.45)" : "rgba(148, 163, 184, 0.28)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.t);
+      ctx.lineTo(x, h - pad.b);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      const above = flip;
+      flip = !flip;
+      const fontSize = opts.large ? (city.major ? 11 : 10) : city.major ? 9 : 8;
+      ctx.font = (city.major ? "600 " : "") + fontSize + "px sans-serif";
+      ctx.fillStyle = city.major ? "#c5cee0" : "#7d8798";
+      ctx.textAlign = "center";
+      const label = city.name;
+      const tw = ctx.measureText(label).width;
+      let tx = x;
+      if (tx - tw / 2 < pad.l) tx = pad.l + tw / 2 + 2;
+      if (tx + tw / 2 > w - pad.r) tx = w - pad.r - tw / 2 - 2;
+      const labelY = above ? pad.t + (opts.large ? 14 : 11) : h - pad.b - (opts.large ? 6 : 4);
+      ctx.fillText(label, tx, labelY);
+      if (opts.large) {
+        ctx.font = "9px sans-serif";
+        ctx.fillStyle = "#6b7280";
+        ctx.fillText("km " + city.km, tx, above ? pad.t + 26 : h - pad.b + 14);
+      }
+      if (pt && opts.large) {
+        ctx.fillStyle = "rgba(196, 206, 224, 0.9)";
+        ctx.beginPath();
+        ctx.arc(x, yOn, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.textAlign = "left";
+  }
+
+  function elevBounds(prof) {
     const alts = prof.map((p) => p.elevation);
-    const minA = Math.min(...alts) - 20;
-    const maxA = Math.max(...alts) + 20;
+    return {
+      minA: Math.min(...alts) - 20,
+      maxA: Math.max(...alts) + 20,
+      maxKm: prof[prof.length - 1].km,
+    };
+  }
+
+  function elevAtKm(km, prof) {
+    if (!prof.length) return null;
+    if (km <= prof[0].km) return { ...prof[0], km };
+    const last = prof[prof.length - 1];
+    if (km >= last.km) return { ...last, km };
+    let i = 0;
+    while (i < prof.length - 1 && prof[i + 1].km < km) i += 1;
+    const a = prof[i];
+    const b = prof[i + 1];
+    const span = b.km - a.km || 1;
+    const t = (km - a.km) / span;
+    return {
+      km: Math.round(km * 10) / 10,
+      elevation: Math.round((a.elevation + t * (b.elevation - a.elevation)) * 10) / 10,
+      gain: a.gain,
+      loss: a.loss,
+    };
+  }
+
+  function elevKmFromClientX(canvas, clientX, layout) {
+    if (!layout) return null;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const { pad, w, maxKm } = layout;
+    const plotW = w - pad.l - pad.r;
+    if (x < pad.l || x > pad.l + plotW) return null;
+    return (Math.max(0, Math.min(1, (x - pad.l) / plotW)) * maxKm);
+  }
+
+  function drawElevProfile(canvas, height, opts) {
+    const prof = elevProfile();
+    if (!prof.length || !canvas) return null;
+    const s = setupCanvas(canvas, height);
+    if (!s) return null;
+    const { ctx, w, h } = s;
+    const pad = opts.pad || { l: 44, r: 16, t: 16, b: 28 };
+    const { minA, maxA, maxKm } = elevBounds(prof);
+    const plotH = h - pad.t - pad.b;
+    const plotW = w - pad.l - pad.r;
+
+    const xAtKm = (km) => pad.l + (km / maxKm) * plotW;
+    const yAtAlt = (alt) => pad.t + (1 - (alt - minA) / (maxA - minA)) * plotH;
 
     ctx.fillStyle = "#151920";
     ctx.fillRect(0, 0, w, h);
 
+    ctx.strokeStyle = "#2a3344";
+    ctx.lineWidth = 1;
+    const altStep = maxA - minA > 400 ? 100 : maxA - minA > 150 ? 50 : 25;
+    for (let a = Math.ceil(minA / altStep) * altStep; a <= maxA; a += altStep) {
+      const y = yAtAlt(a);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(w - pad.r, y);
+      ctx.stroke();
+      ctx.fillStyle = "#8b95a8";
+      ctx.font = (opts.large ? 11 : 10) + "px sans-serif";
+      ctx.fillText(a + " m", 6, y + 4);
+    }
+
+    if (opts.large && maxKm > 100) {
+      const kmStep = maxKm > 400 ? 100 : 50;
+      ctx.strokeStyle = "#2a3344";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#8b95a8";
+      ctx.font = "10px sans-serif";
+      for (let km = 0; km <= maxKm; km += kmStep) {
+        const x = xAtKm(km);
+        ctx.beginPath();
+        ctx.moveTo(x, pad.t);
+        ctx.lineTo(x, h - pad.b);
+        ctx.stroke();
+        ctx.fillText(km, x - 8, h - 8);
+      }
+    }
+
+    const layout = { pad, w, h, maxKm, minA, maxA, xAtKm, yAtAlt, plotH, plotW };
+    drawElevCityMarkers(ctx, opts, layout, prof);
+
     ctx.beginPath();
     prof.forEach((p, i) => {
-      const x = pad.l + (p.km / maxKm) * (w - pad.l - pad.r);
-      const y =
-        pad.t + (1 - (p.elevation - minA) / (maxA - minA)) * (h - pad.t - pad.b);
+      const x = xAtKm(p.km);
+      const y = yAtAlt(p.elevation);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
-    ctx.lineTo(pad.l + (w - pad.l - pad.r), h - pad.b);
+    ctx.lineTo(xAtKm(maxKm), h - pad.b);
     ctx.lineTo(pad.l, h - pad.b);
     ctx.closePath();
-    ctx.fillStyle = "rgba(61, 139, 253, 0.2)";
+    ctx.fillStyle = "rgba(61, 139, 253, 0.22)";
     ctx.fill();
     ctx.strokeStyle = "#3d8bfd";
-    ctx.lineWidth = 2;
+    ctx.lineWidth = opts.large ? 2.5 : 2;
     ctx.stroke();
 
-    const cx = pad.l + (currentKm / maxKm) * (w - pad.l - pad.r);
-    ctx.strokeStyle = "#22c55e";
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(cx, pad.t);
-    ctx.lineTo(cx, h - pad.b);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = "#22c55e";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("Agora: km " + currentKm, Math.min(cx + 4, w - 80), pad.t + 12);
+    const markerKm = opts.hoverKm != null ? opts.hoverKm : currentKm;
+    const cx = xAtKm(markerKm);
+    const isHover = opts.hoverKm != null;
+
+    if (isHover) {
+      const pt = elevAtKm(opts.hoverKm, prof);
+      if (pt) {
+        const hx = xAtKm(pt.km);
+        const hy = yAtAlt(pt.elevation);
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.85)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(hx, pad.t);
+        ctx.lineTo(hx, h - pad.b);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(hx, hy, opts.large ? 5 : 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    if (!isHover || Math.abs(markerKm - currentKm) > 0.5) {
+      const nowX = xAtKm(currentKm);
+      ctx.strokeStyle = "#22c55e";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(nowX, pad.t);
+      ctx.lineTo(nowX, h - pad.b);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#22c55e";
+      ctx.font = (opts.large ? 11 : 10) + "px sans-serif";
+      ctx.fillText(
+        "Agora: km " + currentKm,
+        Math.min(nowX + 4, w - 96),
+        pad.t + 12
+      );
+    }
 
     ctx.fillStyle = "#8b95a8";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("km", w / 2, h - 6);
-    ctx.fillText("m", 8, pad.t + 10);
+    ctx.font = (opts.large ? 11 : 10) + "px sans-serif";
+    ctx.fillText("km", w / 2 - 8, h - 6);
+    if (!opts.large) ctx.fillText("m", 8, pad.t + 10);
+
+    return layout;
+  }
+
+  function drawElevChart() {
+    drawElevProfile($("chart-elev"), 200, { large: false, showCities: elevShowCities });
+  }
+
+  function formatElevTooltip(pt) {
+    if (!pt) return "";
+    let html =
+      "<strong>km " +
+      pt.km +
+      "</strong> · " +
+      fmtNum(pt.elevation, 1) +
+      " m";
+    if (pt.gain != null || pt.loss != null) {
+      html +=
+        "<br><span style='opacity:.85'>Δ +" +
+        fmtNum(pt.gain || 0, 1) +
+        " / −" +
+        fmtNum(pt.loss || 0, 1) +
+        " m</span>";
+    }
+    const rem = totalKm - pt.km;
+    if (rem > 0) {
+      html += "<br><span style='opacity:.75'>" + fmtNum(rem, 1) + " km até à meta</span>";
+    }
+    const near = nearestLandmark(pt.km, 4);
+    if (near) {
+      html += "<br><span style='opacity:.9'>Ref.: " + near.name + " (km " + near.km + ")</span>";
+    }
+    return html;
+  }
+
+  function positionElevTooltip(tip, chartEl, clientX, clientY) {
+    if (!tip || !chartEl) return;
+    const rect = chartEl.getBoundingClientRect();
+    let left = clientX - rect.left + 14;
+    let top = clientY - rect.top - 12;
+    const maxL = rect.width - tip.offsetWidth - 8;
+    const maxT = rect.height - tip.offsetHeight - 8;
+    left = Math.max(8, Math.min(left, maxL));
+    top = Math.max(8, Math.min(top, maxT));
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+
+  function drawElevChartLarge() {
+    const canvas = $("chart-elev-large");
+    const height = Math.min(480, Math.max(320, Math.floor(window.innerHeight * 0.52)));
+    elevLargeLayout = drawElevProfile(canvas, height, {
+      large: true,
+      hoverKm: elevLargeHoverKm,
+      showCities: elevShowCities,
+      pad: { l: 52, r: 20, t: 28, b: 40 },
+    });
+    const meta = $("elev-modal-meta");
+    if (meta && elevLargeHoverKm != null) {
+      const pt = elevAtKm(elevLargeHoverKm, elevProfile());
+      meta.textContent = pt
+        ? "km " + pt.km + " · " + fmtNum(pt.elevation, 1) + " m · " + fmtNum(totalKm, 0) + " km total"
+        : totalKm + " km · posição actual km " + currentKm;
+    } else if (meta) {
+      meta.textContent =
+        totalKm + " km · posição actual km " + currentKm + " · passe o rato no gráfico";
+    }
+  }
+
+  function openElevModal() {
+    const modal = $("elev-modal");
+    if (!modal) return;
+    elevLargeHoverKm = null;
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("elev-modal-open");
+    const tip = $("elev-tooltip");
+    if (tip) tip.hidden = true;
+    requestAnimationFrame(() => {
+      drawElevChartLarge();
+    });
+  }
+
+  function closeElevModal() {
+    const modal = $("elev-modal");
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("elev-modal-open");
+    elevLargeHoverKm = null;
+    const tip = $("elev-tooltip");
+    if (tip) tip.hidden = true;
+  }
+
+  function onElevLargeMove(ev) {
+    const canvas = $("chart-elev-large");
+    const chartEl = $("elev-modal-chart");
+    const tip = $("elev-tooltip");
+    if (!canvas || !chartEl) return;
+    const km = elevKmFromClientX(canvas, ev.clientX, elevLargeLayout);
+    if (km == null) {
+      elevLargeHoverKm = null;
+      if (tip) tip.hidden = true;
+      drawElevChartLarge();
+      return;
+    }
+    elevLargeHoverKm = km;
+    drawElevChartLarge();
+    const pt = elevAtKm(km, elevProfile());
+    if (tip && pt) {
+      tip.innerHTML = formatElevTooltip(pt);
+      tip.hidden = false;
+      positionElevTooltip(tip, chartEl, ev.clientX, ev.clientY);
+    }
+  }
+
+  function setElevShowCities(on) {
+    elevShowCities = !!on;
+    try {
+      localStorage.setItem("travessiaElevCities", on ? "1" : "0");
+    } catch {}
+    const ids = ["elev-show-cities", "elev-show-cities-modal"];
+    ids.forEach((id) => {
+      const el = $(id);
+      if (el) el.checked = on;
+    });
+    drawElevChart();
+    if ($("elev-modal") && !$("elev-modal").hidden) drawElevChartLarge();
+  }
+
+  function initElevCitiesToggle() {
+    const ids = ["elev-show-cities", "elev-show-cities-modal"];
+    ids.forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.checked = elevShowCities;
+      el.addEventListener("change", () => setElevShowCities(el.checked));
+    });
+  }
+  initElevCitiesToggle();
+
+  function initElevModal() {
+    const box = $("chart-elev-box");
+    const modal = $("elev-modal");
+    const largeCanvas = $("chart-elev-large");
+    const closeBtn = $("elev-modal-close");
+
+    if (box) {
+      box.addEventListener("click", (ev) => {
+        if (ev.target.closest("a") || ev.target.closest(".elev-cities-toggle")) return;
+        openElevModal();
+      });
+      box.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          openElevModal();
+        }
+      });
+    }
+    closeBtn?.addEventListener("click", closeElevModal);
+    modal?.querySelectorAll("[data-elev-close]").forEach((el) => {
+      el.addEventListener("click", closeElevModal);
+    });
+    largeCanvas?.addEventListener("mousemove", onElevLargeMove);
+    largeCanvas?.addEventListener("mouseleave", () => {
+      elevLargeHoverKm = null;
+      const tip = $("elev-tooltip");
+      if (tip) tip.hidden = true;
+      drawElevChartLarge();
+    });
+    window.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") closeElevModal();
+    });
+    window.addEventListener("resize", () => {
+      if ($("elev-modal") && !$("elev-modal").hidden) drawElevChartLarge();
+    });
+  }
+  initElevModal();
+
+  function fmtDayRange(start, end) {
+    if (!start) return "—";
+    const a = start.replace(" ", " · ");
+    if (!end) return a + " → …";
+    const d0 = start.slice(0, 10);
+    const d1 = end.slice(0, 10);
+    if (d0 === d1) {
+      return d0 + " · " + start.split(" ")[1] + "–" + end.split(" ")[1];
+    }
+    return start.split(" ")[0] + " " + start.split(" ")[1] + " → " + end.split(" ")[0] + " " + end.split(" ")[1];
+  }
+
+  function getDaysPayload() {
+    if (D.days && Array.isArray(D.days.days)) return D.days;
+    return { days: [], nightStops: [], method: "", longStopThresholdMin: 60 };
+  }
+
+  function renderDays() {
+    const grid = $("days-grid");
+    const lead = $("days-lead");
+    if (!grid) return;
+    const payload = getDaysPayload();
+    const days = payload.days || [];
+    const goalKm = D.event?.goal?.kmPerDayCalendar;
+
+    if (lead) {
+      lead.textContent =
+        payload.method ||
+        "Cada dia corresponde ao período de movimento entre paragens noturnas longas (≥60 min).";
+      if (goalKm != null) {
+        lead.textContent += " Meta 31/05: ~" + fmtNum(goalKm, 1) + " km/dia em movimento.";
+      }
+    }
+
+    if (!days.length) {
+      grid.innerHTML = '<p class="chart-caption">Sem dias calculados — actualiza os dados completos.</p>';
+      return;
+    }
+
+    const catMap = {};
+    (D.categoryLegend || []).forEach((c) => {
+      catMap[c.id] = c;
+    });
+
+    grid.innerHTML = days
+      .map((day) => {
+        const vs = day.vsGoalKmDay;
+        let vsCls = "warn";
+        if (vs != null) vsCls = vs >= 0 ? "good" : "bad";
+        const night = day.nightAfter;
+        const nightHtml = night
+          ? `<div class="day-night"><strong>Paragem noite</strong> km ${night.kmFrom}` +
+            (night.kmTo !== night.kmFrom ? "–" + night.kmTo : "") +
+            " · " +
+            night.duration +
+            (night.endCrossing ? " · fim " + night.endCrossing.split(" ")[1] : "") +
+            "</div>"
+          : day.inProgress
+            ? '<div class="day-night">Dia em curso — paragem noturna ainda não registada.</div>'
+            : "";
+
+        const cats = Object.entries(day.categories || {})
+          .map(([id, n]) => {
+            const c = catMap[id];
+            const label = c ? c.short : id;
+            const col = c ? c.color : "#8b95a8";
+            return `<span class="cat-chip" style="border-color:${col}55;color:${col}">${label} ${n}</span>`;
+          })
+          .join("");
+
+        return (
+          `<article class="day-card${day.inProgress ? " in-progress" : ""}">` +
+          `<header class="day-card-head">` +
+          `<div><h3>${day.label}</h3>` +
+          `<p class="day-card-meta">km ${day.kmFrom}–${day.kmTo}` +
+          (day.splitsFromKm != null && day.splitsFromKm > day.kmFrom
+            ? ` · splits desde km ${day.splitsFromKm}`
+            : day.kmFrom === 0 && day.splitsFromKm
+              ? ` · splits desde km ${day.splitsFromKm}`
+              : "") +
+          ` · ${fmtDayRange(day.startTime, day.endTime)}</p></div>` +
+          `<div class="day-km-big">${day.km} km</div></header>` +
+          `<div class="day-stats">` +
+          `<div><span class="k">Tempo em movimento</span><span class="v">${day.movingTime || "—"} (${fmtNum(day.movingHours, 1)} h)</span></div>` +
+          `<div><span class="k">Ritmo em movimento</span><span class="v">${day.movingPace || "—"}</span></div>` +
+          `<div><span class="k">Km/dia (extrapolado)</span><span class="v ${vsCls}">${day.kmPerDay != null ? fmtNum(day.kmPerDay, 1) : "—"}</span></div>` +
+          `<div><span class="k">vs meta 31/05</span><span class="v ${vsCls}">${vs != null ? (vs >= 0 ? "+" : "") + fmtNum(vs, 1) + " km/d" : "—"}</span></div>` +
+          `<div><span class="k">Relógio (início→fim)</span><span class="v">${day.spanHours != null ? fmtNum(day.spanHours, 1) + " h" : "—"}</span></div>` +
+          `<div><span class="k">D+ / D−</span><span class="v">+${day.gainM || 0} / −${day.lossM || 0} m</span></div>` +
+          `</div>` +
+          (cats ? `<div class="day-cats">${cats}</div>` : "") +
+          nightHtml +
+          `</article>`
+        );
+      })
+      .join("");
+
+    drawDaysKmChart(days, goalKm);
+  }
+
+  function drawDaysKmChart(days, goalKm) {
+    const canvas = $("chart-days-km");
+    const s = setupCanvas(canvas, 160);
+    if (!s || !days.length) return;
+    const { ctx, w, h } = s;
+    const pad = { l: 40, r: 12, t: 16, b: 36 };
+    const maxKm = Math.max(...days.map((d) => d.km), goalKm || 0, 1);
+    const barGap = 12;
+    const plotW = w - pad.l - pad.r;
+    const barW = Math.min(72, (plotW - barGap * (days.length + 1)) / days.length);
+    const plotH = h - pad.t - pad.b;
+
+    ctx.fillStyle = "#151920";
+    ctx.fillRect(0, 0, w, h);
+
+    if (goalKm != null && goalKm > 0) {
+      const gy = pad.t + (1 - goalKm / maxKm) * plotH;
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.55)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, gy);
+      ctx.lineTo(w - pad.r, gy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = "9px sans-serif";
+      ctx.fillText("meta " + Math.round(goalKm) + " km", pad.l + 4, gy - 4);
+    }
+
+    days.forEach((day, i) => {
+      const x = pad.l + barGap + i * (barW + barGap);
+      const bh = (day.km / maxKm) * plotH;
+      const y = h - pad.b - bh;
+      ctx.fillStyle = day.inProgress ? "rgba(34, 197, 94, 0.75)" : "rgba(61, 139, 253, 0.75)";
+      ctx.fillRect(x, y, barW, bh);
+      ctx.fillStyle = "#8b95a8";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("D" + day.day, x + barW / 2, h - 8);
+      ctx.fillText(String(day.km), x + barW / 2, y - 4);
+    });
+    ctx.textAlign = "left";
+  }
+
+  try {
+    renderDays();
+  } catch (err) {
+    console.error("renderDays:", err);
   }
 
   window.__travessiaRedrawCharts = function () {
     drawPaceChart();
     drawElevChart();
+    try {
+      renderDays();
+    } catch (err) {
+      console.error("renderDays:", err);
+    }
+    if ($("elev-modal") && !$("elev-modal").hidden) drawElevChartLarge();
     try {
       updateConfidence();
     } catch (err) {
@@ -1008,4 +2088,82 @@
     const km = parseInt(tr.dataset.km, 10);
     if (window.highlightMapKm) window.highlightMapKm(km);
   });
+
+  window.travessiaApplyLivePatch = function (patch) {
+    if (!patch || !patch.ok) return;
+    if (patch.live) {
+      D.live = patch.live;
+      D.liveUpdatedAt = patch.liveUpdatedAt;
+    }
+    if (patch.goal && D.event) D.event.goal = patch.goal;
+    if (patch.mapCurrent && D.map) D.map.current = patch.mapCurrent;
+    renderLive();
+    if (patch.updatedAt) {
+      const updatedEl = $("updated-at");
+      if (updatedEl) {
+        let foot = "Dados: " + patch.updatedAt;
+        if (D.live && D.live.gpsTime) foot += " · GPS live " + D.live.gpsTime.split(" ")[1];
+        updatedEl.textContent = foot;
+      }
+    }
+    if (window.travessiaUpdateMapLive) window.travessiaUpdateMapLive(patch);
+  };
+
+  window.travessiaReloadAnalytics = function (next) {
+    if (!next) return;
+    window.ANALYTICS = next;
+    D = next;
+    totalKm = D.event.totalKm;
+    currentKm = D.current.km;
+    profileFull = D.routeProfileFull || D.routeProfile;
+    P = D.prediction;
+    perf = P.performance || {};
+    profileFull = D.routeProfileFull || D.routeProfile;
+    params.basePaceMin = perf.weightedPaceMin || P.basePaceMin;
+    params.climbSecPer100m = P.climbSecPer100m || perf.climbSecPer100m || CAPS.climbPrior;
+    params.fatiguePerKm = perf.fatiguePerKm ?? P.fatigueRatePerKm ?? 0;
+    params.stopProb = perf.stopProbPerKm ?? (perf.stopRatioPct || 0) / 100;
+    params.avgStopSec =
+      perf.medianStopSec ?? perf.avgStopSec ?? (perf.medianStopMin || perf.avgStopMin || 0) * 60;
+    params.nightFactor = perf.nightFactor ?? 1 + (perf.nightSlowdownPct || 0) / 100;
+    params.decayPer10k = perf.decayPer10kmAfter100 ?? 0;
+
+    $("athlete-name").textContent = D.athlete.name;
+    $("progress-pct").textContent = D.current.progressPct + "%";
+    $("progress-km").textContent = currentKm + " / " + totalKm + " km";
+    $("progress-fill").style.width = D.current.progressPct + "%";
+
+    renderLive();
+    try {
+      updateConfidence();
+      updateModelBadge();
+    } catch (err) {
+      console.error("updateConfidence:", err);
+    }
+    refreshTable();
+    const fast = D.stats && D.stats.fastest;
+    const slow = D.stats && D.stats.slowest;
+    if (fast && $("fastest-km")) {
+      $("fastest-km").textContent =
+        "Km " + fast.km + " · " + fast.segment_time + " (" + fast.pace + ")" +
+        (fast.categoryLabel ? " · " + fast.categoryLabel : "");
+    }
+    if (slow && $("slowest-km")) {
+      $("slowest-km").textContent =
+        "Km " + slow.km + " · " + slow.segment_time + " (" + slow.pace + ")" +
+        (slow.categoryLabel ? " · " + slow.categoryLabel : "");
+    }
+    if (window.travessiaMapReload) window.travessiaMapReload(D.map);
+    try {
+      renderDays();
+    } catch (err) {
+      console.error("renderDays:", err);
+    }
+    const updatedEl = $("updated-at");
+    if (updatedEl && D.updatedAt) {
+      let foot = "Dados: " + D.updatedAt;
+      if (D.live && D.live.gpsTime) foot += " · GPS live " + D.live.gpsTime.split(" ")[1];
+      updatedEl.textContent = foot;
+    }
+  };
 })();
