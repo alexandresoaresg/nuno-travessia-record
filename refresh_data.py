@@ -12,7 +12,8 @@ from pathlib import Path
 # Local km_splits module
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import km_splits as km
-from background_pipeline import enqueue, enqueue_snapshot
+from background_pipeline import enqueue
+from prediction_history import append_snapshot
 from prediction_model import build_prediction, estimate_finish_from_km
 from pace_categories import category_legend, summarize_categories
 from route_landmarks import snap_landmarks_to_route
