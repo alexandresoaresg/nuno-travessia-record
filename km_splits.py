@@ -53,8 +53,10 @@ def decode_api_json(raw):
 
 
 def fetch_url(url):
+    """Fetch without HTTP_PROXY — IDE/sandbox proxies break api.stopandgo.pro."""
     req = urllib.request.Request(url, headers={"User-Agent": "km-splits-script/1.0"})
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    with opener.open(req, timeout=120) as resp:
         return resp.read()
 
 

@@ -268,6 +268,11 @@
       fmtDate(opt.finish) +
       " · Pessimista: " +
       fmtDate(pes.finish);
+    const preview = $("prediction-preview");
+    if (preview) {
+      preview.textContent =
+        fmtDate(main.finish) + " · ~" + main.hours.toFixed(0) + " h restantes";
+    }
     drawForecastChart(main.forecast);
     renderInsightPanels();
   }
@@ -290,6 +295,13 @@
   bindSlider("sl-climb", "climbSecPer100m", (v) => v.toFixed(0) + " s/100m D+");
   renderInsightPanels();
   updatePrediction();
+
+  const predictionDetails = $("prediction-details");
+  if (predictionDetails) {
+    predictionDetails.addEventListener("toggle", () => {
+      if (predictionDetails.open) updatePrediction();
+    });
+  }
 
   // --- Charts ---
   function setupCanvas(canvas, height) {

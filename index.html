@@ -78,57 +78,6 @@
       </div>
     </section>
 
-    <section class="prediction-section">
-      <h2>Previsão de chegada</h2>
-      <div class="panel">
-        <div class="prediction-meta">
-          <span class="badge badge-science" id="pred-confidence">—</span>
-          <span class="badge" id="pred-blend-label">—</span>
-        </div>
-        <div class="prediction-insights">
-          <div class="insight-card" id="card-performance">
-            <h3>Performance real (GPS)</h3>
-            <ul class="insight-list" id="perf-stats"></ul>
-          </div>
-          <div class="insight-card" id="card-science">
-            <h3>Referência científica</h3>
-            <ul class="insight-list" id="science-stats"></ul>
-            <ul class="science-refs" id="science-refs"></ul>
-          </div>
-        </div>
-        <div class="prediction-hero">
-          <div>
-            <div class="finish-time" id="finish-time">—</div>
-            <div id="finish-hours" class="finish-range">—</div>
-            <div id="finish-range" class="finish-range">—</div>
-            <div class="model-controls">
-              <div class="control-row">
-                <label>Peso dados reais vs literatura <span class="control-val" id="sl-blend-val"></span></label>
-                <input type="range" id="sl-blend" min="30" max="95" step="1" />
-              </div>
-              <div class="control-row">
-                <label>Ritmo base (ajuste fino) <span class="control-val" id="sl-base-val"></span></label>
-                <input type="range" id="sl-base" min="5" max="14" step="0.1" />
-              </div>
-              <div class="control-row">
-                <label>Fadiga pessoal (%/km) <span class="control-val" id="sl-fatigue-val"></span></label>
-                <input type="range" id="sl-fatigue" min="0" max="2" step="0.02" />
-              </div>
-              <div class="control-row">
-                <label>Penalização subida <span class="control-val" id="sl-climb-val"></span></label>
-                <input type="range" id="sl-climb" min="8" max="45" step="1" />
-              </div>
-            </div>
-            <p class="model-desc" id="model-desc">—</p>
-          </div>
-          <div class="chart-box" style="min-width:280px">
-            <canvas id="chart-forecast"></canvas>
-            <p class="chart-caption">Ritmo previsto (cenário principal, cada 5 km)</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="map-section">
       <h2>Mapa interativo</h2>
       <div class="panel">
@@ -217,6 +166,62 @@
           <tbody id="splits-body"></tbody>
         </table>
       </div>
+    </section>
+
+    <section class="prediction-section">
+      <details class="collapsible" id="prediction-details">
+        <summary class="collapsible-summary">
+          <span class="collapsible-title">Previsão de chegada</span>
+          <span class="collapsible-preview" id="prediction-preview">Modelo híbrido · clica para expandir</span>
+        </summary>
+        <div class="panel collapsible-body">
+          <div class="prediction-meta">
+            <span class="badge badge-science" id="pred-confidence">—</span>
+            <span class="badge" id="pred-blend-label">—</span>
+          </div>
+          <div class="prediction-insights">
+            <div class="insight-card" id="card-performance">
+              <h3>Performance real (GPS)</h3>
+              <ul class="insight-list" id="perf-stats"></ul>
+            </div>
+            <div class="insight-card" id="card-science">
+              <h3>Referência científica</h3>
+              <ul class="insight-list" id="science-stats"></ul>
+              <ul class="science-refs" id="science-refs"></ul>
+            </div>
+          </div>
+          <div class="prediction-hero">
+            <div>
+              <div class="finish-time" id="finish-time">—</div>
+              <div id="finish-hours" class="finish-range">—</div>
+              <div id="finish-range" class="finish-range">—</div>
+              <div class="model-controls">
+                <div class="control-row">
+                  <label>Peso dados reais vs literatura <span class="control-val" id="sl-blend-val"></span></label>
+                  <input type="range" id="sl-blend" min="30" max="95" step="1" />
+                </div>
+                <div class="control-row">
+                  <label>Ritmo base (ajuste fino) <span class="control-val" id="sl-base-val"></span></label>
+                  <input type="range" id="sl-base" min="5" max="14" step="0.1" />
+                </div>
+                <div class="control-row">
+                  <label>Fadiga pessoal (%/km) <span class="control-val" id="sl-fatigue-val"></span></label>
+                  <input type="range" id="sl-fatigue" min="0" max="2" step="0.02" />
+                </div>
+                <div class="control-row">
+                  <label>Penalização subida <span class="control-val" id="sl-climb-val"></span></label>
+                  <input type="range" id="sl-climb" min="8" max="45" step="1" />
+                </div>
+              </div>
+              <p class="model-desc" id="model-desc">—</p>
+            </div>
+            <div class="chart-box" style="min-width:280px">
+              <canvas id="chart-forecast"></canvas>
+              <p class="chart-caption">Ritmo previsto (cenário principal, cada 5 km)</p>
+            </div>
+          </div>
+        </div>
+      </details>
     </section>
   </main>
 

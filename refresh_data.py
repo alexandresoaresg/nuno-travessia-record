@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -18,6 +19,17 @@ DIR = Path(__file__).resolve().parent
 DATA_DIR = DIR / "cache"
 RAW_DIR = DIR / "raw"
 DATA_DIR.mkdir(exist_ok=True)
+
+_PROXY_KEYS = (
+    "HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy",
+    "ALL_PROXY", "all_proxy", "GIT_HTTP_PROXY", "GIT_HTTPS_PROXY",
+    "SOCKS_PROXY", "SOCKS5_PROXY", "socks_proxy", "socks5_proxy",
+)
+
+
+def strip_proxy_env() -> None:
+    for key in _PROXY_KEYS:
+        os.environ.pop(key, None)
 
 EVENTO = 4
 ETAPA = 1
@@ -441,24 +453,51 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true", help="Use cache/ only")
     args_cli = ap.parse_args()
+    if not args_cli.offline:
+        strip_proxy_env()
+
     print("=== Actualizacao Travessia Analytics ===")
     print(f"Data/hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     raw_saved: list[Path] = []
+    api_live = False
+    api_log = False
+
+    # Baseline from cache (route + log always needed for splits)
+    event_meta, routes, log = load_from_cache()
+    start = event_meta.get("horainicio", RACE_START)
+    coords, dist_m = km.load_route(str(DATA_DIR / "route.json"), EVENTO, ETAPA)
     live = None
 
     if args_cli.offline:
         print("Modo offline: a usar cache/")
-        event_meta, routes, log = load_from_cache()
-        start = event_meta.get("horainicio", RACE_START)
-        coords, dist_m = km.load_route(str(DATA_DIR / "route.json"), EVENTO, ETAPA)
         print(f"    Pontos GPS (cache): {len(log)}")
         live = load_live_from_cache()
         if live:
             print(f"    Posicao live (cache): {live.get('gpsTime')} via {live.get('source')}")
     else:
+        print("1/4 Posicao live (position_new / position)...")
+        live, live_path = fetch_live_position(coords, dist_m)
+        if live:
+            api_live = True
+            live["logTime"] = log[-1]["Time"] if log else None
+            raw_saved.append(live_path)
+            (DATA_DIR / "live_position.json").write_text(
+                json.dumps(live, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            print(
+                f"    GPS ao vivo: {live['gpsTime']} · {live['battery']} "
+                f"· km ~{live.get('alongRouteKm')} ({live['source']})"
+            )
+        else:
+            live = load_live_from_cache()
+            if live:
+                print(f"    Live em cache: {live.get('gpsTime')}")
+            else:
+                print("    AVISO: sem posicao live")
+
+        print("2/4 Meta do evento...")
         try:
-            print("1/4 Meta do evento...")
             event_meta, raw_path = fetch_event_meta()
             if raw_path:
                 raw_saved.append(raw_path)
@@ -466,8 +505,11 @@ def main() -> int:
             (DATA_DIR / "event_meta.json").write_text(
                 json.dumps(event_meta, ensure_ascii=False, indent=2), encoding="utf-8"
             )
+        except Exception as e:
+            print(f"    AVISO: meta em cache ({e})")
 
-            print("2/4 Percurso (tracks.php)...")
+        print("3/4 Percurso (tracks.php)...")
+        try:
             route_raw = km.fetch_url(
                 f"{km.API_BASE}/tracking/tracks.php?id_evento={EVENTO}&id_etapa={ETAPA}"
             )
@@ -479,8 +521,11 @@ def main() -> int:
                 json.dumps(routes, ensure_ascii=False), encoding="utf-8"
             )
             coords, dist_m = km.load_route(str(route_latest), EVENTO, ETAPA)
+        except Exception as e:
+            print(f"    AVISO: percurso em cache ({e})")
 
-            print("3/4 Log GPS (trackersLog.php)...")
+        print("4/4 Log GPS (trackersLog.php)...")
+        try:
             log_end = log_end_time()
             params = {
                 "id_evento": EVENTO,
@@ -499,31 +544,17 @@ def main() -> int:
             (DATA_DIR / "gps_log.json").write_text(
                 json.dumps(log, ensure_ascii=False), encoding="utf-8"
             )
-            print(f"    Pontos GPS: {len(log)} (ate {log_end}) — historico ~1h atraso")
-
-            print("3b/4 Posicao live (position_new / position)...")
-            live, live_path = fetch_live_position(coords, dist_m)
+            api_log = True
+            print(f"    Pontos GPS: {len(log)} (ate {log_end})")
             if live:
-                if log:
-                    live["logTime"] = log[-1]["Time"]
-                raw_saved.append(live_path)
+                live["logTime"] = log[-1]["Time"]
                 (DATA_DIR / "live_position.json").write_text(
                     json.dumps(live, ensure_ascii=False, indent=2), encoding="utf-8"
                 )
-                print(
-                    f"    GPS ao vivo: {live['gpsTime']} · bateria {live['battery']} "
-                    f"· km ~{live.get('alongRouteKm')} ({live['source']}, lag {live['lagMinutes']} min)"
-                )
-            else:
-                print("    AVISO: sem posicao live; mapa usa ultimo trackersLog")
         except Exception as e:
-            print(f"AVISO: API indisponivel ({e}). A usar cache/...")
-            event_meta, routes, log = load_from_cache()
-            start = event_meta.get("horainicio", RACE_START)
-            coords, dist_m = km.load_route(str(DATA_DIR / "route.json"), EVENTO, ETAPA)
-            live = load_live_from_cache()
+            print(f"    AVISO: log em cache ({len(log)} pts) — {e}")
 
-    print("4/4 Splits + data.js...")
+    print("5/5 Splits + data.js...")
     start_time = km.parse_time(start)
     samples, skipped = [], 0
     for row in log:
@@ -577,6 +608,7 @@ def main() -> int:
         for p in raw_saved:
             print(f"              {p.name} ({p.stat().st_size:,} bytes)")
     print("=== Concluido ===")
+    print(f"API_STATUS: live={'online' if api_live else 'cache'} log={'online' if api_log else 'cache'}")
     return 0
 
 

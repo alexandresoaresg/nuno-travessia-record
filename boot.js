@@ -23,15 +23,21 @@
     setStatus("A ligar a API Stop&Go...");
 
     try {
-      const res = await fetch("/api/refresh", { cache: "no-store" });
+      const res = await fetch("/api/refresh?force=1", { cache: "no-store" });
       const info = await res.json().catch(() => ({}));
-      if (info.skipped) {
-        setStatus("Dados recentes (cache " + (info.nextRefreshInSec || 0) + "s)");
+      if (!res.ok && !info.ok) {
+        setStatus("Erro ao actualizar — a usar ultimos dados guardados");
+      } else if (info.skipped) {
+        setStatus("Actualizado ha " + (info.nextRefreshInSec || 0) + "s");
+      } else if (info.apiLive) {
+        const live = info.liveGpsTime ? " · GPS " + info.liveGpsTime.split(" ")[1] : "";
+        const logNote = info.apiLog ? "" : " · log em cache";
+        setStatus("Ao vivo " + (info.updatedAt || "") + live + logNote);
       } else if (info.ok) {
-        const live = info.liveGpsTime ? " - GPS " + info.liveGpsTime.split(" ")[1] : "";
-        setStatus("Actualizado " + (info.updatedAt || "") + live);
+        const live = info.liveGpsTime ? " · GPS " + info.liveGpsTime.split(" ")[1] : "";
+        setStatus("Cache local " + (info.updatedAt || "") + live);
       } else {
-        setStatus("API indisponivel - cache local");
+        setStatus("Sem dados — corre ./update.sh");
       }
     } catch (err) {
       console.warn("Refresh:", err);

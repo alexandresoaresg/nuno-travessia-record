@@ -393,3 +393,46 @@ body.is-loading-data header {
 @keyframes refresh-spin { to { transform: rotate(360deg); } }
 .data-refresh-title { font-weight: 600; margin-bottom: 0.35rem; }
 .data-refresh-status { font-size: 0.85rem; color: var(--muted); }
+
+.collapsible {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.collapsible-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.collapsible-summary::-webkit-details-marker { display: none; }
+.collapsible-summary::before {
+  content: "▸";
+  color: var(--muted);
+  margin-right: 0.5rem;
+  transition: transform 0.15s ease;
+}
+.collapsible[open] > .collapsible-summary::before {
+  transform: rotate(90deg);
+}
+.collapsible-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.collapsible-preview {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-align: right;
+}
+.collapsible-body {
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  margin: 0;
+}
+.prediction-section { margin-top: 0.5rem; }
