@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Travessia — Análise Nuno Faria</title>
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <title>Nuno Faria · Travessia 642 km — Live &amp; previsões</title>
+  <meta name="description" content="Acompanhamento ao vivo da Travessia de Nuno Faria: km, mapa GPS, splits, dias, previsão de chegada e objetivos 31/05 e record." />
+  <meta name="theme-color" content="#0c0e12" />
+  <meta name="application-name" content="Travessia Analytics" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css?v=8" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body>
@@ -248,6 +254,22 @@
             <p class="chart-caption" id="conf-evolution-caption">
               Confiança híbrida para 31/05 (verde) e record (azul), recalculada a cada ~5 km com o modelo v4 no momento do split.
             </p>
+          </div>
+
+          <div class="panel chart-box pred-evolution-block">
+            <h3 class="conf-evolution-title">Evolução da previsão de chegada</h3>
+            <p class="pred-evolution-summary" id="pred-evolution-summary">—</p>
+            <canvas id="chart-pred-evolution"></canvas>
+            <p class="chart-caption" id="pred-evolution-caption">
+              Margem ao prazo 31/05 (cenário principal) em cada snapshot do modelo. Linha a zero = chegada exactamente no prazo.
+            </p>
+            <div class="pred-backtest-wrap">
+              <h4 class="pred-backtest-title">Backtest — revisões recentes</h4>
+              <p class="chart-caption pred-backtest-lead">
+                O que o modelo dizia então vs agora, e o ritmo real desde cada snapshot.
+              </p>
+              <div class="pred-backtest-table" id="pred-backtest-table"></div>
+            </div>
           </div>
 
           <div class="conf-grid">

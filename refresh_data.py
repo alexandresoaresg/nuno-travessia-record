@@ -18,7 +18,9 @@ from prediction_model import build_prediction, estimate_finish_from_km
 from pace_categories import category_legend, summarize_categories
 from route_landmarks import snap_landmarks_to_route
 from day_analysis import build_days
+from day_weather import enrich_days_with_temperature
 from confidence_curve import build_confidence_curve
+from prediction_evolution import build_prediction_evolution
 
 DIR = Path(__file__).resolve().parent
 DATA_DIR = DIR / "cache"
@@ -730,6 +732,11 @@ def build_analytics(
             current_km=current_km,
             last_crossing=last["crossing_time"],
         ),
+        "predictionEvolution": build_prediction_evolution(
+            current_km=current_km,
+            current_finish_main=prediction.get("finishTimeIso") or prediction.get("finishTime"),
+            calendar_deadline=goal.get("calendarDeadline"),
+        ),
         "live": live,
         "map": build_map_data(
             coords,
@@ -888,6 +895,15 @@ def main() -> int:
     analytics = build_analytics(
         splits, coords, dist_m, event_meta, log, first_sample=samples[0], live=live
     )
+    try:
+        enrich_days_with_temperature(
+            analytics["days"]["days"],
+            analytics["splits"],
+            log,
+            offline=args_cli.offline,
+        )
+    except Exception as e:
+        print(f"  AVISO temperatura dias: {e}", file=sys.stderr)
     analytics["stats"]["gpsPoints"] = len(samples)
     analytics["stats"]["gpsSkipped"] = skipped
 

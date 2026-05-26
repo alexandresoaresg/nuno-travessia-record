@@ -17,6 +17,22 @@
     evSub += " (percurso ~km " + ev.firstAlongRouteKm + ")";
   }
   $("event-name").textContent = evSub;
+  updatePageTitle();
+
+  function updatePageTitle() {
+    const pct = D.current && D.current.progressPct != null ? D.current.progressPct : 0;
+    const km = currentKm != null ? currentKm : 0;
+    const total = totalKm != null ? totalKm : 642;
+    document.title =
+      D.athlete.name +
+      " · km " +
+      km +
+      "/" +
+      total +
+      " (" +
+      pct +
+      "%) — Travessia";
+  }
 
   function renderLive() {
     const section = $("live-section");
@@ -970,6 +986,249 @@
     }
   }
 
+  function parseDataDate(s) {
+    if (!s) return null;
+    const d = new Date(String(s).replace(" ", "T"));
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function fmtShortWhen(s) {
+    const d = parseDataDate(s);
+    if (!d) return "—";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return dd + "/" + mm + " " + hh + ":" + mi;
+  }
+
+  function fmtFinishShort(s) {
+    const d = parseDataDate(s);
+    if (!d) return "—";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return dd + "/" + mm + " " + hh + ":" + mi;
+  }
+
+  function renderPredictionEvolutionSummary(ev) {
+    const el = $("pred-evolution-summary");
+    if (!el) return;
+    if (!ev || !ev.ok || !ev.summary) {
+      el.innerHTML =
+        '<span class="muted">' +
+        (ev && ev.label ? ev.label : "Sem histórico — cada refresh completo grava um snapshot.") +
+        "</span>";
+      return;
+    }
+    const s = ev.summary;
+    const rev = s.revisionTotalMin;
+    const revTxt =
+      rev == null
+        ? "—"
+        : rev === 0
+          ? "estável"
+          : rev > 0
+            ? '<span class="warn">+' + Math.round(rev / 60) + "h" + (Math.abs(rev % 60) ? " " + Math.abs(rev % 60) + "m" : "") + " mais tarde</span>"
+            : '<span class="good">' + fmtHM(rev) + " mais cedo</span>";
+    const marginSwing =
+      s.marginSwingMin != null ? fmtHM(s.marginSwingMin).replace("+", "±") : "—";
+    el.innerHTML =
+      "Desde <strong>" +
+      fmtShortWhen(s.firstAt) +
+      "</strong> (km " +
+      (ev.timeline[0] && ev.timeline[0].km != null ? ev.timeline[0].km : "?") +
+      ") a chegada prevista passou de <strong>" +
+      fmtFinishShort(s.firstFinish) +
+      "</strong> para <strong>" +
+      fmtFinishShort(s.currentFinish) +
+      "</strong> (" +
+      revTxt +
+      "). Oscilação de margem ao prazo: " +
+      marginSwing +
+      '. <span class="muted">' +
+      (ev.label || "") +
+      "</span>";
+  }
+
+  function drawPredictionEvolutionChart(ev) {
+    const canvas = $("chart-pred-evolution");
+    const cap = $("pred-evolution-caption");
+    if (!canvas) return;
+    const pts = (ev && ev.timeline) || [];
+    if (!pts.length) {
+      if (cap) {
+        cap.textContent =
+          "Sem snapshots — corre refresh_data.py (grava history/predictions.jsonl a cada actualização completa).";
+      }
+      return;
+    }
+    const margins = pts
+      .map((p) => p.marginMainMin)
+      .filter((v) => v != null && Number.isFinite(v));
+    if (!margins.length) {
+      if (cap) cap.textContent = "Snapshots sem margem ao prazo calculada.";
+      return;
+    }
+
+    const s = setupCanvas(canvas, 200);
+    if (!s) return;
+    const { ctx, w, h } = s;
+    const pad = { l: 48, r: 16, t: 24, b: 36 };
+    const plotW = w - pad.l - pad.r;
+    const plotH = h - pad.t - pad.b;
+
+    const minM = Math.min(0, ...margins);
+    const maxM = Math.max(0, ...margins);
+    const span = Math.max(maxM - minM, 120);
+    const yMin = minM - span * 0.08;
+    const yMax = maxM + span * 0.08;
+
+    ctx.fillStyle = "#151920";
+    ctx.fillRect(0, 0, w, h);
+
+    const xAt = (i) => pad.l + (i / Math.max(1, pts.length - 1)) * plotW;
+    const yAt = (m) => pad.t + (1 - (m - yMin) / (yMax - yMin)) * plotH;
+
+    const y0 = yAt(0);
+    ctx.strokeStyle = "rgba(248, 113, 113, 0.55)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y0);
+    ctx.lineTo(w - pad.r, y0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = "10px sans-serif";
+    ctx.fillStyle = "#f87171";
+    ctx.fillText("Prazo 31/05", pad.l + 4, y0 - 4);
+
+    ctx.strokeStyle = "#2a3344";
+    ctx.fillStyle = "#8b95a8";
+    for (let t = Math.ceil(yMin / 120) * 120; t <= yMax; t += 120) {
+      const y = yAt(t);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(w - pad.r, y);
+      ctx.stroke();
+      ctx.fillText(fmtHM(t), 4, y + 4);
+    }
+
+    ctx.strokeStyle = "rgba(250, 204, 21, 0.95)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    let started = false;
+    pts.forEach((p, i) => {
+      if (p.marginMainMin == null) return;
+      const x = xAt(i);
+      const y = yAt(p.marginMainMin);
+      if (!started) {
+        ctx.moveTo(x, y);
+        started = true;
+      } else ctx.lineTo(x, y);
+    });
+    if (started) ctx.stroke();
+
+    pts.forEach((p, i) => {
+      if (p.marginMainMin == null) return;
+      const x = xAt(i);
+      const y = yAt(p.marginMainMin);
+      const good = p.marginMainMin >= 0;
+      ctx.fillStyle = p.isCurrent ? "#facc15" : good ? "#22c55e" : "#f87171";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = p.isCurrent ? 2 : 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, p.isCurrent ? 6 : 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    ctx.fillStyle = "#8b95a8";
+    ctx.font = "10px sans-serif";
+    const tickIdx = [0, Math.floor(pts.length / 2), pts.length - 1];
+    tickIdx.forEach((i) => {
+      if (!pts[i]) return;
+      ctx.fillText(fmtShortWhen(pts[i].recordedAt), xAt(i) - 24, h - 8);
+    });
+
+    if (cap) {
+      const last = pts[pts.length - 1];
+      cap.textContent =
+        (ev.label || "") +
+        (last && last.marginMainMin != null
+          ? " Margem actual: " + fmtHM(last.marginMainMin) + " vs 31/05."
+          : "");
+    }
+  }
+
+  function renderPredictionBacktestTable(ev) {
+    const table = $("pred-backtest-table");
+    if (!table) return;
+    const rows = (ev && ev.backtest) || [];
+    if (!rows.length) {
+      table.innerHTML =
+        '<p class="pred-backtest-empty">Ainda não há snapshots suficientes para backtest.</p>';
+      return;
+    }
+    const head =
+      '<div class="pred-backtest-row head"><span>Quando</span><span>Km</span><span>Previsto então</span><span>Previsto agora</span><span>Revisão</span><span>Ritmo real</span></div>';
+    const body = rows
+      .slice(-10)
+      .reverse()
+      .map((r) => {
+        const rev = r.revisionMin;
+        let revCls = "";
+        let revTxt = "—";
+        if (rev != null) {
+          revTxt = fmtHM(rev);
+          revCls = rev > 60 ? "bad" : rev < -60 ? "good" : rev > 0 ? "warn" : "good";
+        }
+        const pace =
+          r.actualKmPerDay != null && r.kmSince > 0
+            ? r.actualKmPerDay + " km/d"
+            : r.kmSince === 0
+              ? "parado"
+              : "—";
+        const paceCls =
+          r.actualKmPerDay != null && r.actualKmPerDay >= 74 ? "good" : r.actualKmPerDay != null && r.actualKmPerDay < 65 ? "warn" : "";
+        return (
+          '<div class="pred-backtest-row">' +
+          "<span>" +
+          fmtShortWhen(r.recordedAt) +
+          "</span>" +
+          "<span>" +
+          r.kmThen +
+          "</span>" +
+          "<span>" +
+          fmtFinishShort(r.finishThen) +
+          "</span>" +
+          "<span>" +
+          fmtFinishShort(r.finishNow) +
+          "</span>" +
+          '<span class="cell ' +
+          revCls +
+          '">' +
+          revTxt +
+          "</span>" +
+          '<span class="cell ' +
+          paceCls +
+          '">' +
+          pace +
+          "</span></div>"
+        );
+      })
+      .join("");
+    table.innerHTML = head + body;
+  }
+
+  function renderPredictionEvolution() {
+    const ev = D.predictionEvolution;
+    renderPredictionEvolutionSummary(ev);
+    drawPredictionEvolutionChart(ev);
+    renderPredictionBacktestTable(ev);
+  }
+
   function renderModelReliabilityPanel() {
     const panel = $("conf-model-reliability");
     if (!panel) return;
@@ -1264,6 +1523,7 @@
     renderConfidenceCard("conf-rec", recConf, "Record " + (g.recordCurrent || "") + " · limite " + (g.recordDeadlineFromStart || "").replace(" ", " · "));
     window.__travessiaLastConf = { cal: calConf, rec: recConf };
     drawConfidenceEvolutionChart(calConf, recConf);
+    renderPredictionEvolution();
     const table = $("conf-scenario-table");
     if (table) {
       const row = (label, a, b) => `<div class="conf-scenario-row"><span>${label}</span><span class="cell ${a >= 0 ? "good" : "bad"}">31/05: ${fmtHM(a)}</span><span class="cell ${b >= 0 ? "good" : "bad"}">Record: ${fmtHM(b)}</span></div>`;
@@ -1804,6 +2064,8 @@
       if (goalKm != null) {
         lead.textContent += " Meta 31/05: ~" + fmtNum(goalKm, 1) + " km/dia em movimento.";
       }
+      lead.textContent +=
+        " Temperatura min/máx em movimento via Open-Meteo (ar a 2 m, horas sobrepostas ao ritmo).";
     }
 
     if (!days.length) {
@@ -1861,6 +2123,11 @@
           `<div><span class="k">vs meta 31/05</span><span class="v ${vsCls}">${vs != null ? (vs >= 0 ? "+" : "") + fmtNum(vs, 1) + " km/d" : "—"}</span></div>` +
           `<div><span class="k">Relógio (início→fim)</span><span class="v">${day.spanHours != null ? fmtNum(day.spanHours, 1) + " h" : "—"}</span></div>` +
           `<div><span class="k">D+ / D−</span><span class="v">+${day.gainM || 0} / −${day.lossM || 0} m</span></div>` +
+          `<div><span class="k">Temperatura (mov.)</span><span class="v">${
+            day.tempMinC != null && day.tempMaxC != null
+              ? fmtNum(day.tempMinC, 1) + "° – " + fmtNum(day.tempMaxC, 1) + "°C"
+              : "—"
+          }</span></div>` +
           `</div>` +
           (cats ? `<div class="day-cats">${cats}</div>` : "") +
           nightHtml +
@@ -2129,6 +2396,7 @@
     params.decayPer10k = perf.decayPer10kmAfter100 ?? 0;
 
     $("athlete-name").textContent = D.athlete.name;
+    updatePageTitle();
     $("progress-pct").textContent = D.current.progressPct + "%";
     $("progress-km").textContent = currentKm + " / " + totalKm + " km";
     $("progress-fill").style.width = D.current.progressPct + "%";
