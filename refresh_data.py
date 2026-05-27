@@ -21,6 +21,7 @@ from day_analysis import build_days
 from day_weather import enrich_days_with_temperature
 from confidence_curve import build_confidence_curve
 from prediction_evolution import build_prediction_evolution
+from git_publish_data import print_publish_result, publish_data_changes
 
 DIR = Path(__file__).resolve().parent
 DATA_DIR = DIR / "cache"
@@ -773,6 +774,21 @@ def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true", help="Use cache/ only")
+    ap.add_argument(
+        "--no-git",
+        action="store_true",
+        help="Do not auto-commit/push data files after refresh",
+    )
+    ap.add_argument(
+        "--no-push",
+        action="store_true",
+        help="Auto-commit data files but do not push to remote",
+    )
+    ap.add_argument(
+        "--git-dry-run",
+        action="store_true",
+        help="Show what would be committed without changing git state",
+    )
     args_cli = ap.parse_args()
     if not args_cli.offline:
         strip_proxy_env()
@@ -945,6 +961,18 @@ def main() -> int:
             print(f"              {p.name} ({p.stat().st_size:,} bytes)")
     print("=== Concluido ===")
     print(f"API_STATUS: live={'online' if api_live else 'cache'} log={'online' if api_log else 'cache'}")
+
+    if not args_cli.no_git:
+        git_result = publish_data_changes(
+            DIR,
+            kind="full",
+            push=not args_cli.no_push,
+            dry_run=args_cli.git_dry_run,
+        )
+        print_publish_result(git_result)
+        if not git_result.get("ok"):
+            print(f"  AVISO git: {git_result.get('error', 'falha')}", file=sys.stderr)
+
     return 0
 
 

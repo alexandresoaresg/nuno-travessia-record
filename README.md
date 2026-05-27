@@ -31,6 +31,22 @@ Ao carregar/recarregar a página, o site chama `GET /api/refresh` (servido por `
 ./update.sh
 ```
 
+## Git automático (dados)
+
+Depois de cada refresh bem-sucedido, o projeto faz **commit + push** dos ficheiros publicados no site:
+
+- `refresh_data.py` → `data.js`, `data.json`, `km_splits.json`
+- `refresh_live.py` → `data.js`, `data.json`
+
+Desligar temporariamente:
+
+```bash
+export TRAVESSIA_SKIP_GIT_PUBLISH=1   # nenhum commit automático
+export TRAVESSIA_AUTO_GIT_LIVE=0      # só refresh completo faz commit (não o live)
+python3 refresh_data.py --no-git      # uma execução sem git
+python3 refresh_data.py --no-push    # commit local, sem push
+```
+
 ## Dados e cache
 
 - `cache/`: dados processados usados em modo offline (não versionado)

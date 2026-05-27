@@ -22,6 +22,7 @@ from refresh_data import (
     pos_at_distance_m,
     strip_proxy_env,
 )
+from git_publish_data import print_publish_result, publish_data_changes
 
 DIR = Path(__file__).resolve().parent
 
@@ -79,7 +80,7 @@ def _update_goal_time_fields(goal, *, total_km, current_km, coords, dist_m):
     }
 
 
-def refresh_live(*, offline=False):
+def refresh_live(*, offline: bool = False, git: bool = True, git_push: bool = True) -> dict:
     data_path = DIR / "data.json"
     if not data_path.exists():
         return {"ok": False, "error": "data.json missing - run refresh_data.py first"}
@@ -134,7 +135,7 @@ def refresh_live(*, offline=False):
         "window.ANALYTICS = " + json.dumps(analytics, ensure_ascii=False) + ";\n",
         encoding="utf-8",
     )
-    return {
+    result = {
         "ok": True,
         "apiLive": api_live,
         "fromCache": not api_live,
@@ -147,15 +148,34 @@ def refresh_live(*, offline=False):
         "live": live,
     }
 
+    if git:
+        git_result = publish_data_changes(
+            DIR,
+            paths=("data.js", "data.json"),
+            kind="live",
+            push=git_push,
+        )
+        result["git"] = git_result
+        if not git_result.get("ok"):
+            result["gitError"] = git_result.get("error")
+
+    return result
+
 
 def main():
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--offline", action="store_true")
+    ap.add_argument("--offline", action="store_true", help="Use cached live position only")
+    ap.add_argument("--no-git", action="store_true", help="Do not auto-commit/push data files")
+    ap.add_argument("--no-push", action="store_true", help="Commit only, do not push")
     args = ap.parse_args()
     if not args.offline:
         strip_proxy_env()
-    result = refresh_live(offline=args.offline)
+    result = refresh_live(
+        offline=args.offline,
+        git=not args.no_git,
+        git_push=not args.no_push,
+    )
     if not result.get("ok"):
         print(result.get("error", "refresh_live failed"), file=sys.stderr)
         return 1
@@ -163,6 +183,8 @@ def main():
         f"LIVE_OK gps={result.get('liveGpsTime')} km~{result.get('alongRouteKm')} "
         f"api={'online' if result.get('apiLive') else 'cache'}"
     )
+    if result.get("git"):
+        print_publish_result(result["git"])
     return 0
 
 
