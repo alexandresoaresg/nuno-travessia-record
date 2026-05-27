@@ -1631,27 +1631,27 @@
   } catch {}
   let elevLargeHoverKm = null;
   let elevLargeLayout = null;
-  const ELEV_Y_ZOOM_MIN = 0.6;
-  const ELEV_Y_ZOOM_MAX = 3.0;
-  const ELEV_Y_ZOOM_MUL = 1.25;
-  let elevYZoom = 1;
+  const ELEV_X_ZOOM_MIN = 1;
+  const ELEV_X_ZOOM_MAX = 24;
+  const ELEV_X_ZOOM_MUL = 1.5;
+  let elevXZoom = 1;
   try {
-    const z = parseFloat(localStorage.getItem("travessiaElevZoomY") || "1");
-    if (Number.isFinite(z)) elevYZoom = Math.max(ELEV_Y_ZOOM_MIN, Math.min(ELEV_Y_ZOOM_MAX, z));
+    const z = parseFloat(localStorage.getItem("travessiaElevZoomX") || "1");
+    if (Number.isFinite(z)) elevXZoom = Math.max(ELEV_X_ZOOM_MIN, Math.min(ELEV_X_ZOOM_MAX, z));
   } catch {}
 
   function updateElevZoomUI() {
     const el = $("elev-zoom-value");
     if (!el) return;
-    el.textContent = Math.round(elevYZoom * 100) + "%";
+    el.textContent = Math.round(elevXZoom * 100) + "%";
   }
 
-  function setElevYZoom(next) {
-    const clamped = Math.max(ELEV_Y_ZOOM_MIN, Math.min(ELEV_Y_ZOOM_MAX, next));
-    if (Math.abs(clamped - elevYZoom) < 1e-6) return;
-    elevYZoom = clamped;
+  function setElevXZoom(next) {
+    const clamped = Math.max(ELEV_X_ZOOM_MIN, Math.min(ELEV_X_ZOOM_MAX, next));
+    if (Math.abs(clamped - elevXZoom) < 1e-6) return;
+    elevXZoom = clamped;
     try {
-      localStorage.setItem("travessiaElevZoomY", String(elevYZoom));
+      localStorage.setItem("travessiaElevZoomX", String(elevXZoom));
     } catch {}
     updateElevZoomUI();
     if ($("elev-modal") && !$("elev-modal").hidden) drawElevChartLarge();
@@ -1758,10 +1758,11 @@
     if (!layout) return null;
     const rect = canvas.getBoundingClientRect();
     const x = clientX - rect.left;
-    const { pad, w, maxKm } = layout;
+    const { pad, w, minKm, maxKm } = layout;
     const plotW = w - pad.l - pad.r;
     if (x < pad.l || x > pad.l + plotW) return null;
-    return (Math.max(0, Math.min(1, (x - pad.l) / plotW)) * maxKm);
+    const t = Math.max(0, Math.min(1, (x - pad.l) / plotW));
+    return minKm + t * (maxKm - minKm);
   }
 
   function drawElevProfile(canvas, height, opts) {
@@ -1771,49 +1772,39 @@
     if (!s) return null;
     const { ctx, w, h } = s;
     const pad = opts.pad || { l: 44, r: 16, t: 16, b: 28 };
-    const { minA, maxA, maxKm } = elevBounds(prof);
+    const { minA, maxA, maxKm: fullMaxKm } = elevBounds(prof);
     const plotH = h - pad.t - pad.b;
     const plotW = w - pad.l - pad.r;
 
-    const yZoomFactor = Number.isFinite(opts.yZoomFactor) ? Number(opts.yZoomFactor) : 1;
-    let minA2 = minA;
-    let maxA2 = maxA;
-    const fullRange = maxA - minA;
-    if (fullRange > 1e-9 && Math.abs(yZoomFactor - 1) > 1e-9) {
-      const centerKm = opts.zoomCenterKm;
-      let centerAlt = (minA + maxA) / 2;
-      if (centerKm != null) {
-        const cp = elevAtKm(Number(centerKm), prof);
-        if (cp && Number.isFinite(cp.elevation)) centerAlt = cp.elevation;
-      }
-      const newRange = fullRange / yZoomFactor;
-      const minRange = Math.max(20, fullRange * 0.12);
-      const maxRange = fullRange * 2.5;
-      const rangeClamped = Math.max(minRange, Math.min(maxRange, newRange));
-      minA2 = centerAlt - rangeClamped / 2;
-      maxA2 = centerAlt + rangeClamped / 2;
-      if (minA2 > maxA2) {
-        const tmp = minA2;
-        minA2 = maxA2;
-        maxA2 = tmp;
-      }
+    const xZoomFactor = Number.isFinite(opts.xZoomFactor) ? Number(opts.xZoomFactor) : 1;
+    const centerKm = opts.zoomCenterKm != null ? Number(opts.zoomCenterKm) : currentKm;
+    const fullRangeKm = Math.max(1, fullMaxKm);
+    const visibleRangeKm = Math.max(8, Math.min(fullRangeKm, fullRangeKm / Math.max(1, xZoomFactor)));
+    let minKm = centerKm - visibleRangeKm / 2;
+    let maxKm = centerKm + visibleRangeKm / 2;
+    if (minKm < 0) {
+      maxKm -= minKm;
+      minKm = 0;
+    }
+    if (maxKm > fullMaxKm) {
+      const over = maxKm - fullMaxKm;
+      minKm = Math.max(0, minKm - over);
+      maxKm = fullMaxKm;
+    }
+    if (maxKm - minKm < 1) {
+      minKm = Math.max(0, maxKm - 1);
     }
 
-    const rangeA2 = maxA2 - minA2 || 1;
-
-    const xAtKm = (km) => pad.l + (km / maxKm) * plotW;
-    const yAtAlt = (alt) => {
-      const a = Math.max(minA2, Math.min(maxA2, alt));
-      return pad.t + (1 - (a - minA2) / rangeA2) * plotH;
-    };
+    const xAtKm = (km) => pad.l + ((km - minKm) / (maxKm - minKm)) * plotW;
+    const yAtAlt = (alt) => pad.t + (1 - (alt - minA) / (maxA - minA)) * plotH;
 
     ctx.fillStyle = "#151920";
     ctx.fillRect(0, 0, w, h);
 
     ctx.strokeStyle = "#2a3344";
     ctx.lineWidth = 1;
-    const altStep = rangeA2 > 400 ? 100 : rangeA2 > 150 ? 50 : 25;
-    for (let a = Math.ceil(minA2 / altStep) * altStep; a <= maxA2; a += altStep) {
+    const altStep = maxA - minA > 400 ? 100 : maxA - minA > 150 ? 50 : 25;
+    for (let a = Math.ceil(minA / altStep) * altStep; a <= maxA; a += altStep) {
       const y = yAtAlt(a);
       ctx.beginPath();
       ctx.moveTo(pad.l, y);
@@ -1824,14 +1815,16 @@
       ctx.fillText(a + " m", 6, y + 4);
     }
 
-    if (opts.large && maxKm > 100) {
-      const kmStep = maxKm > 400 ? 100 : 50;
+    if (opts.large && (maxKm - minKm) > 40) {
+      const spanKm = maxKm - minKm;
+      const kmStep = spanKm > 400 ? 100 : spanKm > 180 ? 50 : spanKm > 80 ? 20 : 10;
       ctx.strokeStyle = "#2a3344";
       ctx.lineWidth = 1;
       ctx.setLineDash([]);
       ctx.fillStyle = "#8b95a8";
       ctx.font = "10px sans-serif";
-      for (let km = 0; km <= maxKm; km += kmStep) {
+      const firstTick = Math.ceil(minKm / kmStep) * kmStep;
+      for (let km = firstTick; km <= maxKm; km += kmStep) {
         const x = xAtKm(km);
         ctx.beginPath();
         ctx.moveTo(x, pad.t);
@@ -1841,11 +1834,13 @@
       }
     }
 
-    const layout = { pad, w, h, maxKm, minA: minA2, maxA: maxA2, xAtKm, yAtAlt, plotH, plotW };
+    const layout = { pad, w, h, minKm, maxKm, minA, maxA, xAtKm, yAtAlt, plotH, plotW };
     drawElevCityMarkers(ctx, opts, layout, prof);
 
     ctx.beginPath();
-    prof.forEach((p, i) => {
+    const profInView = prof.filter((p) => p.km >= minKm - 1e-6 && p.km <= maxKm + 1e-6);
+    if (!profInView.length) return layout;
+    profInView.forEach((p, i) => {
       const x = xAtKm(p.km);
       const y = yAtAlt(p.elevation);
       if (i === 0) ctx.moveTo(x, y);
@@ -1885,22 +1880,28 @@
     }
 
     if (!isHover || Math.abs(markerKm - currentKm) > 0.5) {
-      const nowX = xAtKm(currentKm);
-      ctx.strokeStyle = "#22c55e";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(nowX, pad.t);
-      ctx.lineTo(nowX, h - pad.b);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#22c55e";
-      ctx.font = (opts.large ? 11 : 10) + "px sans-serif";
-      ctx.fillText(
-        "Agora: km " + currentKm,
-        Math.min(nowX + 4, w - 96),
-        pad.t + 12
-      );
+      if (currentKm >= minKm - 1e-6 && currentKm <= maxKm + 1e-6) {
+        const nowX = xAtKm(currentKm);
+        ctx.strokeStyle = "#22c55e";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(nowX, pad.t);
+        ctx.lineTo(nowX, h - pad.b);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#22c55e";
+        ctx.font = (opts.large ? 11 : 10) + "px sans-serif";
+        ctx.fillText(
+          "Agora: km " + currentKm,
+          Math.min(nowX + 4, w - 96),
+          pad.t + 12
+        );
+      } else if (opts.large) {
+        ctx.fillStyle = "#8b95a8";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("Agora fora do zoom (km " + currentKm + ")", pad.l + 6, pad.t + 12);
+      }
     }
 
     ctx.fillStyle = "#8b95a8";
@@ -1962,7 +1963,7 @@
       large: true,
       hoverKm: elevLargeHoverKm,
       showCities: elevShowCities,
-      yZoomFactor: elevYZoom,
+      xZoomFactor: elevXZoom,
       zoomCenterKm: elevLargeHoverKm != null ? elevLargeHoverKm : currentKm,
       pad: { l: 52, r: 20, t: 28, b: 40 },
     });
@@ -2076,11 +2077,11 @@
     updateElevZoomUI();
     $("elev-zoom-in")?.addEventListener("click", (ev) => {
       ev.preventDefault();
-      setElevYZoom(elevYZoom * ELEV_Y_ZOOM_MUL);
+      setElevXZoom(elevXZoom * ELEV_X_ZOOM_MUL);
     });
     $("elev-zoom-out")?.addEventListener("click", (ev) => {
       ev.preventDefault();
-      setElevYZoom(elevYZoom / ELEV_Y_ZOOM_MUL);
+      setElevXZoom(elevXZoom / ELEV_X_ZOOM_MUL);
     });
 
     largeCanvas?.addEventListener("mousemove", onElevLargeMove);
@@ -2088,8 +2089,8 @@
       "wheel",
       (ev) => {
         ev.preventDefault();
-        if (ev.deltaY < 0) setElevYZoom(elevYZoom * ELEV_Y_ZOOM_MUL);
-        else setElevYZoom(elevYZoom / ELEV_Y_ZOOM_MUL);
+        if (ev.deltaY < 0) setElevXZoom(elevXZoom * ELEV_X_ZOOM_MUL);
+        else setElevXZoom(elevXZoom / ELEV_X_ZOOM_MUL);
       },
       { passive: false }
     );
@@ -2105,10 +2106,10 @@
       if (ev.key === "Escape") closeElevModal();
       if (ev.key === "+" || ev.key === "=") {
         ev.preventDefault();
-        setElevYZoom(elevYZoom * ELEV_Y_ZOOM_MUL);
+        setElevXZoom(elevXZoom * ELEV_X_ZOOM_MUL);
       } else if (ev.key === "-") {
         ev.preventDefault();
-        setElevYZoom(elevYZoom / ELEV_Y_ZOOM_MUL);
+        setElevXZoom(elevXZoom / ELEV_X_ZOOM_MUL);
       }
     });
     window.addEventListener("resize", () => {
