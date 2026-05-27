@@ -1759,6 +1759,23 @@
     };
   }
 
+  function splitCategoryColorMap() {
+    const m = {};
+    (D.splits || []).forEach((s) => {
+      if (!s || s.unavailable || s.partial) return;
+      if (s.km == null) return;
+      const k = Math.round(Number(s.km));
+      if (!Number.isFinite(k)) return;
+      if (s.categoryColor) m[k] = s.categoryColor;
+    });
+    return m;
+  }
+
+  function categoryColorAtKm(km, cmap) {
+    const k = Math.round(km);
+    return (cmap && cmap[k]) || null;
+  }
+
   function elevKmFromClientX(canvas, clientX, layout) {
     if (!layout) return null;
     const rect = canvas.getBoundingClientRect();
@@ -1859,6 +1876,33 @@
     ctx.strokeStyle = "#3d8bfd";
     ctx.lineWidth = opts.large ? 2.5 : 2;
     ctx.stroke();
+
+    // Overlay completed path using pace categories (per km).
+    const cmap = splitCategoryColorMap();
+    const completedKm = Math.max(0, Math.min(currentKm, fullMaxKm));
+    if (completedKm > minKm + 1e-6) {
+      const ptsDone = prof.filter((p) => p.km >= minKm - 1e-6 && p.km <= Math.min(maxKm, completedKm) + 1e-6);
+      if (ptsDone.length >= 2) {
+        const lw = opts.large ? 4 : 3;
+        ctx.save();
+        ctx.lineWidth = lw;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        for (let i = 0; i < ptsDone.length - 1; i++) {
+          const a = ptsDone[i];
+          const b = ptsDone[i + 1];
+          const midKm = (a.km + b.km) / 2;
+          const col = categoryColorAtKm(midKm, cmap);
+          if (!col) continue;
+          ctx.strokeStyle = col;
+          ctx.beginPath();
+          ctx.moveTo(xAtKm(a.km), yAtAlt(a.elevation));
+          ctx.lineTo(xAtKm(b.km), yAtAlt(b.elevation));
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
 
     const markerKm = opts.hoverKm != null ? opts.hoverKm : currentKm;
     const cx = xAtKm(markerKm);
