@@ -24,21 +24,21 @@
       "requiredClockPaceCalendar": "19:27/km",
       "hoursLeftCalendar": 99.3,
       "kmPerDayCalendar": 74.0,
-      "kmPerHourCalendar": 3.08,
+      "kmPerHourCalendar": 3.09,
       "remainingKm": 306.4,
       "recordPaceNow": {
         "km": 240.2,
-        "lat": 39.987495,
-        "lng": -8.801074,
+        "lat": 39.987086,
+        "lng": -8.800852,
         "alt": 109.5,
-        "time": "2026-05-27 20:40:43"
+        "time": "2026-05-27 20:41:43"
       },
       "calendarPaceNow": {
         "km": 289.9,
-        "lat": 39.591447,
-        "lng": -8.819081,
+        "lat": 39.590947,
+        "lng": -8.819329,
         "alt": 134.5,
-        "time": "2026-05-27 20:40:43",
+        "time": "2026-05-27 20:41:43",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -14066,7 +14066,7 @@
     "battery": "76%",
     "gpsTime": "2026-05-27 20:40:07",
     "gpsTimeUtc": "2026-05-27 19:40:07",
-    "lagMinutes": 0.6,
+    "lagMinutes": 1.6,
     "alongRouteKm": 337.0,
     "offRouteM": 4.0,
     "source": "position_new",
@@ -45540,22 +45540,22 @@
       "status": "OK",
       "alongRouteKm": 337.0,
       "source": "position_new",
-      "lagMinutes": 0.6,
+      "lagMinutes": 1.6,
       "logTime": "2026-05-27 19:37:08"
     },
     "recordPace": {
       "km": 240.2,
-      "lat": 39.987495,
-      "lng": -8.801074,
+      "lat": 39.987086,
+      "lng": -8.800852,
       "alt": 109.5,
-      "time": "2026-05-27 20:40:43"
+      "time": "2026-05-27 20:41:43"
     },
     "calendarPace": {
       "km": 289.9,
-      "lat": 39.591447,
-      "lng": -8.819081,
+      "lat": 39.590947,
+      "lng": -8.819329,
       "alt": 134.5,
-      "time": "2026-05-27 20:40:43",
+      "time": "2026-05-27 20:41:43",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -57328,5 +57328,5 @@
     "gpsPoints": 4431,
     "gpsSkipped": 368
   },
-  "liveUpdatedAt": "2026-05-27 20:40:43"
+  "liveUpdatedAt": "2026-05-27 20:41:43"
 }
