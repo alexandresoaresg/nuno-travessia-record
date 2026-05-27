@@ -599,8 +599,8 @@ def build_analytics(
     def _fmt_pace(seconds_per_km: float) -> str:
         if seconds_per_km <= 0:
             return "—"
-        m = int(seconds_per_km // 60)
-        s = int(round(seconds_per_km - 60 * m))
+        total = int(round(seconds_per_km))
+        m, s = divmod(total, 60)
         return f"{m}:{s:02d}/km"
 
     goal = {
@@ -736,6 +736,7 @@ def build_analytics(
             current_km=current_km,
             current_finish_main=prediction.get("finishTimeIso") or prediction.get("finishTime"),
             calendar_deadline=goal.get("calendarDeadline"),
+            splits=splits,
         ),
         "live": live,
         "map": build_map_data(

@@ -110,6 +110,28 @@ def _scenario_finishes(prediction: dict[str, Any]) -> dict[str, dict[str, Any]]:
     }
 
 
+def _forecast_points_for_history(pred: dict[str, Any]) -> list[dict[str, Any]]:
+    """
+    Persist forecast points used by the map/model so we can backtest ETA accuracy by km later.
+    We keep main-scenario points only (or scenario-less rows), sorted by km.
+    """
+    out: list[dict[str, Any]] = []
+    for f in pred.get("forecast") or []:
+        if f.get("scenario") not in (None, "", "main"):
+            continue
+        km = f.get("km")
+        t = f.get("predicted_crossing_iso") or f.get("predicted_crossing")
+        if km is None or not t:
+            continue
+        try:
+            km_i = int(round(float(km)))
+        except Exception:
+            continue
+        out.append({"km": km_i, "predictedCrossing": str(t)})
+    out.sort(key=lambda x: x["km"])
+    return out
+
+
 def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
     pred = analytics.get("prediction") or {}
     perf = pred.get("performance") or {}
@@ -200,6 +222,7 @@ def build_snapshot(analytics: dict[str, Any]) -> dict[str, Any]:
         "modelReliability": model_reliability,
         "proven": proven,
         "forecastSample": (pred.get("forecast") or [])[:12],
+        "forecastByKm": _forecast_points_for_history(pred),
     }
 
 

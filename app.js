@@ -1034,6 +1034,13 @@
             : '<span class="good">' + fmtHM(rev) + " mais cedo</span>";
     const marginSwing =
       s.marginSwingMin != null ? fmtHM(s.marginSwingMin).replace("+", "±") : "—";
+    const acc = ev.forecastAccuracy && ev.forecastAccuracy.overall;
+    const accTxt =
+      acc && acc.n
+        ? ` Acerto ETA (km já passados): MAE ${fmtNum(acc.maeMin, 1)} min · viés ${fmtHM(
+            Math.round(acc.biasMin || 0)
+          )} · n=${acc.n}.`
+        : "";
     el.innerHTML =
       "Desde <strong>" +
       fmtShortWhen(s.firstAt) +
@@ -1047,6 +1054,8 @@
       revTxt +
       "). Oscilação de margem ao prazo: " +
       marginSwing +
+      "." +
+      accTxt +
       '. <span class="muted">' +
       (ev.label || "") +
       "</span>";
@@ -1250,7 +1259,14 @@
 
   function parsePaceStr(s) {
     const m = String(s).match(/(\d+):(\d+)\/km/);
-    return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
+    if (!m) return null;
+    let min = parseInt(m[1], 10);
+    let sec = parseInt(m[2], 10);
+    if (sec >= 60) {
+      min += Math.floor(sec / 60);
+      sec = sec % 60;
+    }
+    return min * 60 + sec;
   }
 
   function renderConfidenceCard(prefix, conf, deadlineLabel) {
@@ -1377,7 +1393,7 @@
     panel.innerHTML = `<h3>Cenário principal — modelo v4</h3>
       ${regimeLine}${suspendedLine}
       <p class="chart-caption conf-callout">Calibrado no percurso do Nuno (${fmtNum(proven.kmDay40, 0)} km/dia nas primeiras 40 h). Projecta <strong>${fmtNum(main.stats.kmPerDay, 1)} km/dia</strong> — meta 31/05: ${reqKmDayCal} km/dia (${gapCal >= 0 ? "+" : ""}${fmtNum(gapCal, 1)} km/dia).</p>
-      <p class="chart-caption">v4: janela recente 15 km no horizonte curto; paragens ≥60 min; âncora GPS se splits atrasados.</p>
+      <p class="chart-caption">v4: janela recente 15 km no horizonte curto; fim de dia só com paragem nocturna (22h–06h), retoma 04h–12h ou ≥6 h; âncora GPS se splits atrasados.</p>
       <div class="conf-detail-grid">${blocks.map((b) => `<div class="conf-detail-block"><h4>${b.title}</h4><ul class="conf-detail-rows">${b.rows.map(([k,v]) => `<li><span class="k">${k}</span><span class="v">${v}</span></li>`).join("")}</ul></div>`).join("")}</div>
       <details class="conf-detail-sample"><summary>Previsão km-a-km (modelo v4)</summary><table><thead><tr><th>Km</th><th>Ritmo</th><th>Hora</th><th>D+</th></tr></thead><tbody>${sampleRows || "<tr><td colspan=\"4\">Sem previsão (paragem ou dados em falta)</td></tr>"}</tbody></table></details>`;
   }
@@ -2698,6 +2714,7 @@
     if (goalKm != null && day.kmPerDay != null) {
       day.vsGoalKmDay = Math.round((day.kmPerDay - goalKm) * 10) / 10;
     }
+    if (isLast) day.isLast = true;
     return day;
   }
 
@@ -2705,33 +2722,80 @@
     const pred = D.prediction || {};
     const timeline = forecastTimelineMain();
     const finishKm = Math.floor(D.event?.totalKm || totalKm);
-    const finishDt =
-      parseDataDate(pred.finishTimeIso || pred.finishTime) ||
-      parseFinishDt(pred.finishTimeIso || pred.finishTime);
+    const finishDt = parseFinishDt(pred.finishTimeIso || pred.finishTime);
     if (!finishDt || !timeline.length || !baseDays.length) return baseDays.map((d) => ({ ...d }));
 
     const goalKm = D.event?.goal?.kmPerDayCalendar;
     const refPaceMin = referenceMovingPaceMin();
     const nightMin = medianNightStopMin(payload);
     const maxMovingHours = maxMovingHoursFromHistory(baseDays);
+    const maxDayKm = avgCompletedDayKm(baseDays);
     const days = baseDays.map((d) => ({ ...d }));
     const last = days[days.length - 1];
     const projKm = Math.floor(Number(pred.projectionKm != null ? pred.projectionKm : currentKm));
     const projTime = parseDataDate(pred.projectionTime) || new Date();
     let dayNo = last.day != null ? Number(last.day) : days.length;
 
-    const nearestStopLabel = (km) => {
-      const lk = Math.floor(Number(km));
-      const lm = nearestRouteLandmark(lk);
-      if (lm && Math.abs(Number(lm.km) - lk) <= 18) return lm.name;
-      return "≈ km " + lk;
+    const finishArrivalNight = () => ({
+      kmFrom: finishKm,
+      kmTo: finishKm,
+      durationMin: 0,
+      duration: "—",
+      endCrossing: fmtDataDateTime(finishDt),
+      placeName: "Sagres",
+    });
+
+    const prevPredictedEnd = (extra) => {
+      if (extra.length) return parseDataDate(extra[extra.length - 1].endTime);
+      const p = last.projected?.endTime || last.endTime;
+      return parseDataDate(p);
     };
 
-    const calcEndFromBudget = (startDt, budgetHours) => {
-      if (!startDt || !Number.isFinite(budgetHours) || budgetHours <= 0) return startDt;
-      const dt = new Date(startDt.getTime() + budgetHours * 3600000);
-      if (dt > finishDt) return finishDt;
-      return dt;
+    /** Início do troço final: nunca antes do fim do dia anterior nem depois do ETA v4. */
+    const metaDayStartDt = (fromKm, cursorDt, prevEndDt) => {
+      let start = cursorDt && cursorDt < finishDt ? cursorDt : interpForecastTime(fromKm, timeline);
+      if (prevEndDt && (!start || start < prevEndDt)) start = prevEndDt;
+      if (!start || start >= finishDt) {
+        start =
+          prevEndDt && prevEndDt < finishDt
+            ? prevEndDt
+            : new Date(finishDt.getTime() - 3600000);
+      }
+      return start;
+    };
+
+    /** Hora de fim mostrada no cartão: nunca anterior ao início do dia. */
+    const predictedDayEndDt = (startDt, plan, isLast) => {
+      if (isLast) return finishDt;
+      const calc = plan.eveningCalcDt;
+      let display = parseDataDate(plan.eveningDt) || calc;
+      if (startDt && display && display <= startDt) {
+        display = calc && calc > startDt ? calc : new Date(startDt.getTime() + 3600000);
+      }
+      if (display && finishDt && display > finishDt) display = finishDt;
+      return display;
+    };
+
+    const appendFinishMetaDay = (extra, fromKm, prevEndHint) => {
+      if (fromKm > finishKm) return false;
+      if (extra.some((d) => d.isLast || (d.label && d.label.includes("· meta")))) return false;
+      dayNo += 1;
+      const start = metaDayStartDt(fromKm, null, prevEndHint || prevPredictedEnd(extra));
+      const day = buildPredictedDay({
+        dayNo,
+        kmFrom: fromKm,
+        kmTo: finishKm,
+        startTime: fmtDataDateTime(start),
+        endTime: fmtDataDateTime(finishDt),
+        goalKm,
+        timeline,
+        refPaceMin,
+        isLast: true,
+        inProgress: false,
+      });
+      day.nightAfter = finishArrivalNight();
+      extra.push(day);
+      return true;
     };
 
     // 1) Dia em curso: projetar só o que falta hoje.
@@ -2739,30 +2803,57 @@
     let cursorTime = projTime;
     if (last.inProgress) {
       const startDt = parseDataDate(last.startTime) || projTime;
-      const doneStats = movingStatsFromForecast(Math.floor(Number(last.kmFrom)), projKm, timeline, refPaceMin, {
-        segmentStartDt: startDt,
+      const planToday = planPredictedDayEnd({
+        fromKm: projKm,
+        startDt: projTime,
+        finishKm,
+        finishDt,
+        timeline,
+        refPaceMin,
+        maxMovingHours,
+        maxDayKm,
+        dayNo,
+        cal: calendarDateFromDt(projTime),
       });
-      const doneHours = doneStats.movingHours != null ? Math.max(0, doneStats.movingHours) : 0;
-      const remainBudget = Math.max(1.5, maxMovingHours - doneHours);
-      const endCalcDt = calcEndFromBudget(projTime, remainBudget);
-      let kmTo = interpForecastKmAtTime(endCalcDt, timeline);
-      if (kmTo == null) kmTo = projKm;
-      kmTo = Math.max(projKm, Math.min(finishKm, Math.floor(kmTo)));
 
+      if (planToday.isFinish) {
+        const statsFull = movingStatsFromForecast(Math.floor(Number(last.kmFrom)), finishKm, timeline, refPaceMin, {
+          segmentStartDt: startDt,
+          finishTimeDt: finishDt,
+        });
+        const statsRemain = movingStatsFromForecast(projKm, finishKm, timeline, refPaceMin, {
+          segmentStartDt: projTime,
+          finishTimeDt: finishDt,
+        });
+        last.projected = {
+          kmTo: finishKm,
+          km: statsFull.km,
+          endTime: fmtDataDateTime(finishDt),
+          movingHours: statsFull.movingHours != null ? Math.round(statsFull.movingHours * 100) / 100 : null,
+          movingTime: fmtDurationFromHours(statsFull.movingHours),
+          kmPerDay: statsFull.kmPerDay != null ? Math.round(statsFull.kmPerDay * 10) / 10 : null,
+          movingPace: statsRemain.movingPaceMin != null ? fmtPaceMin(statsRemain.movingPaceMin) : "—",
+          nightAfter: finishArrivalNight(),
+        };
+        if (goalKm != null && last.projected.kmPerDay != null) {
+          last.projected.vsGoalKmDay = Math.round((last.projected.kmPerDay - goalKm) * 10) / 10;
+        }
+        return days;
+      }
+
+      const kmTo = planToday.kmTo;
+      const endDisplay = predictedDayEndDt(projTime, planToday, false);
+      const endCalcDt =
+        planToday.eveningCalcDt && planToday.eveningCalcDt > projTime
+          ? planToday.eveningCalcDt
+          : endDisplay || projTime;
       const statsFull = movingStatsFromForecast(Math.floor(Number(last.kmFrom)), kmTo, timeline, refPaceMin, {
         segmentStartDt: startDt,
       });
       const statsRemain = movingStatsFromForecast(projKm, kmTo, timeline, refPaceMin, {
         segmentStartDt: projTime,
       });
-      const endDisplay =
-        parseDataDate(displayDayEndTime(endCalcDt, dayNo)) || eveningStopOnDate(calendarDateFromDt(endCalcDt), dayNo);
-      const stopKm = Math.min(finishKm, kmTo + 1);
-      const nightAfter = buildNightAfter(
-        { km: stopKm, name: nearestStopLabel(stopKm), major: false },
-        endCalcDt,
-        nightMin
-      );
+      const nightAfter = buildNightAfter(planToday.landmark, endCalcDt, nightMin);
       last.projected = {
         kmTo,
         km: statsFull.km,
@@ -2786,28 +2877,36 @@
       cursorTime = parseDataDate(night?.endCrossing) || projTime;
     }
 
-    // 2) Dias futuros: blocos temporais fixos (maxMovingHours) até finishTimeIso.
+    // 2) Dias futuros até km meta; o último dia usa sempre finishTimeIso do v4.
     const extra = [];
     let guard = 0;
-    while (cursorKm <= finishKm && cursorTime < finishDt && guard < 24) {
+    while (cursorKm <= finishKm && guard < 24) {
       guard += 1;
-      dayNo += 1;
-      const startDt = cursorTime;
-      const endCalcDt = calcEndFromBudget(startDt, maxMovingHours);
-      const isLast = endCalcDt >= finishDt || cursorKm >= finishKm;
-
-      let kmTo = isLast ? finishKm : interpForecastKmAtTime(endCalcDt, timeline);
-      if (kmTo == null) kmTo = finishKm;
-      kmTo = Math.max(cursorKm, Math.min(finishKm, Math.floor(kmTo)));
-
-      if (kmTo <= cursorKm && !isLast) {
-        kmTo = Math.min(finishKm, cursorKm + 1);
+      if (cursorTime >= finishDt) {
+        appendFinishMetaDay(extra, cursorKm, prevPredictedEnd(extra));
+        break;
       }
 
-      const endDisplay = isLast
-        ? finishDt
-        : parseDataDate(displayDayEndTime(endCalcDt, dayNo)) ||
-          eveningStopOnDate(calendarDateFromDt(endCalcDt), dayNo);
+      dayNo += 1;
+      let startDt = cursorTime;
+      const plan = planPredictedDayEnd({
+        fromKm: cursorKm,
+        startDt,
+        finishKm,
+        finishDt,
+        timeline,
+        refPaceMin,
+        maxMovingHours,
+        maxDayKm,
+        dayNo,
+        cal: calendarDateFromDt(startDt),
+      });
+      const isLast = plan.isFinish || cursorKm >= finishKm;
+      const kmTo = isLast ? finishKm : plan.kmTo;
+      if (isLast && startDt >= finishDt) {
+        startDt = metaDayStartDt(cursorKm, null, prevPredictedEnd(extra));
+      }
+      const endDisplay = predictedDayEndDt(startDt, plan, isLast);
       const day = buildPredictedDay({
         dayNo,
         kmFrom: cursorKm,
@@ -2821,30 +2920,25 @@
         inProgress: false,
       });
 
-      if (isLast || kmTo >= finishKm) {
-        day.nightAfter = {
-          kmFrom: finishKm,
-          kmTo: finishKm,
-          durationMin: 0,
-          duration: "—",
-          endCrossing: fmtDataDateTime(finishDt),
-          placeName: "Sagres",
-        };
+      if (isLast) {
+        day.nightAfter = finishArrivalNight();
         extra.push(day);
         break;
       }
 
-      const stopKm = Math.min(finishKm, kmTo + 1);
-      day.nightAfter = buildNightAfter(
-        { km: stopKm, name: nearestStopLabel(stopKm), major: false },
-        endCalcDt,
-        nightMin
-      );
+      const endCalcDt =
+        plan.eveningCalcDt && plan.eveningCalcDt > startDt
+          ? plan.eveningCalcDt
+          : endDisplay;
+      day.nightAfter = buildNightAfter(plan.landmark, endCalcDt, nightMin);
       extra.push(day);
       cursorKm = kmTo + 1;
       cursorTime = parseDataDate(day.nightAfter.endCrossing) || morningResumeAfterNight(endCalcDt, nightMin);
     }
 
+    if (cursorKm <= finishKm) {
+      appendFinishMetaDay(extra, cursorKm, prevPredictedEnd(extra));
+    }
     return days.concat(extra);
   }
 

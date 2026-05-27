@@ -123,11 +123,93 @@ def _thin_snapshots(
     return kept
 
 
+def _actual_crossings_by_km(splits: list[dict[str, Any]] | None) -> dict[int, datetime]:
+    out: dict[int, datetime] = {}
+    for s in splits or []:
+        if s.get("unavailable") or s.get("partial"):
+            continue
+        km = s.get("km")
+        ct = _parse_dt(s.get("crossing_time"))
+        if km is None or not ct:
+            continue
+        try:
+            out[int(km)] = ct
+        except Exception:
+            continue
+    return out
+
+
+def _forecast_accuracy_summary(
+    rows: list[dict[str, Any]],
+    *,
+    splits: list[dict[str, Any]] | None = None,
+    current_km: int = 0,
+) -> dict[str, Any] | None:
+    actual_by_km = _actual_crossings_by_km(splits)
+    if not actual_by_km:
+        return None
+
+    samples: list[dict[str, Any]] = []
+    for row in rows:
+        rec = _parse_dt(row.get("recordedAt"))
+        cur = row.get("current") or {}
+        km_at_snap = int(cur.get("km") or 0)
+        points = row.get("forecastByKm") or []
+        for p in points:
+            km = p.get("km")
+            pred_dt = _parse_dt(p.get("predictedCrossing"))
+            if km is None or not pred_dt:
+                continue
+            km_i = int(km)
+            actual_dt = actual_by_km.get(km_i)
+            if not actual_dt:
+                continue
+            if rec and rec >= actual_dt:
+                continue
+            if km_i > int(current_km):
+                continue
+            err_min = (pred_dt - actual_dt).total_seconds() / 60.0
+            ahead_km = max(0, km_i - km_at_snap)
+            bucket = "short" if ahead_km <= 25 else "mid" if ahead_km <= 75 else "long"
+            samples.append({"km": km_i, "errMin": err_min, "aheadKm": ahead_km, "bucket": bucket})
+
+    if not samples:
+        return None
+
+    def stats(vals: list[float]) -> dict[str, Any]:
+        abs_vals = [abs(v) for v in vals]
+        mae = statistics.mean(abs_vals)
+        rmse = math.sqrt(statistics.mean([v * v for v in vals]))
+        bias = statistics.mean(vals)
+        p50 = statistics.median(abs_vals)
+        p90 = sorted(abs_vals)[max(0, min(len(abs_vals) - 1, int(round((len(abs_vals) - 1) * 0.9))))]
+        return {
+            "n": len(vals),
+            "maeMin": round(mae, 1),
+            "rmseMin": round(rmse, 1),
+            "biasMin": round(bias, 1),
+            "p50AbsMin": round(p50, 1),
+            "p90AbsMin": round(p90, 1),
+        }
+
+    by_bucket: dict[str, list[float]] = {"short": [], "mid": [], "long": []}
+    for s in samples:
+        by_bucket[s["bucket"]].append(float(s["errMin"]))
+
+    return {
+        "n": len(samples),
+        "overall": stats([float(s["errMin"]) for s in samples]),
+        "byHorizon": {k: stats(v) for k, v in by_bucket.items() if v},
+        "latestSamples": samples[-30:],
+    }
+
+
 def build_prediction_evolution(
     *,
     current_km: int,
     current_finish_main: str | None,
     calendar_deadline: str | None = None,
+    splits: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     deadline = calendar_deadline or CALENDAR_DEADLINE
     raw = _load_all_snapshots()
@@ -277,6 +359,7 @@ def build_prediction_evolution(
         "count": len(raw),
         "timeline": timeline,
         "backtest": backtest,
+        "forecastAccuracy": _forecast_accuracy_summary(raw, splits=splits, current_km=current_km),
         "summary": summary,
         "label": f"{len(timeline)} pontos · {len(raw)} snapshots gravados",
         "calendarDeadline": deadline,
