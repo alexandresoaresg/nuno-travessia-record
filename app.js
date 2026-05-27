@@ -1631,6 +1631,11 @@
   } catch {}
   let elevLargeHoverKm = null;
   let elevLargeLayout = null;
+  let elevPanCenterKm = null;
+  let elevIsDragging = false;
+  let elevDragStartClientX = null;
+  let elevDragStartCenterKm = null;
+  let elevDragStartKmAtX = null;
   const ELEV_X_ZOOM_MIN = 1;
   const ELEV_X_ZOOM_MAX = 24;
   const ELEV_X_ZOOM_MUL = 1.5;
@@ -1959,12 +1964,13 @@
   function drawElevChartLarge() {
     const canvas = $("chart-elev-large");
     const height = Math.min(480, Math.max(320, Math.floor(window.innerHeight * 0.52)));
+    if (elevPanCenterKm == null) elevPanCenterKm = currentKm;
     elevLargeLayout = drawElevProfile(canvas, height, {
       large: true,
       hoverKm: elevLargeHoverKm,
       showCities: elevShowCities,
       xZoomFactor: elevXZoom,
-      zoomCenterKm: elevLargeHoverKm != null ? elevLargeHoverKm : currentKm,
+      zoomCenterKm: elevPanCenterKm,
       pad: { l: 52, r: 20, t: 28, b: 40 },
     });
     const meta = $("elev-modal-meta");
@@ -1983,6 +1989,7 @@
     const modal = $("elev-modal");
     if (!modal) return;
     elevLargeHoverKm = null;
+    elevPanCenterKm = currentKm;
     modal.hidden = false;
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("elev-modal-open");
@@ -2009,6 +2016,7 @@
     const chartEl = $("elev-modal-chart");
     const tip = $("elev-tooltip");
     if (!canvas || !chartEl) return;
+    if (elevIsDragging) return;
     const km = elevKmFromClientX(canvas, ev.clientX, elevLargeLayout);
     if (km == null) {
       elevLargeHoverKm = null;
@@ -2024,6 +2032,43 @@
       tip.hidden = false;
       positionElevTooltip(tip, chartEl, ev.clientX, ev.clientY);
     }
+  }
+
+  function onElevLargeDragStart(ev) {
+    const canvas = $("chart-elev-large");
+    if (!canvas) return;
+    if (ev.button != null && ev.button !== 0) return;
+    if (!elevLargeLayout) return;
+    const kmAt = elevKmFromClientX(canvas, ev.clientX, elevLargeLayout);
+    if (kmAt == null) return;
+    elevIsDragging = true;
+    elevDragStartClientX = ev.clientX;
+    elevDragStartKmAtX = kmAt;
+    elevDragStartCenterKm = elevPanCenterKm != null ? elevPanCenterKm : currentKm;
+    const tip = $("elev-tooltip");
+    if (tip) tip.hidden = true;
+    canvas.style.cursor = "grabbing";
+  }
+
+  function onElevLargeDragMove(ev) {
+    if (!elevIsDragging) return;
+    const canvas = $("chart-elev-large");
+    if (!canvas || !elevLargeLayout) return;
+    const kmNow = elevKmFromClientX(canvas, ev.clientX, elevLargeLayout);
+    if (kmNow == null || elevDragStartKmAtX == null) return;
+    const deltaKm = kmNow - elevDragStartKmAtX;
+    elevPanCenterKm = (elevDragStartCenterKm != null ? elevDragStartCenterKm : currentKm) - deltaKm;
+    drawElevChartLarge();
+  }
+
+  function onElevLargeDragEnd() {
+    if (!elevIsDragging) return;
+    elevIsDragging = false;
+    elevDragStartClientX = null;
+    elevDragStartCenterKm = null;
+    elevDragStartKmAtX = null;
+    const canvas = $("chart-elev-large");
+    if (canvas) canvas.style.cursor = "";
   }
 
   function setElevShowCities(on) {
@@ -2084,7 +2129,15 @@
       setElevXZoom(elevXZoom / ELEV_X_ZOOM_MUL);
     });
 
-    largeCanvas?.addEventListener("mousemove", onElevLargeMove);
+    largeCanvas?.addEventListener("mousemove", (ev) => {
+      if (elevIsDragging) onElevLargeDragMove(ev);
+      else onElevLargeMove(ev);
+    });
+    largeCanvas?.addEventListener("mousedown", (ev) => {
+      ev.preventDefault();
+      onElevLargeDragStart(ev);
+    });
+    window.addEventListener("mouseup", onElevLargeDragEnd);
     largeCanvas?.addEventListener(
       "wheel",
       (ev) => {
@@ -2095,6 +2148,7 @@
       { passive: false }
     );
     largeCanvas?.addEventListener("mouseleave", () => {
+      onElevLargeDragEnd();
       elevLargeHoverKm = null;
       const tip = $("elev-tooltip");
       if (tip) tip.hidden = true;
