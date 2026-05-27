@@ -10,7 +10,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.svg" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body>
@@ -357,6 +357,11 @@
       <header class="elev-modal-header">
         <h2 id="elev-modal-title">Perfil altimétrico</h2>
         <p class="elev-modal-meta" id="elev-modal-meta">—</p>
+        <div class="elev-zoom-controls elev-zoom-controls-modal" aria-label="Zoom no perfil altimétrico">
+          <button type="button" class="elev-zoom-btn" id="elev-zoom-out" aria-label="Diminuir zoom" title="Diminuir zoom">−</button>
+          <span class="elev-zoom-value" id="elev-zoom-value">100%</span>
+          <button type="button" class="elev-zoom-btn" id="elev-zoom-in" aria-label="Aumentar zoom" title="Aumentar zoom">+</button>
+        </div>
         <label class="elev-cities-toggle elev-cities-toggle-modal">
           <input type="checkbox" id="elev-show-cities-modal" checked />
           <span>Cidades</span>

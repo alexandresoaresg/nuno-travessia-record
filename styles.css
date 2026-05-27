@@ -310,9 +310,49 @@ body.elev-modal-open { overflow: hidden; }
 }
 .elev-cities-toggle-modal {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   align-self: center;
   margin: 0;
+}
+
+.elev-zoom-controls-modal {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  margin: 0;
+}
+
+.elev-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(12, 14, 18, 0.5);
+}
+
+.elev-zoom-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text, #e8ecf4);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.elev-zoom-btn:hover { background: rgba(255, 255, 255, 0.08); }
+
+.elev-zoom-value {
+  min-width: 4.5rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 /* Confidence / objectives tab */
