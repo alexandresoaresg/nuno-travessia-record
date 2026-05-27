@@ -1,11 +1,13 @@
-"""Segment race into days between long night stops (>= 60 min)."""
+"""Segment race into days between long stops that qualify as end-of-day (sleep / night)."""
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 LONG_STOP_THRESHOLD_S = 3600
+# Paragens muito longas (ex. acampamento) partem o dia mesmo fora da janela nocturna.
+VERY_LONG_STOP_S = 6 * 3600
 
 
 def _parse_dt(s: str | None) -> datetime | None:
@@ -48,6 +50,41 @@ def _usable_splits(splits: list[dict]) -> list[dict]:
     ]
 
 
+def _overlaps_clock_night(start: datetime, end: datetime) -> bool:
+    """True if [start, end) overlaps local clock 22:00–06:00 (typical sleep window)."""
+    step = timedelta(minutes=30)
+    t = start
+    while t < end:
+        h = t.hour + t.minute / 60.0
+        if h >= 22 or h < 6:
+            return True
+        t += step
+    return False
+
+
+def _stop_splits_calendar_day(end_cross: str | None, duration_s: float) -> bool:
+    """
+    A long stationary segment only ends a *calendar day* if it looks like sleep / night stop:
+    - very long (>= 6 h), or
+    - resume in the morning (04:00–12:00), or
+    - interval overlaps 22:00–06:00.
+
+    Lunch breaks (e.g. 60–120 min mid-day) do not split days.
+    """
+    if duration_s < LONG_STOP_THRESHOLD_S:
+        return False
+    if duration_s >= VERY_LONG_STOP_S:
+        return True
+    end = _parse_dt(end_cross)
+    if not end:
+        return False
+    start = end - timedelta(seconds=duration_s)
+    resume_h = end.hour + end.minute / 60.0
+    if 4.0 <= resume_h < 12.0:
+        return True
+    return _overlaps_clock_night(start, end)
+
+
 def _night_blocks(usable: list[dict]) -> list[dict[str, Any]]:
     blocks: list[dict[str, Any]] = []
     i = 0
@@ -67,15 +104,16 @@ def _night_blocks(usable: list[dict]) -> list[dict[str, Any]]:
             km_to = usable[j]["km"]
             end_cross = usable[j].get("crossing_time")
             j += 1
-        blocks.append(
-            {
-                "kmFrom": km_from,
-                "kmTo": km_to,
-                "durationMin": round(total_s / 60, 1),
-                "duration": _fmt_duration(total_s),
-                "endCrossing": end_cross,
-            }
-        )
+        if _stop_splits_calendar_day(end_cross, float(total_s)):
+            blocks.append(
+                {
+                    "kmFrom": km_from,
+                    "kmTo": km_to,
+                    "durationMin": round(total_s / 60, 1),
+                    "duration": _fmt_duration(total_s),
+                    "endCrossing": end_cross,
+                }
+            )
         i = j
     return blocks
 
@@ -183,5 +221,9 @@ def build_days(
         "days": days,
         "nightStops": nights,
         "longStopThresholdMin": LONG_STOP_THRESHOLD_S // 60,
-        "method": "Paragem noturna >=60 min (v4). Dia = km continuos desde 0; estatisticas dos splits disponiveis.",
+        "method": (
+            "Fim de dia: paragem >=60 min que seja noite (22h–06h), retoma 04h–12h, "
+            "ou paragem >=6 h; almoço/longas de dia não partem o dia. "
+            "Km contínuos desde 0; estatísticas dos splits disponíveis."
+        ),
     }

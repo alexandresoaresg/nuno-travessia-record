@@ -13,7 +13,6 @@ LANDMARKS: list[dict[str, Any]] = [
     {"name": "Aveiro", "lat": 40.641, "lng": -8.654, "major": True},
     {"name": "Figueira da Foz", "lat": 40.151, "lng": -8.861},
     {"name": "Leiria", "lat": 39.744, "lng": -8.807, "major": True},
-    {"name": "Nazaré", "lat": 39.602, "lng": -9.070},
     {"name": "Santarém", "lat": 39.236, "lng": -8.686, "major": True},
     {"name": "Grândola", "lat": 38.177, "lng": -8.567},
     {"name": "Sines", "lat": 37.956, "lng": -8.869},

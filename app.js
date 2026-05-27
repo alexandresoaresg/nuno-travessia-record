@@ -1625,6 +1625,15 @@
   function routeLandmarks() {
     return D.routeLandmarks && D.routeLandmarks.length ? D.routeLandmarks : DEFAULT_ROUTE_LANDMARKS;
   }
+
+  /** Só cidades no percurso oficial (snapshot GPS); sem inventar pontos fora da rota. */
+  function routeLandmarksForDays() {
+    const lms = D.routeLandmarks && D.routeLandmarks.length ? D.routeLandmarks : DEFAULT_ROUTE_LANDMARKS;
+    return lms
+      .filter((lm) => lm.km != null && (lm.offRouteKm == null || lm.offRouteKm <= 12))
+      .slice()
+      .sort((a, b) => a.km - b.km);
+  }
   let elevShowCities = true;
   try {
     elevShowCities = localStorage.getItem("travessiaElevCities") !== "0";
@@ -2233,18 +2242,643 @@
     return { days: [], nightStops: [], method: "", longStopThresholdMin: 60 };
   }
 
+  function daysShowPredicted() {
+    const predToggle = $("days-toggle-pred");
+    let show = !!(predToggle && predToggle.checked);
+    try {
+      if (predToggle && !predToggle.dataset.initDone) {
+        const saved = localStorage.getItem("travessiaDaysShowPred");
+        predToggle.checked = saved === "1";
+        predToggle.dataset.initDone = "1";
+        show = predToggle.checked;
+      }
+    } catch {}
+    return show;
+  }
+
+  function fmtDataDateTime(dt) {
+    if (!(dt instanceof Date) || Number.isNaN(dt.getTime())) return null;
+    const pad2 = (n) => String(n).padStart(2, "0");
+    return (
+      dt.getFullYear() +
+      "-" +
+      pad2(dt.getMonth() + 1) +
+      "-" +
+      pad2(dt.getDate()) +
+      " " +
+      pad2(dt.getHours()) +
+      ":" +
+      pad2(dt.getMinutes()) +
+      ":" +
+      pad2(dt.getSeconds())
+    );
+  }
+
+  function fmtDurationFromHours(hours) {
+    if (!Number.isFinite(hours) || hours <= 0) return "—";
+    const mins = Math.max(0, Math.round(hours * 60));
+    const hh = Math.floor(mins / 60);
+    const mm = mins % 60;
+    if (hh) return hh + "h " + (mm ? String(mm).padStart(2, "0") + "m" : "");
+    return mm + "m";
+  }
+
+  function fmtDurationFromMin(min) {
+    if (!Number.isFinite(min) || min <= 0) return "—";
+    return fmtDurationFromHours(min / 60);
+  }
+
+  function forecastTimelineMain() {
+    return (D.prediction?.forecast || [])
+      .filter((f) => !f.scenario || f.scenario === "main")
+      .map((f) => ({
+        km: Number(f.km),
+        t: parseDataDate(f.predicted_crossing_iso || f.predicted_crossing),
+      }))
+      .filter((p) => p.t && Number.isFinite(p.km))
+      .sort((a, b) => a.km - b.km);
+  }
+
+  function interpForecastTime(km, pts) {
+    if (!pts.length) return null;
+    const k = Number(km);
+    if (k <= pts[0].km) return pts[0].t;
+    const last = pts[pts.length - 1];
+    if (k >= last.km) return last.t;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      if (a.km <= k && k <= b.km) {
+        const span = b.km - a.km;
+        if (span <= 1e-6) return a.t;
+        const f = (k - a.km) / span;
+        return new Date(a.t.getTime() + f * (b.t.getTime() - a.t.getTime()));
+      }
+    }
+    return last.t;
+  }
+
+  function interpForecastKmAtTime(dt, pts) {
+    if (!dt || !pts.length) return null;
+    const t = dt.getTime();
+    if (t <= pts[0].t.getTime()) return Math.floor(pts[0].km);
+    const last = pts[pts.length - 1];
+    if (t >= last.t.getTime()) return Math.floor(last.km);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      const ta = a.t.getTime();
+      const tb = b.t.getTime();
+      if (ta <= t && t <= tb) {
+        const span = tb - ta;
+        if (span <= 1) return Math.floor(a.km);
+        const f = (t - ta) / span;
+        return Math.floor(a.km + f * (b.km - a.km));
+      }
+    }
+    return Math.floor(last.km);
+  }
+
+  function avgCompletedDayKm(days) {
+    const done = days.filter((d) => !d.inProgress && !d.isPredicted && (d.km || 0) > 0);
+    if (!done.length) return 85;
+    return done.reduce((s, d) => s + d.km, 0) / done.length;
+  }
+
+  /** Máximo de horas em movimento por dia (histórico real, teto 18h). */
+  function maxMovingHoursFromHistory(days) {
+    const hrs = days
+      .filter((d) => !d.isPredicted && Number.isFinite(d.movingHours) && d.movingHours > 0)
+      .map((d) => d.movingHours)
+      .sort((a, b) => a - b);
+    if (!hrs.length) return 18;
+    const idx = Math.min(hrs.length - 1, Math.floor(hrs.length * 0.9));
+    const p90 = hrs[idx];
+    return Math.min(18, Math.max(14, Math.round(p90 * 10) / 10));
+  }
+
+  function nearestRouteLandmark(km) {
+    const lms = routeLandmarksForDays();
+    let best = null;
+    let bestD = 1e18;
+    for (const lm of lms) {
+      const d = Math.abs(lm.km - km);
+      if (d < bestD) {
+        bestD = d;
+        best = lm;
+      }
+    }
+    return best && bestD <= 18 ? best : null;
+  }
+
+  /** Maior kmTo (>= fromKm+12) com horas de movimento <= budgetHours (forecast). */
+  function kmCapForMovingBudget(fromKm, budgetHours, finishKm, timeline, refPaceMin, opts) {
+    const from = Number(fromKm);
+    const cap = Math.min(Number(finishKm), from + 130);
+    let lo = from + 12;
+    let hi = cap;
+    const hiStats = movingStatsFromForecast(from, hi, timeline, refPaceMin, opts);
+    const hiH =
+      hiStats.movingHours != null ? hiStats.movingHours : ((hi - from) * refPaceMin) / 60;
+    if (hiH <= budgetHours) return Math.floor(hi);
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      const st = movingStatsFromForecast(from, mid, timeline, refPaceMin, opts);
+      const h = st.movingHours != null ? st.movingHours : ((mid - from) * refPaceMin) / 60;
+      if (h <= budgetHours) lo = mid;
+      else hi = mid;
+    }
+    return Math.floor(lo);
+  }
+
+  function planPredictedDayEnd(params) {
+    const {
+      fromKm,
+      startDt,
+      finishKm,
+      finishDt,
+      timeline,
+      refPaceMin,
+      maxMovingHours,
+      maxDayKm,
+      dayNo,
+      cal,
+    } = params;
+    const opts = { segmentStartDt: startDt, finishTimeDt: finishDt };
+    const fromK = Math.floor(Number(fromKm));
+    const finK = Math.floor(Number(finishKm));
+    const toFinish = movingStatsFromForecast(fromK, finK, timeline, refPaceMin, opts);
+    if (
+      toFinish.movingHours != null &&
+      toFinish.movingHours > 0 &&
+      toFinish.movingHours <= maxMovingHours * 1.02
+    ) {
+      const lm =
+        pickNightLandmark(fromK, finK, finK, null, { strictMax: false }) ||
+        nearestRouteLandmark(finK) || { km: finK, name: "Sagres", major: true };
+      const stopLm = {
+        km: finK,
+        name: lm?.name || "Sagres",
+        major: !!lm?.major,
+      };
+      return {
+        kmTo: finK,
+        landmark: stopLm,
+        stats: toFinish,
+        // For chegada, o display e cálculo coincidem.
+        eveningDt: finishDt,
+        eveningCalcDt: finishDt,
+        isFinish: true,
+      };
+    }
+
+    const capKm = kmCapForMovingBudget(
+      fromK,
+      maxMovingHours,
+      finK,
+      timeline,
+      refPaceMin,
+      opts
+    );
+    const maxAhead = Math.min(maxDayKm, Math.max(20, capKm - fromK));
+    let lm = pickNightLandmark(fromK, capKm, finK, maxAhead, { strictMax: true });
+    let kmTo = Math.floor(capKm);
+    if (lm) {
+      const cand = Math.min(Math.floor(lm.km) - 1, finK);
+      const st = movingStatsFromForecast(fromK, cand, timeline, refPaceMin, opts);
+      if (st.movingHours != null && st.movingHours <= maxMovingHours * 1.05) kmTo = cand;
+    }
+    if (!lm || kmTo >= capKm - 2) {
+      lm = nearestRouteLandmark(kmTo) || { km: kmTo, name: "≈ km " + kmTo, major: false };
+    }
+    kmTo = Math.min(finK, Math.max(fromK + 1, Math.floor(kmTo)));
+    const stats = movingStatsFromForecast(fromK, kmTo, timeline, refPaceMin, opts);
+    // Cálculo (continuidade temporal): usa a hora real do forecast.
+    const eveningCalcDt = stats.forecastEnd || null;
+    // Display: força o texto a cair no intervalo 22h–01h.
+    const eveningDt =
+      parseDataDate(displayDayEndTime(stats.forecastEnd, dayNo)) || eveningStopOnDate(cal, dayNo);
+
+    // Continuidade: a paragem noturna marca o próximo km do dia seguinte.
+    const stopKm = Math.min(finK, Math.floor(Number(kmTo)) + 1);
+    const nearest = nearestRouteLandmark(stopKm);
+    const stopName =
+      lm && lm.name && Math.abs(Number(lm.km) - stopKm) <= 18
+        ? lm.name
+        : nearest?.name || ("≈ km " + stopKm);
+    const stopLm = {
+      km: stopKm,
+      name: stopName,
+      major: !!(nearest?.major || lm?.major),
+    };
+
+    return {
+      kmTo: Math.floor(kmTo),
+      landmark: stopLm,
+      stats,
+      eveningDt,
+      eveningCalcDt,
+      isFinish: false,
+    };
+  }
+
+  function medianNightStopMin(payload) {
+    const nights = payload.nightStops || [];
+    const mins = nights.map((n) => n.durationMin).filter((v) => Number.isFinite(v));
+    if (!mins.length) return 400;
+    mins.sort((a, b) => a - b);
+    return mins[Math.floor(mins.length / 2)];
+  }
+
+  function profileGainLossRange(kmFrom, kmTo) {
+    const prof = profileFull || D.routeProfile || [];
+    let gainM = 0;
+    let lossM = 0;
+    const k0 = Math.ceil(kmFrom);
+    const k1 = Math.floor(kmTo);
+    for (let k = k0; k <= k1; k++) {
+      const seg = prof[k - 1];
+      if (!seg) continue;
+      gainM += seg.gain || 0;
+      lossM += seg.loss || 0;
+    }
+    return { gainM: Math.round(gainM), lossM: Math.round(lossM) };
+  }
+
+  function pickNightLandmark(fromKm, targetKm, finishKm, maxAheadKm, opts) {
+    const strictMax = opts && opts.strictMax;
+    const lms = routeLandmarksForDays()
+      .filter((l) => l.km > fromKm)
+      .sort((a, b) => a.km - b.km);
+    if (!lms.length) return null;
+    const cap = finishKm != null ? finishKm + 1 : 1e9;
+    const cappedTarget =
+      maxAheadKm != null && Number.isFinite(maxAheadKm)
+        ? Math.min(targetKm, fromKm + maxAheadKm)
+        : targetKm;
+    let best = null;
+    let bestScore = 1e18;
+    for (const lm of lms) {
+      if (lm.km > cap) break;
+      const ahead = lm.km - fromKm;
+      if (ahead < 20) continue;
+      if (maxAheadKm != null && ahead > maxAheadKm + 5) continue;
+      let score = Math.abs(lm.km - cappedTarget);
+      if (lm.major) score -= 15;
+      if (finishKm != null && Math.abs(lm.km - finishKm) <= 3) score -= 40;
+      if (score < bestScore) {
+        bestScore = score;
+        best = lm;
+      }
+    }
+    if (best) return best;
+    if (maxAheadKm != null && !strictMax) {
+      return pickNightLandmark(fromKm, targetKm, finishKm, null, opts);
+    }
+    if (strictMax) return null;
+    const fallback = lms.find((l) => l.km <= cap && l.km - fromKm >= 20);
+    return fallback || lms[lms.length - 1];
+  }
+
+  /** Paragem noturna entre 22h e 01h, no mesmo dia civil do movimento. */
+  function eveningStopOnDate(dayDate, dayIndex) {
+    const d = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
+    const slots = [
+      [22, 30],
+      [23, 0],
+      [23, 30],
+      [22, 45],
+      [23, 15],
+      [22, 15],
+      [23, 45],
+    ];
+    const [hh, mm] = slots[((dayIndex % slots.length) + slots.length) % slots.length];
+    d.setHours(hh, mm, 0, 0);
+    return d;
+  }
+
+  function morningResumeAfterNight(eveningStopDt, nightMin) {
+    const nightEnd = new Date(eveningStopDt.getTime() + nightMin * 60000);
+    const h = nightEnd.getHours() + nightEnd.getMinutes() / 60;
+    if (h >= 4.5 && h <= 8.5) return nightEnd;
+    const d = new Date(eveningStopDt);
+    d.setDate(d.getDate() + 1);
+    d.setHours(5, 30, 0, 0);
+    return d;
+  }
+
+  function calendarDateFromDt(dt) {
+    if (!dt || Number.isNaN(dt.getTime())) return new Date();
+    return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  }
+
+  function referenceMovingPaceMin() {
+    const p = (D.prediction && D.prediction.performance) || perf || {};
+    const fromPerf = p.recentPaceMin || p.weightedPaceMin || p.medianPaceMin;
+    if (fromPerf && fromPerf > 0) return fromPerf;
+    const mov = D.prediction?.movingPaceMin || D.prediction?.basePaceMin;
+    return mov && mov > 0 ? mov : 11;
+  }
+
+  function movingStatsFromForecast(kmFrom, kmTo, timeline, refPaceMin, opts) {
+    const km = Math.max(0, Number(kmTo) - Number(kmFrom));
+    if (!timeline.length || km <= 0) {
+      return {
+        km,
+        movingHours: null,
+        movingPaceMin: refPaceMin,
+        kmPerDay: null,
+        forecastStart: null,
+        forecastEnd: null,
+      };
+    }
+    const first = timeline[0];
+    const lastPt = timeline[timeline.length - 1];
+    let t0 =
+      kmFrom < first.km - 0.5
+        ? opts?.segmentStartDt || first.t
+        : interpForecastTime(kmFrom, timeline);
+    let t1 = interpForecastTime(kmTo, timeline);
+    if (kmTo > lastPt.km + 0.5) {
+      t1 = opts?.finishTimeDt || lastPt.t;
+    }
+    let movingHours = null;
+    if (t0 && t1 && t1 > t0) {
+      movingHours = (t1 - t0) / 3600000;
+    } else if (refPaceMin && km > 0) {
+      movingHours = (km * refPaceMin) / 60;
+      // Se o forecast estiver "para trás" (t1 <= t0), força timeline monotónica.
+      if (t0 && (!t1 || t1 <= t0)) t1 = new Date(t0.getTime() + movingHours * 3600000);
+    }
+    // Última segurança: nunca devolver forecastEnd anterior ao start.
+    if (t0 && t1 && t1 <= t0) {
+      t1 = new Date(t0.getTime() + Math.max(0.01, (movingHours || 0.01)) * 3600000);
+    }
+    const movingPaceMin =
+      km > 0 && movingHours && movingHours > 0 ? (movingHours * 60) / km : refPaceMin;
+    const kmPerDay =
+      km > 0 && movingHours && movingHours > 0 ? (km / movingHours) * 24 : null;
+    return {
+      km,
+      movingHours,
+      movingPaceMin,
+      kmPerDay,
+      forecastStart: t0,
+      forecastEnd: t1,
+    };
+  }
+
+  /** Hora de paragem: usa forecast; se fora de 22h–01h, mostra noite típica desse dia civil. */
+  function displayDayEndTime(forecastEndDt, dayIndex) {
+    if (!forecastEndDt) return null;
+    const h = forecastEndDt.getHours() + forecastEndDt.getMinutes() / 60;
+    if (h >= 21.5 || h <= 1.5) return fmtDataDateTime(forecastEndDt);
+    return fmtDataDateTime(eveningStopOnDate(forecastEndDt, dayIndex));
+  }
+
+  function buildNightAfter(landmark, endMoveDt, nightMin) {
+    const resumeDt = morningResumeAfterNight(endMoveDt, nightMin);
+    return {
+      kmFrom: landmark.km,
+      kmTo: landmark.km,
+      durationMin: Math.round(nightMin * 10) / 10,
+      duration: fmtDurationFromMin(nightMin),
+      endCrossing: fmtDataDateTime(resumeDt),
+      placeName: landmark.name,
+    };
+  }
+
+  function buildPredictedDay(opts) {
+    const {
+      dayNo,
+      kmFrom,
+      kmTo,
+      startTime,
+      endTime,
+      goalKm,
+      timeline,
+      refPaceMin,
+      isLast,
+      inProgress,
+    } = opts;
+    const startDt = parseDataDate(startTime);
+    const endDt = parseDataDate(endTime);
+    const stats = movingStatsFromForecast(kmFrom, kmTo, timeline, refPaceMin, {
+      segmentStartDt: startDt,
+      finishTimeDt: isLast ? endDt : null,
+    });
+    const km = stats.km;
+    const movingHours = stats.movingHours;
+    const kmPerDay = stats.kmPerDay;
+    const movingPaceMin = stats.movingPaceMin;
+    const spanHours =
+      startDt && endDt && endDt > startDt ? (endDt - startDt) / 3600000 : movingHours;
+    const gl = profileGainLossRange(kmFrom, kmTo);
+    const day = {
+      day: dayNo,
+      label: "Dia " + dayNo + (inProgress ? " · em curso" : "") + (isLast ? " · meta" : ""),
+      kmFrom,
+      kmTo,
+      km,
+      startTime,
+      endTime: inProgress ? null : endTime,
+      spanHours: spanHours != null ? Math.round(spanHours * 100) / 100 : null,
+      movingHours: movingHours != null ? Math.round(movingHours * 100) / 100 : null,
+      movingTime: fmtDurationFromHours(movingHours),
+      movingPace: movingPaceMin != null ? fmtPaceMin(movingPaceMin) : "—",
+      kmPerDay: kmPerDay != null ? Math.round(kmPerDay * 10) / 10 : null,
+      gainM: gl.gainM,
+      lossM: gl.lossM,
+      inProgress: !!inProgress,
+      categories: {},
+      splitsFromKm: kmFrom,
+      splitsToKm: kmTo,
+      isPredicted: !inProgress,
+    };
+    if (goalKm != null && day.kmPerDay != null) {
+      day.vsGoalKmDay = Math.round((day.kmPerDay - goalKm) * 10) / 10;
+    }
+    return day;
+  }
+
+  function applyDaysWithPredictions(baseDays, payload) {
+    const pred = D.prediction || {};
+    const timeline = forecastTimelineMain();
+    const finishKm = Math.floor(D.event?.totalKm || totalKm);
+    const finishDt =
+      parseDataDate(pred.finishTimeIso || pred.finishTime) ||
+      parseFinishDt(pred.finishTimeIso || pred.finishTime);
+    if (!finishDt || !timeline.length || !baseDays.length) return baseDays.map((d) => ({ ...d }));
+
+    const goalKm = D.event?.goal?.kmPerDayCalendar;
+    const refPaceMin = referenceMovingPaceMin();
+    const nightMin = medianNightStopMin(payload);
+    const maxMovingHours = maxMovingHoursFromHistory(baseDays);
+    const days = baseDays.map((d) => ({ ...d }));
+    const last = days[days.length - 1];
+    const projKm = Math.floor(Number(pred.projectionKm != null ? pred.projectionKm : currentKm));
+    const projTime = parseDataDate(pred.projectionTime) || new Date();
+    let dayNo = last.day != null ? Number(last.day) : days.length;
+
+    const nearestStopLabel = (km) => {
+      const lk = Math.floor(Number(km));
+      const lm = nearestRouteLandmark(lk);
+      if (lm && Math.abs(Number(lm.km) - lk) <= 18) return lm.name;
+      return "≈ km " + lk;
+    };
+
+    const calcEndFromBudget = (startDt, budgetHours) => {
+      if (!startDt || !Number.isFinite(budgetHours) || budgetHours <= 0) return startDt;
+      const dt = new Date(startDt.getTime() + budgetHours * 3600000);
+      if (dt > finishDt) return finishDt;
+      return dt;
+    };
+
+    // 1) Dia em curso: projetar só o que falta hoje.
+    let cursorKm = Math.floor(Number(last.kmTo)) + 1;
+    let cursorTime = projTime;
+    if (last.inProgress) {
+      const startDt = parseDataDate(last.startTime) || projTime;
+      const doneStats = movingStatsFromForecast(Math.floor(Number(last.kmFrom)), projKm, timeline, refPaceMin, {
+        segmentStartDt: startDt,
+      });
+      const doneHours = doneStats.movingHours != null ? Math.max(0, doneStats.movingHours) : 0;
+      const remainBudget = Math.max(1.5, maxMovingHours - doneHours);
+      const endCalcDt = calcEndFromBudget(projTime, remainBudget);
+      let kmTo = interpForecastKmAtTime(endCalcDt, timeline);
+      if (kmTo == null) kmTo = projKm;
+      kmTo = Math.max(projKm, Math.min(finishKm, Math.floor(kmTo)));
+
+      const statsFull = movingStatsFromForecast(Math.floor(Number(last.kmFrom)), kmTo, timeline, refPaceMin, {
+        segmentStartDt: startDt,
+      });
+      const statsRemain = movingStatsFromForecast(projKm, kmTo, timeline, refPaceMin, {
+        segmentStartDt: projTime,
+      });
+      const endDisplay =
+        parseDataDate(displayDayEndTime(endCalcDt, dayNo)) || eveningStopOnDate(calendarDateFromDt(endCalcDt), dayNo);
+      const stopKm = Math.min(finishKm, kmTo + 1);
+      const nightAfter = buildNightAfter(
+        { km: stopKm, name: nearestStopLabel(stopKm), major: false },
+        endCalcDt,
+        nightMin
+      );
+      last.projected = {
+        kmTo,
+        km: statsFull.km,
+        endTime: fmtDataDateTime(endDisplay),
+        movingHours: statsFull.movingHours != null ? Math.round(statsFull.movingHours * 100) / 100 : null,
+        movingTime: fmtDurationFromHours(statsFull.movingHours),
+        kmPerDay: statsFull.kmPerDay != null ? Math.round(statsFull.kmPerDay * 10) / 10 : null,
+        movingPace: statsRemain.movingPaceMin != null ? fmtPaceMin(statsRemain.movingPaceMin) : "—",
+        nightAfter,
+      };
+      if (goalKm != null && last.projected.kmPerDay != null) {
+        last.projected.vsGoalKmDay = Math.round((last.projected.kmPerDay - goalKm) * 10) / 10;
+      }
+
+      if (kmTo >= finishKm) return days;
+      cursorKm = kmTo + 1;
+      cursorTime = parseDataDate(nightAfter.endCrossing) || morningResumeAfterNight(endCalcDt, nightMin);
+    } else {
+      const night = last.nightAfter;
+      cursorKm = Math.floor(Number(last.kmTo)) + 1;
+      cursorTime = parseDataDate(night?.endCrossing) || projTime;
+    }
+
+    // 2) Dias futuros: blocos temporais fixos (maxMovingHours) até finishTimeIso.
+    const extra = [];
+    let guard = 0;
+    while (cursorKm <= finishKm && cursorTime < finishDt && guard < 24) {
+      guard += 1;
+      dayNo += 1;
+      const startDt = cursorTime;
+      const endCalcDt = calcEndFromBudget(startDt, maxMovingHours);
+      const isLast = endCalcDt >= finishDt || cursorKm >= finishKm;
+
+      let kmTo = isLast ? finishKm : interpForecastKmAtTime(endCalcDt, timeline);
+      if (kmTo == null) kmTo = finishKm;
+      kmTo = Math.max(cursorKm, Math.min(finishKm, Math.floor(kmTo)));
+
+      if (kmTo <= cursorKm && !isLast) {
+        kmTo = Math.min(finishKm, cursorKm + 1);
+      }
+
+      const endDisplay = isLast
+        ? finishDt
+        : parseDataDate(displayDayEndTime(endCalcDt, dayNo)) ||
+          eveningStopOnDate(calendarDateFromDt(endCalcDt), dayNo);
+      const day = buildPredictedDay({
+        dayNo,
+        kmFrom: cursorKm,
+        kmTo,
+        startTime: fmtDataDateTime(startDt),
+        endTime: fmtDataDateTime(endDisplay),
+        goalKm,
+        timeline,
+        refPaceMin,
+        isLast,
+        inProgress: false,
+      });
+
+      if (isLast || kmTo >= finishKm) {
+        day.nightAfter = {
+          kmFrom: finishKm,
+          kmTo: finishKm,
+          durationMin: 0,
+          duration: "—",
+          endCrossing: fmtDataDateTime(finishDt),
+          placeName: "Sagres",
+        };
+        extra.push(day);
+        break;
+      }
+
+      const stopKm = Math.min(finishKm, kmTo + 1);
+      day.nightAfter = buildNightAfter(
+        { km: stopKm, name: nearestStopLabel(stopKm), major: false },
+        endCalcDt,
+        nightMin
+      );
+      extra.push(day);
+      cursorKm = kmTo + 1;
+      cursorTime = parseDataDate(day.nightAfter.endCrossing) || morningResumeAfterNight(endCalcDt, nightMin);
+    }
+
+    return days.concat(extra);
+  }
+
   function renderDays() {
     const grid = $("days-grid");
     const lead = $("days-lead");
     if (!grid) return;
     const payload = getDaysPayload();
-    const days = payload.days || [];
+    const baseDays = payload.days || [];
     const goalKm = D.event?.goal?.kmPerDayCalendar;
+    const showPredicted = daysShowPredicted();
+
+    let days = baseDays;
+    if (showPredicted) {
+      try {
+        days = applyDaysWithPredictions(baseDays, payload);
+      } catch (err) {
+        console.error("applyDaysWithPredictions:", err);
+      }
+    }
 
     if (lead) {
       lead.textContent =
         payload.method ||
         "Cada dia corresponde ao período de movimento entre paragens noturnas longas (≥60 min).";
+      if (showPredicted) {
+        const fin = D.prediction?.finishTimeIso || D.prediction?.finishTime;
+        const maxH = maxMovingHoursFromHistory(baseDays);
+        lead.textContent +=
+          " Com previsão: cada dia até ~" +
+          fmtNum(maxH, 0) +
+          " h em movimento (como os dias já feitos); paragem 22h–01h; retoma ~05h30; paragens em cidades no percurso ou ≈km quando o troço é longo" +
+          (fin ? " (" + String(fin).replace(" ", " · ") + ")." : ".");
+      }
       if (goalKm != null) {
         lead.textContent += " Meta 31/05: ~" + fmtNum(goalKm, 1) + " km/dia em movimento.";
       }
@@ -2262,22 +2896,57 @@
       catMap[c.id] = c;
     });
 
+    function nightStopHtml(night, predicted) {
+      if (!night) return "";
+      const place = night.placeName || "";
+      const predTag = predicted ? " <span class='muted'>(previsto)</span>" : "";
+      if (!night.durationMin || night.durationMin <= 0) {
+        return (
+          `<div class="day-night${predicted ? " predicted" : ""}"><strong>Chegada</strong> ${place}` +
+          (place ? " · " : "") +
+          "km " +
+          night.kmFrom +
+          (night.endCrossing ? " · " + night.endCrossing.replace(" ", " · ") : "") +
+          predTag +
+          "</div>"
+        );
+      }
+      return (
+        `<div class="day-night${predicted ? " predicted" : ""}"><strong>Paragem noite</strong> ${place ? place + " · " : ""}km ${night.kmFrom}` +
+        (night.kmTo !== night.kmFrom ? "–" + night.kmTo : "") +
+        " · " +
+        night.duration +
+        (night.endCrossing ? " · fim " + night.endCrossing.split(" ")[1] : "") +
+        predTag +
+        "</div>"
+      );
+    }
+
     grid.innerHTML = days
       .map((day) => {
-        const vs = day.vsGoalKmDay;
+        const proj = day.projected;
+        const displayKm = proj && proj.km != null ? proj.km : day.km;
+        const vsVal = proj && proj.vsGoalKmDay != null ? proj.vsGoalKmDay : day.vsGoalKmDay;
         let vsCls = "warn";
-        if (vs != null) vsCls = vs >= 0 ? "good" : "bad";
-        const night = day.nightAfter;
-        const nightHtml = night
-          ? `<div class="day-night"><strong>Paragem noite</strong> km ${night.kmFrom}` +
-            (night.kmTo !== night.kmFrom ? "–" + night.kmTo : "") +
-            " · " +
-            night.duration +
-            (night.endCrossing ? " · fim " + night.endCrossing.split(" ")[1] : "") +
-            "</div>"
-          : day.inProgress
-            ? '<div class="day-night">Dia em curso — paragem noturna ainda não registada.</div>'
-            : "";
+        if (vsVal != null) vsCls = vsVal >= 0 ? "good" : "bad";
+        const kmPerDayVal = proj && proj.kmPerDay != null ? proj.kmPerDay : day.kmPerDay;
+
+        let nightHtml = "";
+        if (day.nightAfter) nightHtml = nightStopHtml(day.nightAfter, false);
+        else if (proj && proj.nightAfter) nightHtml = nightStopHtml(proj.nightAfter, true);
+        else if (day.inProgress && showPredicted)
+          nightHtml = '<div class="day-night muted">A calcular paragem noturna prevista…</div>';
+        else if (day.inProgress)
+          nightHtml = '<div class="day-night">Dia em curso — paragem noturna ainda não registada.</div>';
+
+        const kmRange =
+          proj && proj.kmTo != null
+            ? `km ${day.kmFrom}–${day.kmTo} → <strong>${proj.kmTo}</strong>`
+            : `km ${day.kmFrom}–${day.kmTo}`;
+        const timeRange =
+          proj && proj.endTime
+            ? fmtDayRange(day.startTime, proj.endTime)
+            : fmtDayRange(day.startTime, day.endTime);
 
         const cats = Object.entries(day.categories || {})
           .map(([id, n]) => {
@@ -2288,23 +2957,32 @@
           })
           .join("");
 
+        const kmBig =
+          proj && day.km !== displayKm
+            ? `${day.km} → <strong>${displayKm}</strong> km`
+            : `${displayKm} km`;
+
         return (
-          `<article class="day-card${day.inProgress ? " in-progress" : ""}">` +
+          `<article class="day-card${day.inProgress ? " in-progress" : ""}${day.isPredicted ? " predicted" : ""}">` +
           `<header class="day-card-head">` +
           `<div><h3>${day.label}</h3>` +
-          `<p class="day-card-meta">km ${day.kmFrom}–${day.kmTo}` +
+          `<p class="day-card-meta">${kmRange}` +
           (day.splitsFromKm != null && day.splitsFromKm > day.kmFrom
             ? ` · splits desde km ${day.splitsFromKm}`
             : day.kmFrom === 0 && day.splitsFromKm
               ? ` · splits desde km ${day.splitsFromKm}`
               : "") +
-          ` · ${fmtDayRange(day.startTime, day.endTime)}</p></div>` +
-          `<div class="day-km-big">${day.km} km</div></header>` +
+          ` · ${timeRange}</p></div>` +
+          `<div class="day-km-big">${kmBig}</div></header>` +
           `<div class="day-stats">` +
-          `<div><span class="k">Tempo em movimento</span><span class="v">${day.movingTime || "—"} (${fmtNum(day.movingHours, 1)} h)</span></div>` +
-          `<div><span class="k">Ritmo em movimento</span><span class="v">${day.movingPace || "—"}</span></div>` +
-          `<div><span class="k">Km/dia (extrapolado)</span><span class="v ${vsCls}">${day.kmPerDay != null ? fmtNum(day.kmPerDay, 1) : "—"}</span></div>` +
-          `<div><span class="k">vs meta 31/05</span><span class="v ${vsCls}">${vs != null ? (vs >= 0 ? "+" : "") + fmtNum(vs, 1) + " km/d" : "—"}</span></div>` +
+          `<div><span class="k">Tempo em movimento</span><span class="v">${
+            proj && proj.movingTime
+              ? (day.movingTime || "—") + " → " + proj.movingTime + " (prev.)"
+              : (day.movingTime || "—") + " (" + fmtNum(day.movingHours, 1) + " h)"
+          }</span></div>` +
+          `<div><span class="k">Ritmo em movimento</span><span class="v">${(proj && proj.movingPace) || day.movingPace || "—"}</span></div>` +
+          `<div><span class="k">Km/dia (extrapolado)</span><span class="v ${vsCls}">${kmPerDayVal != null ? fmtNum(kmPerDayVal, 1) : "—"}</span></div>` +
+          `<div><span class="k">vs meta 31/05</span><span class="v ${vsCls}">${vsVal != null ? (vsVal >= 0 ? "+" : "") + fmtNum(vsVal, 1) + " km/d" : "—"}</span></div>` +
           `<div><span class="k">Relógio (início→fim)</span><span class="v">${day.spanHours != null ? fmtNum(day.spanHours, 1) + " h" : "—"}</span></div>` +
           `<div><span class="k">D+ / D−</span><span class="v">+${day.gainM || 0} / −${day.lossM || 0} m</span></div>` +
           `<div><span class="k">Temperatura (mov.)</span><span class="v">${
@@ -2329,7 +3007,13 @@
     if (!s || !days.length) return;
     const { ctx, w, h } = s;
     const pad = { l: 40, r: 12, t: 16, b: 36 };
-    const maxKm = Math.max(...days.map((d) => d.km), goalKm || 0, 1);
+    const maxKm = Math.max(
+      ...days.map((d) =>
+        d.inProgress && d.projected && d.projected.km != null ? d.projected.km : d.km
+      ),
+      goalKm || 0,
+      1
+    );
     const barGap = 12;
     const plotW = w - pad.l - pad.r;
     const barW = Math.min(72, (plotW - barGap * (days.length + 1)) / days.length);
@@ -2354,20 +3038,34 @@
 
     days.forEach((day, i) => {
       const x = pad.l + barGap + i * (barW + barGap);
-      const bh = (day.km / maxKm) * plotH;
+      const chartKm =
+        day.inProgress && day.projected && day.projected.km != null ? day.projected.km : day.km;
+      const bh = (chartKm / maxKm) * plotH;
       const y = h - pad.b - bh;
-      ctx.fillStyle = day.inProgress ? "rgba(34, 197, 94, 0.75)" : "rgba(61, 139, 253, 0.75)";
+      if (day.inProgress) ctx.fillStyle = "rgba(34, 197, 94, 0.75)";
+      else if (day.isPredicted) ctx.fillStyle = "rgba(167, 139, 250, 0.65)";
+      else ctx.fillStyle = "rgba(61, 139, 253, 0.75)";
       ctx.fillRect(x, y, barW, bh);
       ctx.fillStyle = "#8b95a8";
       ctx.font = "10px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("D" + day.day, x + barW / 2, h - 8);
-      ctx.fillText(String(day.km), x + barW / 2, y - 4);
+      ctx.fillText(String(chartKm), x + barW / 2, y - 4);
     });
     ctx.textAlign = "left";
   }
 
   try {
+    // Listener do toggle (sem recarregar página).
+    const predToggle = $("days-toggle-pred");
+    if (predToggle) {
+      predToggle.addEventListener("change", () => {
+        try {
+          localStorage.setItem("travessiaDaysShowPred", predToggle.checked ? "1" : "0");
+        } catch {}
+        renderDays();
+      });
+    }
     renderDays();
   } catch (err) {
     console.error("renderDays:", err);

@@ -138,6 +138,24 @@ section h2 {
   max-width: 68ch;
   margin: 0.35rem 0 1.1rem;
 }
+.days-pred-toggle {
+  margin: -0.45rem 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.days-pred-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  user-select: none;
+}
+.day-card.predicted {
+  border-color: rgba(167, 139, 250, 0.55);
+  background: rgba(167, 139, 250, 0.08);
+}
 .days-chart-panel { margin-bottom: 1.1rem; }
 .days-grid {
   display: grid;
@@ -196,6 +214,11 @@ section h2 {
   color: var(--muted);
 }
 .day-night strong { color: #c4b5fd; font-weight: 600; }
+.day-night.predicted {
+  border-top-color: rgba(167, 139, 250, 0.35);
+  color: #a78bfa;
+}
+.day-km-big strong { color: #c4b5fd; }
 .day-cats {
   display: flex;
   flex-wrap: wrap;
