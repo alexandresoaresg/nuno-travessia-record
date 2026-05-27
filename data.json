@@ -22,23 +22,23 @@
       "requiredPaceCalendar": "19:29/km",
       "requiredClockPaceRecord": "26:51/km",
       "requiredClockPaceCalendar": "19:29/km",
-      "hoursLeftCalendar": 99.2,
+      "hoursLeftCalendar": 99.1,
       "kmPerDayCalendar": 73.9,
       "kmPerHourCalendar": 3.08,
       "remainingKm": 305.4,
       "recordPaceNow": {
-        "km": 240.6,
-        "lat": 39.983371,
-        "lng": -8.799076,
+        "km": 240.7,
+        "lat": 39.982934,
+        "lng": -8.798979,
         "alt": 107.0,
-        "time": "2026-05-27 20:50:45"
+        "time": "2026-05-27 20:51:45"
       },
       "calendarPaceNow": {
         "km": 290.5,
-        "lat": 39.586477,
-        "lng": -8.821602,
-        "alt": 145.7,
-        "time": "2026-05-27 20:50:45",
+        "lat": 39.585978,
+        "lng": -8.821852,
+        "alt": 147.1,
+        "time": "2026-05-27 20:51:45",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -14103,7 +14103,7 @@
     "battery": "76%",
     "gpsTime": "2026-05-27 20:50:08",
     "gpsTimeUtc": "2026-05-27 19:50:08",
-    "lagMinutes": 0.6,
+    "lagMinutes": 1.6,
     "alongRouteKm": 337.5,
     "offRouteM": 12.0,
     "source": "position_new",
@@ -45633,22 +45633,22 @@
       "status": "OK",
       "alongRouteKm": 337.5,
       "source": "position_new",
-      "lagMinutes": 0.6,
+      "lagMinutes": 1.6,
       "logTime": "2026-05-27 19:47:07"
     },
     "recordPace": {
-      "km": 240.6,
-      "lat": 39.983371,
-      "lng": -8.799076,
+      "km": 240.7,
+      "lat": 39.982934,
+      "lng": -8.798979,
       "alt": 107.0,
-      "time": "2026-05-27 20:50:45"
+      "time": "2026-05-27 20:51:45"
     },
     "calendarPace": {
       "km": 290.5,
-      "lat": 39.586477,
-      "lng": -8.821602,
-      "alt": 145.7,
-      "time": "2026-05-27 20:50:45",
+      "lat": 39.585978,
+      "lng": -8.821852,
+      "alt": 147.1,
+      "time": "2026-05-27 20:51:45",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -57421,5 +57421,5 @@
     "gpsPoints": 4441,
     "gpsSkipped": 368
   },
-  "liveUpdatedAt": "2026-05-27 20:50:45"
+  "liveUpdatedAt": "2026-05-27 20:51:45"
 }
