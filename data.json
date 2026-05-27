@@ -24,21 +24,21 @@
       "requiredClockPaceCalendar": "19:27/km",
       "hoursLeftCalendar": 99.0,
       "kmPerDayCalendar": 74.0,
-      "kmPerHourCalendar": 3.08,
+      "kmPerHourCalendar": 3.09,
       "remainingKm": 305.4,
       "recordPaceNow": {
         "km": 241.1,
-        "lat": 39.979438,
-        "lng": -8.798941,
-        "alt": 108.5,
-        "time": "2026-05-27 20:59:45"
+        "lat": 39.978996,
+        "lng": -8.799013,
+        "alt": 108.2,
+        "time": "2026-05-27 21:00:45"
       },
       "calendarPaceNow": {
-        "km": 291.0,
-        "lat": 39.582014,
-        "lng": -8.823615,
-        "alt": 161.1,
-        "time": "2026-05-27 20:59:45",
+        "km": 291.1,
+        "lat": 39.581499,
+        "lng": -8.823706,
+        "alt": 166.3,
+        "time": "2026-05-27 21:00:45",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -14103,7 +14103,7 @@
     "battery": "75%",
     "gpsTime": "2026-05-27 20:59:10",
     "gpsTimeUtc": "2026-05-27 19:59:10",
-    "lagMinutes": 0.6,
+    "lagMinutes": 1.6,
     "alongRouteKm": 337.4,
     "offRouteM": 3.0,
     "source": "position_new",
@@ -45673,22 +45673,22 @@
       "status": "OK",
       "alongRouteKm": 337.4,
       "source": "position_new",
-      "lagMinutes": 0.6,
+      "lagMinutes": 1.6,
       "logTime": "2026-05-27 19:57:08"
     },
     "recordPace": {
       "km": 241.1,
-      "lat": 39.979438,
-      "lng": -8.798941,
-      "alt": 108.5,
-      "time": "2026-05-27 20:59:45"
+      "lat": 39.978996,
+      "lng": -8.799013,
+      "alt": 108.2,
+      "time": "2026-05-27 21:00:45"
     },
     "calendarPace": {
-      "km": 291.0,
-      "lat": 39.582014,
-      "lng": -8.823615,
-      "alt": 161.1,
-      "time": "2026-05-27 20:59:45",
+      "km": 291.1,
+      "lat": 39.581499,
+      "lng": -8.823706,
+      "alt": 166.3,
+      "time": "2026-05-27 21:00:45",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -57461,5 +57461,5 @@
     "gpsPoints": 4451,
     "gpsSkipped": 368
   },
-  "liveUpdatedAt": "2026-05-27 20:59:45"
+  "liveUpdatedAt": "2026-05-27 21:00:45"
 }
