@@ -17,7 +17,7 @@ from prediction_history import append_snapshot
 from prediction_model import build_prediction, estimate_finish_from_km
 from pace_categories import category_legend, summarize_categories
 from route_landmarks import snap_landmarks_to_route
-from day_analysis import build_days
+from day_analysis import build_days, build_days_24h
 from day_weather import enrich_days_with_temperature
 from confidence_curve import build_confidence_curve
 from prediction_evolution import build_prediction_evolution
@@ -721,6 +721,13 @@ def build_analytics(
             profile_full=profile_full,
             goal_km_per_day=goal.get("kmPerDayCalendar"),
         ),
+        "days24h": build_days_24h(
+            splits,
+            race_start=race_start,
+            current_km=current_km,
+            profile_full=profile_full,
+            goal_km_per_day=goal.get("kmPerDayCalendar"),
+        ),
         "prediction": prediction,
         "confidenceCurve": build_confidence_curve(
             splits,
@@ -915,6 +922,12 @@ def main() -> int:
     try:
         enrich_days_with_temperature(
             analytics["days"]["days"],
+            analytics["splits"],
+            log,
+            offline=args_cli.offline,
+        )
+        enrich_days_with_temperature(
+            analytics["days24h"]["days"],
             analytics["splits"],
             log,
             offline=args_cli.offline,

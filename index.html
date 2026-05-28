@@ -42,6 +42,7 @@
       <button class="tab" data-tab="map" type="button">Mapa</button>
       <button class="tab" data-tab="splits" type="button">Splits</button>
       <button class="tab" data-tab="days" type="button">Dias</button>
+      <button class="tab" data-tab="days24h" type="button">Dias 24h</button>
       <button class="tab" data-tab="scenarios" type="button">Cenários</button>
       <button class="tab" data-tab="prediction" type="button">Modelo de Projeção</button>
     </nav>
@@ -239,6 +240,24 @@
             <p class="chart-caption">Km em movimento por dia civil: corta só em paragens longas que sejam noite (22h–06h), retoma de manhã (04h–12h) ou paragem ≥6 h.</p>
           </div>
           <div class="days-grid" id="days-grid"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-panel="days24h" hidden>
+        <section class="days-section">
+          <h2>Análise por dia (24 h)</h2>
+          <p class="days-lead" id="days24h-lead">—</p>
+          <div class="days-pred-toggle">
+            <label class="days-pred-toggle-label">
+              <input type="checkbox" id="days24h-toggle-pred" />
+              Dias previstos
+            </label>
+          </div>
+          <div class="panel days-chart-panel">
+            <canvas id="chart-days24h-km" height="160"></canvas>
+            <p class="chart-caption">Km em movimento por janela de 24 h exactas desde a partida (não corta em paragens nocturnas).</p>
+          </div>
+          <div class="days-grid" id="days24h-grid"></div>
         </section>
       </section>
 

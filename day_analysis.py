@@ -123,6 +123,196 @@ def _km_distance(km_from: int, km_to: int) -> int:
     return max(0, int(km_to) - int(km_from))
 
 
+def _time_km_points(race_start: str, usable: list[dict]) -> tuple[datetime | None, list[tuple[datetime, float]]]:
+    start_dt = _parse_dt(race_start)
+    if not start_dt:
+        return None, []
+    points: list[tuple[datetime, float]] = [(start_dt, 0.0)]
+    for s in usable:
+        ct = _parse_dt(s.get("crossing_time"))
+        if ct:
+            points.append((ct, float(s["km"])))
+    return start_dt, points
+
+
+def _interp_km_at_time(points: list[tuple[datetime, float]], dt: datetime) -> float:
+    if not points:
+        return 0.0
+    if dt <= points[0][0]:
+        return float(points[0][1])
+    last_t, last_k = points[-1]
+    if dt >= last_t:
+        return float(last_k)
+    for i in range(len(points) - 1):
+        t0, k0 = points[i]
+        t1, k1 = points[i + 1]
+        if t0 <= dt <= t1:
+            span = (t1 - t0).total_seconds()
+            if span <= 0:
+                return float(k1)
+            frac = (dt - t0).total_seconds() / span
+            return float(k0) + frac * (float(k1) - float(k0))
+    return float(last_k)
+
+
+def _day_stats_from_segments(
+    day_segs: list[dict],
+    km_from: int,
+    km_to: int,
+    prof_by_km: dict[int, dict],
+    *,
+    span_s: float | None,
+    start_cross: str | None,
+    end_cross: str | None,
+    in_progress: bool,
+    goal_km_per_day: float | None,
+    boundary_after: dict[str, Any] | None,
+    day_idx: int,
+) -> dict[str, Any]:
+    moving_s = 0.0
+    stop_s = 0.0
+    cat_counts: dict[str, int] = {}
+    for s in day_segs:
+        t = float(s.get("segment_time_s") or 0)
+        cat = s.get("category") or "unknown"
+        if t >= LONG_STOP_THRESHOLD_S:
+            stop_s += t
+        else:
+            moving_s += t
+            cat_counts[cat] = cat_counts.get(cat, 0) + 1
+
+    km_done = _km_distance(km_from, km_to)
+    active_hours = moving_s / 3600 if moving_s else None
+    km_per_day = (km_done / active_hours * 24) if active_hours and active_hours > 0 and km_done else None
+    moving_pace_min = (moving_s / 60) / km_done if km_done > 0 and moving_s > 0 else None
+
+    gain = loss = 0.0
+    for k in range(km_from, km_to + 1):
+        p = prof_by_km.get(k)
+        if p:
+            gain += float(p.get("gain") or 0)
+            loss += float(p.get("loss") or 0)
+
+    day: dict[str, Any] = {
+        "day": day_idx,
+        "label": f"Dia {day_idx}" + (" · em curso" if in_progress else ""),
+        "kmFrom": km_from,
+        "kmTo": km_to,
+        "km": km_done,
+        "startTime": start_cross,
+        "endTime": end_cross if not in_progress else None,
+        "spanHours": round(span_s / 3600, 2) if span_s else None,
+        "movingHours": round(active_hours, 2) if active_hours else None,
+        "movingTime": _fmt_duration(moving_s),
+        "shortStopMin": round(stop_s / 60, 1) if stop_s else 0,
+        "kmPerDay": round(km_per_day, 1) if km_per_day else None,
+        "movingPaceMin": round(moving_pace_min, 2) if moving_pace_min else None,
+        "movingPace": _pace_str(moving_pace_min),
+        "gainM": round(gain, 0),
+        "lossM": round(loss, 0),
+        "inProgress": in_progress,
+        "categories": cat_counts,
+        "nightAfter": boundary_after,
+        "splitsFromKm": day_segs[0]["km"] if day_segs else None,
+        "splitsToKm": day_segs[-1]["km"] if day_segs else None,
+    }
+    if goal_km_per_day and km_per_day is not None:
+        day["vsGoalKmDay"] = round(km_per_day - goal_km_per_day, 1)
+    return day
+
+
+def build_days_24h(
+    splits: list[dict],
+    *,
+    race_start: str,
+    current_km: int | None = None,
+    profile_full: list[dict] | None = None,
+    goal_km_per_day: float | None = None,
+) -> dict[str, Any]:
+    """Days as fixed 24 h windows from race start (not night-stop boundaries)."""
+    usable = _usable_splits(splits)
+    start_dt, points = _time_km_points(race_start, usable)
+    if not start_dt or not points:
+        return {
+            "days": [],
+            "nightStops": [],
+            "longStopThresholdMin": LONG_STOP_THRESHOLD_S // 60,
+            "method": "Cada dia = 24 h exactas desde a hora de partida.",
+        }
+
+    prof_by_km = {int(p["km"]): p for p in (profile_full or []) if p.get("km") is not None}
+    last_cross_dt = points[-1][0]
+    last_km = int(current_km if current_km is not None else usable[-1]["km"])
+    elapsed_s = max(0.0, (last_cross_dt - start_dt).total_seconds())
+    n_complete = int(elapsed_s // 86400)
+    has_partial = elapsed_s % 86400 > 1 or n_complete == 0
+    n_days = max(1, n_complete + (1 if has_partial else 0))
+
+    days: list[dict[str, Any]] = []
+    for idx in range(1, n_days + 1):
+        t0 = start_dt + timedelta(hours=24 * (idx - 1))
+        t1 = start_dt + timedelta(hours=24 * idx)
+        in_progress = idx == n_days
+        effective_end = min(t1, last_cross_dt) if in_progress else t1
+
+        km_from_f = _interp_km_at_time(points, t0)
+        km_to_f = _interp_km_at_time(points, effective_end)
+        km_from = int(max(0, km_from_f))
+        km_to = int(min(last_km, max(km_from, round(km_to_f))))
+
+        day_segs = [
+            s
+            for s in usable
+            if (ct := _parse_dt(s.get("crossing_time"))) is not None and t0 < ct <= effective_end
+        ]
+
+        if day_segs:
+            start_cross = t0.strftime("%Y-%m-%d %H:%M:%S") if idx == 1 else day_segs[0].get("crossing_time")
+            end_cross = day_segs[-1].get("crossing_time")
+        else:
+            start_cross = t0.strftime("%Y-%m-%d %H:%M:%S")
+            end_cross = effective_end.strftime("%Y-%m-%d %H:%M:%S") if not in_progress else None
+
+        span_s = 86400.0 if not in_progress else max(0.0, (effective_end - t0).total_seconds())
+        boundary_after = None
+        if not in_progress:
+            boundary_after = {
+                "kmFrom": km_to,
+                "kmTo": km_to,
+                "durationMin": 0,
+                "duration": "—",
+                "endCrossing": t1.strftime("%Y-%m-%d %H:%M:%S"),
+                "period24h": True,
+            }
+
+        days.append(
+            _day_stats_from_segments(
+                day_segs,
+                km_from,
+                km_to,
+                prof_by_km,
+                span_s=span_s,
+                start_cross=start_cross,
+                end_cross=end_cross,
+                in_progress=in_progress,
+                goal_km_per_day=goal_km_per_day,
+                boundary_after=boundary_after,
+                day_idx=idx,
+            )
+        )
+
+    return {
+        "days": days,
+        "nightStops": [],
+        "longStopThresholdMin": LONG_STOP_THRESHOLD_S // 60,
+        "method": (
+            "Cada dia = 24 h exactas desde a partida ("
+            + (race_start or "—")
+            + "). Km e estatísticas dos splits com hora de passagem dentro do período."
+        ),
+    }
+
+
 def build_days(
     splits: list[dict],
     *,

@@ -119,7 +119,7 @@
         }
       }, 80);
     }
-    if (tabId === "splits" || tabId === "prediction" || tabId === "days") {
+    if (tabId === "splits" || tabId === "prediction" || tabId === "days" || tabId === "days24h") {
       if (tabId === "prediction") {
         try {
           const lc = window.__travessiaLastConf;
@@ -3321,12 +3321,172 @@
     return { days: [], nightStops: [], method: "", longStopThresholdMin: 60 };
   }
 
+  function interpKmAtTime(points, dt) {
+    if (!points.length || !dt) return 0;
+    const t = dt.getTime();
+    if (t <= points[0].t.getTime()) return points[0].km;
+    const last = points[points.length - 1];
+    if (t >= last.t.getTime()) return last.km;
+    for (let i = 0; i < points.length - 1; i++) {
+      const a = points[i];
+      const b = points[i + 1];
+      const ta = a.t.getTime();
+      const tb = b.t.getTime();
+      if (ta <= t && t <= tb) {
+        const span = tb - ta;
+        if (span <= 0) return b.km;
+        const f = (t - ta) / span;
+        return a.km + f * (b.km - a.km);
+      }
+    }
+    return last.km;
+  }
+
+  /** Fallback client-side quando data.json ainda não tem days24h. */
+  function buildDays24hClientFallback() {
+    const raceStart = parseDataDate(D.event?.startTime);
+    const usable = (D.splits || []).filter(
+      (s) => !s.unavailable && !s.partial && s.crossing_time
+    );
+    if (!raceStart || !usable.length) {
+      return {
+        days: [],
+        nightStops: [],
+        method: "Cada dia = 24 h exactas desde a partida.",
+        longStopThresholdMin: 60,
+      };
+    }
+    const points = [{ t: raceStart, km: 0 }];
+    usable.forEach((s) => {
+      const ct = parseDataDate(s.crossing_time);
+      if (ct) points.push({ t: ct, km: Number(s.km) });
+    });
+    const lastCross = points[points.length - 1].t;
+    const lastKm = Math.floor(Number(currentKm));
+    const elapsedS = Math.max(0, (lastCross.getTime() - raceStart.getTime()) / 1000);
+    const nComplete = Math.floor(elapsedS / 86400);
+    const hasPartial = elapsedS % 86400 > 1 || nComplete === 0;
+    const nDays = Math.max(1, nComplete + (hasPartial ? 1 : 0));
+    const goalKm = D.event?.goal?.kmPerDayCalendar;
+    const prof = profileFull || D.routeProfile || [];
+    const days = [];
+
+    for (let idx = 1; idx <= nDays; idx++) {
+      const t0 = new Date(raceStart.getTime() + (idx - 1) * 86400000);
+      const t1 = new Date(raceStart.getTime() + idx * 86400000);
+      const inProgress = idx === nDays;
+      const effectiveEnd = inProgress && lastCross < t1 ? lastCross : t1;
+      const kmFrom = Math.max(0, Math.floor(interpKmAtTime(points, t0)));
+      const kmTo = Math.min(lastKm, Math.max(kmFrom, Math.round(interpKmAtTime(points, effectiveEnd))));
+      const daySegs = usable.filter((s) => {
+        const ct = parseDataDate(s.crossing_time);
+        return ct && ct > t0 && ct <= effectiveEnd;
+      });
+      let movingS = 0;
+      let stopS = 0;
+      const catCounts = {};
+      daySegs.forEach((s) => {
+        const t = Number(s.segment_time_s) || 0;
+        if (t >= SCENARIO_MOVING_THRESHOLD_S) stopS += t;
+        else {
+          movingS += t;
+          const cat = s.category || "unknown";
+          catCounts[cat] = (catCounts[cat] || 0) + 1;
+        }
+      });
+      const kmDone = Math.max(0, kmTo - kmFrom);
+      const movingHours = movingS > 0 ? movingS / 3600 : null;
+      const movingPaceMin = kmDone > 0 && movingS > 0 ? movingS / 60 / kmDone : null;
+      const kmPerDay =
+        kmDone > 0 && movingHours > 0 ? (kmDone / movingHours) * 24 : null;
+      let gainM = 0;
+      let lossM = 0;
+      for (let k = kmFrom; k <= kmTo; k++) {
+        const p = prof[k - 1];
+        if (p) {
+          gainM += p.gain || 0;
+          lossM += p.loss || 0;
+        }
+      }
+      const spanS = inProgress
+        ? Math.max(0, (effectiveEnd.getTime() - t0.getTime()) / 1000)
+        : 86400;
+      const day = {
+        day: idx,
+        label: "Dia " + idx + (inProgress ? " · em curso" : ""),
+        kmFrom,
+        kmTo,
+        km: kmDone,
+        startTime:
+          idx === 1
+            ? fmtDataDateTime(t0)
+            : daySegs[0]?.crossing_time || fmtDataDateTime(t0),
+        endTime: inProgress ? null : daySegs[daySegs.length - 1]?.crossing_time || fmtDataDateTime(t1),
+        spanHours: Math.round((spanS / 3600) * 100) / 100,
+        movingHours: movingHours != null ? Math.round(movingHours * 100) / 100 : null,
+        movingTime: fmtDurationFromHours(movingHours),
+        shortStopMin: stopS ? Math.round((stopS / 60) * 10) / 10 : 0,
+        kmPerDay: kmPerDay != null ? Math.round(kmPerDay * 10) / 10 : null,
+        movingPaceMin: movingPaceMin != null ? Math.round(movingPaceMin * 100) / 100 : null,
+        movingPace: movingPaceMin != null ? fmtPaceMin(movingPaceMin) : "—",
+        gainM: Math.round(gainM),
+        lossM: Math.round(lossM),
+        inProgress,
+        categories: catCounts,
+        nightAfter: inProgress
+          ? null
+          : {
+              kmFrom: kmTo,
+              kmTo,
+              durationMin: 0,
+              duration: "—",
+              endCrossing: fmtDataDateTime(t1),
+              period24h: true,
+            },
+        splitsFromKm: daySegs[0]?.km ?? null,
+        splitsToKm: daySegs[daySegs.length - 1]?.km ?? null,
+      };
+      if (goalKm != null && day.kmPerDay != null) {
+        day.vsGoalKmDay = Math.round((day.kmPerDay - goalKm) * 10) / 10;
+      }
+      days.push(day);
+    }
+    return {
+      days,
+      nightStops: [],
+      longStopThresholdMin: 60,
+      method:
+        "Cada dia = 24 h exactas desde a partida (" +
+        (D.event?.startTime || "—") +
+        "). Km e estatísticas dos splits com hora de passagem dentro do período.",
+    };
+  }
+
+  function getDays24hPayload() {
+    if (D.days24h && Array.isArray(D.days24h.days)) return D.days24h;
+    return buildDays24hClientFallback();
+  }
+
   function daysShowPredicted() {
     const predToggle = $("days-toggle-pred");
     let show = !!(predToggle && predToggle.checked);
     try {
       if (predToggle && !predToggle.dataset.initDone) {
         const saved = localStorage.getItem("travessiaDaysShowPred");
+        predToggle.checked = saved === "1";
+        predToggle.dataset.initDone = "1";
+        show = predToggle.checked;
+      }
+    } catch {}
+    return show;
+  }
+
+  function days24hShowPredicted() {
+    const predToggle = $("days24h-toggle-pred");
+    let show = !!(predToggle && predToggle.checked);
+    try {
+      if (predToggle && !predToggle.dataset.initDone) {
+        const saved = localStorage.getItem("travessiaDays24hShowPred");
         predToggle.checked = saved === "1";
         predToggle.dataset.initDone = "1";
         show = predToggle.checked;
@@ -4005,36 +4165,141 @@
     return days.concat(extra);
   }
 
-  function renderDays() {
-    const grid = $("days-grid");
-    const lead = $("days-lead");
+  function period24hBounds(dayNo, raceStart) {
+    const idx = dayNo - 1;
+    return {
+      t0: new Date(raceStart.getTime() + idx * 86400000),
+      t1: new Date(raceStart.getTime() + (idx + 1) * 86400000),
+    };
+  }
+
+  function boundaryAfter24h(dayNo, raceStart, kmTo, finishDt) {
+    const { t1 } = period24hBounds(dayNo, raceStart);
+    const end = t1 > finishDt ? finishDt : t1;
+    return {
+      kmFrom: kmTo,
+      kmTo,
+      durationMin: 0,
+      duration: "—",
+      endCrossing: fmtDataDateTime(end),
+      period24h: true,
+    };
+  }
+
+  function applyDaysWithPredictions24h(baseDays, payload) {
+    const pred = D.prediction || {};
+    const raceStart = parseDataDate(D.event?.startTime);
+    const timeline = forecastTimelineMain();
+    const finishKm = Math.floor(D.event?.totalKm || totalKm);
+    const finishDt = parseFinishDt(pred.finishTimeIso || pred.finishTime);
+    if (!raceStart || !finishDt || !timeline.length || !baseDays.length) {
+      return baseDays.map((d) => ({ ...d }));
+    }
+
+    const goalKm = D.event?.goal?.kmPerDayCalendar;
+    const refPaceMin = referenceMovingPaceMin();
+    const days = baseDays.map((d) => ({ ...d }));
+    const last = days[days.length - 1];
+    const projKm = Math.floor(Number(pred.projectionKm != null ? pred.projectionKm : currentKm));
+    const projTime = parseDataDate(pred.projectionTime) || new Date();
+
+    const finishArrival = () => ({
+      kmFrom: finishKm,
+      kmTo: finishKm,
+      durationMin: 0,
+      duration: "—",
+      endCrossing: fmtDataDateTime(finishDt),
+      placeName: "Sagres",
+      period24h: true,
+    });
+
+    if (last.inProgress) {
+      const { t0, t1 } = period24hBounds(last.day, raceStart);
+      const projEnd = t1 > finishDt ? finishDt : t1;
+      const startDt = parseDataDate(last.startTime) || t0;
+      const kmFrom = Math.floor(Number(last.kmFrom));
+      const kmTo = Math.min(finishKm, interpForecastKmAtTime(projEnd, timeline));
+      const statsFull = movingStatsFromForecast(kmFrom, kmTo, timeline, refPaceMin, {
+        segmentStartDt: startDt,
+      });
+      const statsRemain = movingStatsFromForecast(projKm, kmTo, timeline, refPaceMin, {
+        segmentStartDt: projTime,
+      });
+      const isFinish = kmTo >= finishKm - 1 || projEnd >= finishDt;
+      last.projected = {
+        kmTo,
+        km: statsFull.km,
+        endTime: fmtDataDateTime(projEnd),
+        movingHours:
+          statsFull.movingHours != null ? Math.round(statsFull.movingHours * 100) / 100 : null,
+        movingTime: fmtDurationFromHours(statsFull.movingHours),
+        kmPerDay: statsFull.kmPerDay != null ? Math.round(statsFull.kmPerDay * 10) / 10 : null,
+        movingPace:
+          statsRemain.movingPaceMin != null ? fmtPaceMin(statsRemain.movingPaceMin) : "—",
+        nightAfter: isFinish
+          ? finishArrival()
+          : boundaryAfter24h(last.day, raceStart, kmTo, finishDt),
+      };
+      if (goalKm != null && last.projected.kmPerDay != null) {
+        last.projected.vsGoalKmDay = Math.round((last.projected.kmPerDay - goalKm) * 10) / 10;
+      }
+      if (isFinish) return days;
+    }
+
+    const extra = [];
+    const startDayNo = last.day + 1;
+    for (let dayNo = startDayNo, guard = 0; guard < 32; dayNo++, guard++) {
+      const { t0, t1 } = period24hBounds(dayNo, raceStart);
+      if (t0 >= finishDt) break;
+      const periodEnd = t1 > finishDt ? finishDt : t1;
+      const kmFrom = Math.max(0, interpForecastKmAtTime(t0, timeline));
+      let kmTo = Math.min(finishKm, interpForecastKmAtTime(periodEnd, timeline));
+      if (kmFrom >= finishKm) break;
+      const isLast = periodEnd >= finishDt || kmTo >= finishKm - 1;
+      if (isLast) kmTo = finishKm;
+      const day = buildPredictedDay({
+        dayNo,
+        kmFrom,
+        kmTo,
+        startTime: fmtDataDateTime(t0),
+        endTime: fmtDataDateTime(periodEnd),
+        goalKm,
+        timeline,
+        refPaceMin,
+        isLast,
+        inProgress: false,
+      });
+      day.spanHours = Math.round(((periodEnd.getTime() - t0.getTime()) / 3600000) * 100) / 100;
+      day.nightAfter = isLast ? finishArrival() : boundaryAfter24h(dayNo, raceStart, kmTo, finishDt);
+      extra.push(day);
+      if (isLast) break;
+    }
+    return days.concat(extra);
+  }
+
+  function renderDaysPanel(cfg) {
+    const grid = $(cfg.gridId);
+    const lead = $(cfg.leadId);
     if (!grid) return;
-    const payload = getDaysPayload();
+    const payload = cfg.getPayload();
     const baseDays = payload.days || [];
     const goalKm = D.event?.goal?.kmPerDayCalendar;
-    const showPredicted = daysShowPredicted();
+    const showPredicted = cfg.showPredicted();
 
     let days = baseDays;
-    if (showPredicted) {
+    if (showPredicted && cfg.applyPredictions) {
       try {
-        days = applyDaysWithPredictions(baseDays, payload);
+        days = cfg.applyPredictions(baseDays, payload);
       } catch (err) {
-        console.error("applyDaysWithPredictions:", err);
+        console.error(cfg.applyPredictions.name + ":", err);
       }
     }
 
     if (lead) {
-      lead.textContent =
-        payload.method ||
-        "Cada dia corresponde ao período de movimento entre paragens noturnas longas (≥60 min).";
-      if (showPredicted) {
+      lead.textContent = payload.method || cfg.defaultMethod;
+      if (showPredicted && cfg.predLeadSuffix) {
         const fin = D.prediction?.finishTimeIso || D.prediction?.finishTime;
-        const maxH = maxMovingHoursFromHistory(baseDays);
-        lead.textContent +=
-          " Com previsão: cada dia até ~" +
-          fmtNum(maxH, 0) +
-          " h em movimento (como os dias já feitos); paragem 22h–01h; retoma ~05h30; paragens em cidades no percurso ou ≈km quando o troço é longo" +
-          (fin ? " (" + String(fin).replace(" ", " · ") + ")." : ".");
+        lead.textContent += cfg.predLeadSuffix(fin);
       }
       if (goalKm != null) {
         lead.textContent += " Meta 31/05: ~" + fmtNum(goalKm, 1) + " km/dia em movimento.";
@@ -4045,6 +4310,7 @@
 
     if (!days.length) {
       grid.innerHTML = '<p class="chart-caption">Sem dias calculados — actualiza os dados completos.</p>';
+      if (cfg.chartId) drawDaysKmChart([], goalKm, cfg.chartId);
       return;
     }
 
@@ -4057,6 +4323,27 @@
       if (!night) return "";
       const place = night.placeName || "";
       const predTag = predicted ? " <span class='muted'>(previsto)</span>" : "";
+      if (night.period24h) {
+        const when = night.endCrossing ? night.endCrossing.replace(" ", " · ") : "";
+        if (night.placeName && !night.durationMin) {
+          return (
+            `<div class="day-night${predicted ? " predicted" : ""}"><strong>Chegada</strong> ${place}` +
+            (place ? " · " : "") +
+            "km " +
+            night.kmFrom +
+            (when ? " · " + when : "") +
+            predTag +
+            "</div>"
+          );
+        }
+        return (
+          `<div class="day-night${predicted ? " predicted" : ""}"><strong>Fim 24 h</strong>` +
+          (when ? " · " + when : "") +
+          (night.kmFrom != null ? " · km " + night.kmFrom : "") +
+          predTag +
+          "</div>"
+        );
+      }
       if (!night.durationMin || night.durationMin <= 0) {
         return (
           `<div class="day-night${predicted ? " predicted" : ""}"><strong>Chegada</strong> ${place}` +
@@ -4091,10 +4378,15 @@
         let nightHtml = "";
         if (day.nightAfter) nightHtml = nightStopHtml(day.nightAfter, false);
         else if (proj && proj.nightAfter) nightHtml = nightStopHtml(proj.nightAfter, true);
-        else if (day.inProgress && showPredicted)
+        else if (day.inProgress && showPredicted && cfg.mode === "night") {
           nightHtml = '<div class="day-night muted">A calcular paragem noturna prevista…</div>';
-        else if (day.inProgress)
+        } else if (day.inProgress && cfg.mode === "night") {
           nightHtml = '<div class="day-night">Dia em curso — paragem noturna ainda não registada.</div>';
+        } else if (day.inProgress && showPredicted && cfg.mode === "24h") {
+          nightHtml = '<div class="day-night muted">A calcular fim das 24 h previsto…</div>';
+        } else if (day.inProgress && cfg.mode === "24h") {
+          nightHtml = '<div class="day-night">Dia em curso — janela de 24 h ainda aberta.</div>';
+        }
 
         const kmRange =
           proj && proj.kmTo != null
@@ -4155,11 +4447,50 @@
       })
       .join("");
 
-    drawDaysKmChart(days, goalKm);
+    drawDaysKmChart(days, goalKm, cfg.chartId);
   }
 
-  function drawDaysKmChart(days, goalKm) {
-    const canvas = $("chart-days-km");
+  function renderDays() {
+    renderDaysPanel({
+      gridId: "days-grid",
+      leadId: "days-lead",
+      chartId: "chart-days-km",
+      getPayload: getDaysPayload,
+      showPredicted: daysShowPredicted,
+      applyPredictions: applyDaysWithPredictions,
+      mode: "night",
+      defaultMethod:
+        "Cada dia corresponde ao período de movimento entre paragens noturnas longas (≥60 min).",
+      predLeadSuffix: (fin) => {
+        const maxH = maxMovingHoursFromHistory(getDaysPayload().days || []);
+        return (
+          " Com previsão: cada dia até ~" +
+          fmtNum(maxH, 0) +
+          " h em movimento (como os dias já feitos); paragem 22h–01h; retoma ~05h30; paragens em cidades no percurso ou ≈km quando o troço é longo" +
+          (fin ? " (" + String(fin).replace(" ", " · ") + ")." : ".")
+        );
+      },
+    });
+  }
+
+  function renderDays24h() {
+    renderDaysPanel({
+      gridId: "days24h-grid",
+      leadId: "days24h-lead",
+      chartId: "chart-days24h-km",
+      getPayload: getDays24hPayload,
+      showPredicted: days24hShowPredicted,
+      applyPredictions: applyDaysWithPredictions24h,
+      mode: "24h",
+      defaultMethod: "Cada dia = 24 h exactas desde a partida.",
+      predLeadSuffix: (fin) =>
+        " Com previsão: cada dia futuro = janela de 24 h desde a partida, km pelo forecast v4" +
+        (fin ? " (" + String(fin).replace(" ", " · ") + ")." : "."),
+    });
+  }
+
+  function drawDaysKmChart(days, goalKm, canvasId) {
+    const canvas = $(canvasId || "chart-days-km");
     const s = setupCanvas(canvas, 160);
     if (!s || !days.length) return;
     const { ctx, w, h } = s;
@@ -4213,7 +4544,6 @@
   }
 
   try {
-    // Listener do toggle (sem recarregar página).
     const predToggle = $("days-toggle-pred");
     if (predToggle) {
       predToggle.addEventListener("change", () => {
@@ -4223,7 +4553,17 @@
         renderDays();
       });
     }
+    const predToggle24h = $("days24h-toggle-pred");
+    if (predToggle24h) {
+      predToggle24h.addEventListener("change", () => {
+        try {
+          localStorage.setItem("travessiaDays24hShowPred", predToggle24h.checked ? "1" : "0");
+        } catch {}
+        renderDays24h();
+      });
+    }
     renderDays();
+    renderDays24h();
   } catch (err) {
     console.error("renderDays:", err);
   }
@@ -4233,6 +4573,7 @@
     drawElevChart();
     try {
       renderDays();
+      renderDays24h();
     } catch (err) {
       console.error("renderDays:", err);
     }
@@ -4469,6 +4810,7 @@
     if (window.travessiaMapReload) window.travessiaMapReload(D.map);
     try {
       renderDays();
+      renderDays24h();
     } catch (err) {
       console.error("renderDays:", err);
     }
