@@ -120,6 +120,113 @@
     .addTo(map)
     .bindPopup(popup);
 
+  const viewerIcon = L.divIcon({
+    className: "viewer-pin",
+    html: '<span class="pin-ring"></span><div class="pin-core"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+  let viewerMarker = null;
+  let viewerAccuracyCircle = null;
+  let viewerLastPos = null;
+  const viewerStatusEl = document.getElementById("map-viewer-status");
+  const viewerCenterBtn = document.getElementById("map-center-viewer");
+
+  function setViewerStatus(text, visible) {
+    if (!viewerStatusEl) return;
+    viewerStatusEl.textContent = text || "";
+    viewerStatusEl.hidden = !visible;
+  }
+
+  function viewerPopupHtml(lat, lng, accuracyM, updatedAt) {
+    let html =
+      "<b>Onde estás</b> (este dispositivo)<br>" +
+      `Lat: ${lat.toFixed(5)}, lng: ${lng.toFixed(5)}`;
+    if (accuracyM != null && Number.isFinite(accuracyM)) {
+      html += `<br>Precisão: ~${Math.round(accuracyM)} m`;
+    }
+    if (updatedAt) html += `<br>Actualizado: ${updatedAt}`;
+    return html;
+  }
+
+  function updateViewerPosition(lat, lng, accuracyM) {
+    viewerLastPos = { lat, lng, accuracyM };
+    const updatedAt = new Date().toLocaleString("pt-PT", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    if (!viewerMarker) {
+      viewerMarker = L.marker([lat, lng], {
+        icon: viewerIcon,
+        zIndexOffset: 1100,
+      })
+        .addTo(map)
+        .bindPopup(viewerPopupHtml(lat, lng, accuracyM, updatedAt));
+      if (viewerCenterBtn) viewerCenterBtn.hidden = false;
+      setViewerStatus(
+        `Localização activa · ${lat.toFixed(4)}, ${lng.toFixed(4)}` +
+          (accuracyM != null ? ` (±${Math.round(accuracyM)} m)` : ""),
+        true
+      );
+    } else {
+      viewerMarker.setLatLng([lat, lng]);
+      viewerMarker.setPopupContent(viewerPopupHtml(lat, lng, accuracyM, updatedAt));
+    }
+    if (accuracyM != null && accuracyM > 0 && accuracyM < 5000) {
+      if (!viewerAccuracyCircle) {
+        viewerAccuracyCircle = L.circle([lat, lng], {
+          radius: accuracyM,
+          color: "#ec4899",
+          weight: 1,
+          fillColor: "#ec4899",
+          fillOpacity: 0.12,
+          interactive: false,
+        }).addTo(map);
+      } else {
+        viewerAccuracyCircle.setLatLng([lat, lng]);
+        viewerAccuracyCircle.setRadius(accuracyM);
+      }
+    }
+  }
+
+  function centerOnViewer() {
+    if (!viewerLastPos) return;
+    const z = viewerLastPos.accuracyM && viewerLastPos.accuracyM < 200 ? 14 : 12;
+    map.setView([viewerLastPos.lat, viewerLastPos.lng], z, { animate: true });
+    if (viewerMarker) viewerMarker.openPopup();
+  }
+
+  if (viewerCenterBtn) {
+    viewerCenterBtn.addEventListener("click", centerOnViewer);
+  }
+
+  if (navigator.geolocation) {
+    setViewerStatus("A pedir localização deste dispositivo…", true);
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        updateViewerPosition(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.accuracy
+        );
+      },
+      (err) => {
+        const msg =
+          err.code === 1
+            ? "Localização recusada — activa permissão no browser para ver onde estás."
+            : err.code === 3
+              ? "Tempo esgotado ao obter GPS deste dispositivo."
+              : "Não foi possível obter a tua localização.";
+        setViewerStatus(msg, true);
+      },
+      { enableHighAccuracy: true, maximumAge: 20000, timeout: 20000 }
+    );
+  } else {
+    setViewerStatus("Geolocalização não suportada neste browser.", true);
+  }
+
   function livePopupHtml(cur) {
     const liveKm = cur.alongRouteKm;
     const kmLabel =
@@ -497,4 +604,5 @@
   window.__travessiaMap = map;
   window.__travessiaMapInvalidate = refreshMapSize;
   window.__travessiaMapRecenter = recenterCurrent;
+  window.__travessiaMapCenterViewer = centerOnViewer;
 })();

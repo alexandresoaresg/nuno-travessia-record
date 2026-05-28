@@ -107,37 +107,50 @@
       <h2>Mapa interativo</h2>
       <div class="panel">
         <div class="map-layout">
-          <div id="map"></div>
-          <aside class="map-sidebar">
-            <h3>Legenda</h3>
-            <ul class="map-legend">
-              <li><span class="swatch route"></span> Percurso oficial</li>
-              <li><span class="swatch track"></span> Trilho GPS</li>
-              <li><span class="swatch" style="background:#22c55e"></span> Corrida forte</li>
-              <li><span class="swatch" style="background:#3d8bfd"></span> Corrida</li>
-              <li><span class="swatch" style="background:#38bdf8"></span> Corrida leve</li>
-              <li><span class="swatch" style="background:#a78bfa"></span> Andar</li>
-              <li><span class="swatch" style="background:#f59e0b"></span> Paragem</li>
-              <li><span class="swatch route-future"></span> Percurso futuro (previsão)</li>
-              <li><span class="swatch current"></span> Posição actual (API live)</li>
-            </ul>
-            <h3>Camadas</h3>
-            <div class="map-layers">
-              <label><input type="checkbox" id="layer-route" checked> Percurso</label>
-              <label><input type="checkbox" id="layer-future" checked> Previsão no mapa</label>
-              <label><input type="checkbox" id="layer-track" checked> Trilho GPS</label>
-              <label><input type="checkbox" id="layer-splits" checked> Splits por km</label>
+          <div class="map-stage">
+            <div id="map"></div>
+            <button type="button" class="map-btn-viewer" id="map-center-viewer" hidden title="Centrar no teu dispositivo">
+              Onde estou
+            </button>
+          </div>
+          <footer class="map-footer">
+            <div class="map-footer-block">
+              <h3>Legenda</h3>
+              <ul class="map-legend map-legend-inline">
+                <li><span class="swatch route"></span> Percurso oficial</li>
+                <li><span class="swatch track"></span> Trilho GPS</li>
+                <li><span class="swatch" style="background:#22c55e"></span> Corrida forte</li>
+                <li><span class="swatch" style="background:#3d8bfd"></span> Corrida</li>
+                <li><span class="swatch" style="background:#38bdf8"></span> Corrida leve</li>
+                <li><span class="swatch" style="background:#a78bfa"></span> Andar</li>
+                <li><span class="swatch" style="background:#f59e0b"></span> Paragem</li>
+                <li><span class="swatch route-future"></span> Percurso futuro (previsão)</li>
+                <li><span class="swatch current"></span> Nuno (GPS live)</li>
+                <li><span class="swatch viewer"></span> Tu (este dispositivo)</li>
+              </ul>
+              <p id="map-viewer-status" class="map-viewer-status muted" hidden></p>
             </div>
-            <div class="map-timeline-wrap">
-              <h3>Replay GPS</h3>
-              <input type="range" id="map-timeline" min="0" value="0" />
-              <span id="map-timeline-label">—</span>
+            <div class="map-footer-controls">
+              <div class="map-footer-block">
+                <h3>Camadas</h3>
+                <div class="map-layers map-layers-inline">
+                  <label><input type="checkbox" id="layer-route" checked> Percurso</label>
+                  <label><input type="checkbox" id="layer-future" checked> Previsão no mapa</label>
+                  <label><input type="checkbox" id="layer-track" checked> Trilho GPS</label>
+                  <label><input type="checkbox" id="layer-splits" checked> Splits por km</label>
+                </div>
+              </div>
+              <div class="map-footer-block map-timeline-wrap">
+                <h3>Replay GPS</h3>
+                <input type="range" id="map-timeline" min="0" value="0" />
+                <span id="map-timeline-label">—</span>
+              </div>
             </div>
-            <p class="chart-caption" style="margin-top:1rem">
+            <p class="chart-caption map-footer-caption">
               Passa o rato sobre a linha <strong>verde</strong> (percurso futuro) — área de detecção alargada.
               Hora prevista a partir do GPS live, com paragens estimadas pelo modelo v4.
             </p>
-          </aside>
+          </footer>
         </div>
       </div>
     </section>
