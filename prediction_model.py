@@ -127,7 +127,7 @@ def _parse_dt(s: str | None) -> datetime | None:
 
 
 def recent_moving_pace_sec(splits: list[dict], current_km: int, window_km: int = RECENT_WINDOW_KM) -> float | None:
-    """Weighted pace from last `window_km` moving segments."""
+    """Arithmetic mean pace from last `window_km` moving segments."""
     usable = [
         s
         for s in splits
@@ -139,9 +139,7 @@ def recent_moving_pace_sec(splits: list[dict], current_km: int, window_km: int =
     if not usable:
         return None
     tail = usable[-window_km:]
-    weights = [math.exp((s["km"] - current_km) / 6.0) for s in tail]
-    wsum = sum(weights)
-    return sum(s["segment_time_s"] * w for s, w in zip(tail, weights)) / wsum
+    return statistics.mean(s["segment_time_s"] for s in tail)
 
 
 def detect_regime(

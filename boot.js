@@ -5,7 +5,7 @@
   const countdownLiveEl = document.getElementById("countdown-live");
   const countdownFullEl = document.getElementById("countdown-full");
   const LIVE_MS = 60 * 1000;
-  const FULL_MS = 5 * 60 * 1000;
+  const FULL_MS = 2 * 60 * 1000;
   const POLL_MS = 8 * 1000;
 
   let lastDataVersion = null;
@@ -116,11 +116,19 @@
     await loadScript("data.js?v=" + v);
     await loadScript("app.js?v=" + v);
     await loadScript("map.js?v=" + v);
+    await loadScript("scenarios-map.js?v=" + v);
     lastDataVersion = window.ANALYTICS && window.ANALYTICS.updatedAt;
     lastLiveUpdatedAt =
       (window.ANALYTICS && window.ANALYTICS.liveUpdatedAt) ||
       (window.ANALYTICS && window.ANALYTICS.live && window.ANALYTICS.live.gpsTime) ||
       null;
+    if (window.travessiaRefreshScenarios) {
+      try {
+        window.travessiaRefreshScenarios();
+      } catch (err) {
+        console.error("travessiaRefreshScenarios:", err);
+      }
+    }
   }
 
   async function applyLivePatch(patch) {

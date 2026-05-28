@@ -26,11 +26,11 @@
     document.title =
       D.athlete.name +
       " · km " +
-      km +
+      fmtNum(km, 1) +
       "/" +
-      total +
+      fmtNum(total, 1) +
       " (" +
-      pct +
+      fmtNum(pct, 1) +
       "%) — Travessia";
   }
 
@@ -59,12 +59,16 @@
       else if (Lv.batteryPct != null && Lv.batteryPct <= 30) battEl.classList.add("battery-warn");
     }
     $("live-status").textContent =
-      [Lv.status, Lv.speed != null ? Lv.speed + " km/h" : null].filter(Boolean).join(" · ") || "—";
+      [Lv.status, Lv.speed != null ? fmtNum(Lv.speed, 1) + " km/h" : null]
+        .filter(Boolean)
+        .join(" · ") || "—";
     const kmLive = Lv.alongRouteKm;
-    $("live-position").textContent = kmLive != null ? `~km ${kmLive}` : `${Lv.lat}, ${Lv.lng}`;
+    $("live-position").textContent =
+      kmLive != null ? `~km ${fmtNum(kmLive, 1)}` : `${fmtNum(Lv.lat, 5)}, ${fmtNum(Lv.lng, 5)}`;
     $("live-coords").textContent =
       kmLive != null
-        ? `${Lv.lat}°, ${Lv.lng}°` + (Lv.alt != null ? ` · ${Lv.alt} m` : "")
+        ? `${fmtNum(Lv.lat, 5)}°, ${fmtNum(Lv.lng, 5)}°` +
+          (Lv.alt != null ? ` · ${fmtNum(Lv.alt, 0)} m` : "")
         : Lv.alt != null
           ? `${Lv.alt} m`
           : "—";
@@ -98,6 +102,23 @@
         if (window.__travessiaMapRecenter) window.__travessiaMapRecenter();
       }, 50);
     }
+    if (tabId === "scenarios") {
+      try {
+        recalcScenarios();
+      } catch (err) {
+        console.error("renderScenarios:", err);
+      }
+      setTimeout(() => {
+        if (window.__travessiaScenariosMapInvalidate) window.__travessiaScenariosMapInvalidate();
+        if (window.__travessiaPendingScenariosMapPayload && window.travessiaRefreshScenariosMap) {
+          try {
+            window.travessiaRefreshScenariosMap(window.__travessiaPendingScenariosMapPayload);
+          } catch (err) {
+            console.error("scenarios map:", err);
+          }
+        }
+      }, 80);
+    }
     if (tabId === "splits" || tabId === "prediction" || tabId === "days") {
       if (tabId === "prediction") {
         try {
@@ -122,9 +143,9 @@
   } catch {}
   setActiveTab(initialTab);
 
-  $("progress-pct").textContent = D.current.progressPct + "%";
-  $("progress-km").textContent = currentKm + " / " + totalKm + " km";
-  $("progress-fill").style.width = D.current.progressPct + "%";
+  $("progress-pct").textContent = fmtNum(D.current.progressPct, 1) + "%";
+  $("progress-km").textContent = fmtNum(currentKm, 1) + " / " + fmtNum(totalKm, 1) + " km";
+  $("progress-fill").style.width = fmtNum(D.current.progressPct, 1) + "%";
 
   // --- Prediction model v4 (mirrors prediction_model.py) ---
   let profileFull = D.routeProfileFull || D.routeProfile;
@@ -381,15 +402,23 @@
     };
   }
 
+  function roundTo(n, d) {
+    if (!Number.isFinite(n)) return null;
+    const f = Math.pow(10, d);
+    return Math.round(n * f) / f;
+  }
+
   function fmtPaceMin(min) {
     if (!Number.isFinite(min) || min <= 0) return "—";
-    const m = Math.floor(min);
-    const s = Math.round((min - m) * 60);
+    const totalSec = Math.round(min * 60);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
     return m + ":" + String(s).padStart(2, "0") + "/km";
   }
 
   function fmtNum(n, d) {
-    return Number.isFinite(n) ? n.toFixed(d) : "—";
+    const r = roundTo(n, d);
+    return r == null ? "—" : r.toFixed(d);
   }
 
   function updateOverviewStats(mainFinish) {
@@ -405,12 +434,12 @@
 
     const kmEl = $("stat-km");
     if (kmEl) {
-      kmEl.querySelector(".value").textContent = currentKm + " km";
-      kmEl.querySelector(".sub").textContent = "Último split: km " + currentKm;
+      kmEl.querySelector(".value").textContent = fmtNum(currentKm, 1) + " km";
+      kmEl.querySelector(".sub").textContent = "Último split: km " + Math.round(currentKm);
     }
     const remEl = $("stat-remain");
     if (remEl) {
-      remEl.querySelector(".value").textContent = D.current.remainingKm + " km";
+      remEl.querySelector(".value").textContent = fmtNum(D.current.remainingKm, 1) + " km";
       remEl.querySelector(".sub").textContent = "Faltam percorrer";
     }
     const elEl = $("stat-elapsed");
@@ -447,11 +476,1036 @@
   }
 
   function fmtHM(mins) {
-    const m = Math.abs(mins);
-    const h = Math.floor(m / 60);
-    const mm = m % 60;
+    if (!Number.isFinite(mins)) return "—";
+    const total = Math.round(Math.abs(mins));
+    const h = Math.floor(total / 60);
+    const mm = total % 60;
     return (mins < 0 ? "−" : "+") + h + "h" + (mm ? " " + mm + "m" : "");
   }
+
+  function fmtHoursLeft(sec) {
+    if (!Number.isFinite(sec) || sec <= 0) return "—";
+    const h = Math.floor(sec / 3600);
+    const m = Math.round((sec % 3600) / 60);
+    if (h >= 48) return fmtNum(h / 24, 1) + " dias";
+    return h + "h" + (m ? " " + m + "m" : "");
+  }
+
+  function fmtPaceDeltaMin(deltaMin) {
+    if (!Number.isFinite(deltaMin)) return "—";
+    if (Math.abs(deltaMin) < 0.05) return "no ritmo";
+    const sign = deltaMin > 0 ? "+" : "−";
+    const totalSec = Math.round(Math.abs(deltaMin) * 60);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return sign + m + ":" + String(s).padStart(2, "0") + "/km";
+  }
+
+  const SCENARIO_MOVING_THRESHOLD_S = 900;
+  const SCENARIO_SLEEP_STOP_MIN_S = 3600;
+  let scenarioMovingWindowKm = 30;
+
+  function readScenarioMovingWindowKm() {
+    const el = $("scenarios-moving-window");
+    if (!el) return scenarioMovingWindowKm;
+    const v = el.value;
+    if (v === "all") return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 30;
+  }
+
+  function readScenarioMovingMode() {
+    const checked = document.querySelector('input[name="scenarios-moving-mode"]:checked');
+    return checked && checked.value === "custom" ? "custom" : "window";
+  }
+
+  function formatPaceForInput(min) {
+    if (!Number.isFinite(min) || min <= 0) return "";
+    const totalSec = Math.round(min * 60);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return m + ":" + String(s).padStart(2, "0");
+  }
+
+  function parseScenarioPaceInput(raw) {
+    if (raw == null || raw === "") return null;
+    const s = String(raw)
+      .trim()
+      .replace(/\/km\s*$/i, "")
+      .trim();
+    const colon = s.match(/^(\d+):(\d{1,2})$/);
+    if (colon) {
+      let min = parseInt(colon[1], 10);
+      let sec = parseInt(colon[2], 10);
+      if (sec >= 60) {
+        min += Math.floor(sec / 60);
+        sec = sec % 60;
+      }
+      return roundTo(min + sec / 60, 2);
+    }
+    const n = Number(s.replace(",", "."));
+    if (Number.isFinite(n) && n > 0) return roundTo(n, 2);
+    return null;
+  }
+
+  function syncScenarioMovingModeUI() {
+    const mode = readScenarioMovingMode();
+    const windowWrap = $("scenarios-moving-window-wrap");
+    const customWrap = $("scenarios-moving-custom-wrap");
+    if (windowWrap) windowWrap.hidden = mode !== "window";
+    if (customWrap) customWrap.hidden = mode !== "custom";
+    const sel = $("scenarios-moving-window");
+    if (sel) sel.disabled = mode !== "window";
+  }
+
+  function scenarioMovingSourceLabel(calcParams) {
+    const p = calcParams || readScenarioCalcParams();
+    if (p.movingMode === "custom" && p.customMovingPaceMin != null) {
+      return "ritmo fixo " + fmtPaceMin(p.customMovingPaceMin);
+    }
+    const w = p.movingWindowKm;
+    return w == null ? "toda a travessia" : "últimos " + w + " km";
+  }
+
+  function scenarioDaysPayload() {
+    if (D.days && Array.isArray(D.days.days)) return D.days;
+    return { days: [], nightStops: [], method: "", longStopThresholdMin: 60 };
+  }
+
+  /** Mediana das paragens de sono (tab Dias) — usada na tab Dias. */
+  function scenarioMedianSleepStopMin() {
+    const nights = scenarioDaysPayload().nightStops || [];
+    const mins = nights.map((n) => n.durationMin).filter((v) => Number.isFinite(v) && v > 0);
+    if (!mins.length) return 400;
+    mins.sort((a, b) => a - b);
+    return Math.round(mins[Math.floor(mins.length / 2)]);
+  }
+
+  /** Média de minutos das paragens de sono que partem o dia (nightStops). */
+  function scenarioMeanSleepStopMin() {
+    const nights = scenarioDaysPayload().nightStops || [];
+    const mins = nights.map((n) => n.durationMin).filter((v) => Number.isFinite(v) && v > 0);
+    if (!mins.length) return 400;
+    return Math.round(mins.reduce((a, b) => a + b, 0) / mins.length);
+  }
+
+  /** Total de minutos de paragens curtas (15–60 min/km) num dia, excl. sono tab Dias. */
+  function scenarioShortStopMinForDay(day) {
+    const kmFrom = Number(day.kmFrom ?? day.splitsFromKm ?? 0);
+    const kmTo = Number(day.kmTo ?? day.splitsToKm ?? kmFrom);
+    if (kmTo < kmFrom) return 0;
+    let sec = 0;
+    (D.splits || []).forEach((s) => {
+      if (s.unavailable || s.partial) return;
+      const km = Number(s.km);
+      if (km < kmFrom || km > kmTo) return;
+      if (scenarioKmInDaysNightStop(km)) return;
+      const t = s.segment_time_s || 0;
+      if (t >= SCENARIO_MOVING_THRESHOLD_S && t < SCENARIO_SLEEP_STOP_MIN_S) sec += t;
+    });
+    return sec / 60;
+  }
+
+  /** Média do total diário de outras paragens (dias fechados na tab Dias). */
+  function scenarioMeanShortStopMinPerDay() {
+    const days = (scenarioDaysPayload().days || []).filter(
+      (d) => !d.inProgress && (d.km || 0) > 0
+    );
+    if (!days.length) return 0;
+    const totals = days.map((d) => scenarioShortStopMinForDay(d));
+    return Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+  }
+
+  function scenarioKmInDaysNightStop(km) {
+    return (scenarioDaysPayload().nightStops || []).some(
+      (n) => km >= Number(n.kmFrom) && km <= Number(n.kmTo)
+    );
+  }
+
+  function scenarioAvgKmPerDay() {
+    const days = (scenarioDaysPayload().days || []).filter((d) => (d.km || 0) > 0 && !d.inProgress);
+    if (!days.length) return 85;
+    return days.reduce((a, d) => a + d.km, 0) / days.length;
+  }
+
+  /** Uma paragem de sono por dia novo até à meta (como nightAfter na tab Dias). */
+  function estimateScenarioNightStops(remainingKm) {
+    const avgKm = scenarioAvgKmPerDay();
+    const projectedDays = Math.max(1, Math.ceil(remainingKm / avgKm));
+    return Math.max(0, projectedDays - 1);
+  }
+
+  function defaultScenarioStopParams() {
+    return {
+      shortStopMinPerDay: scenarioMeanShortStopMinPerDay(),
+      sleepStopMin: scenarioMeanSleepStopMin(),
+    };
+  }
+
+  function updateScenarioParamDataAvgs() {
+    const shortAvgEl = $("scenarios-short-stop-data-avg");
+    const sleepAvgEl = $("scenarios-sleep-stop-data-avg");
+    const days = (scenarioDaysPayload().days || []).filter((d) => !d.inProgress && (d.km || 0) > 0);
+    const nights = scenarioDaysPayload().nightStops || [];
+    const shortMean = scenarioMeanShortStopMinPerDay();
+    const sleepMean = scenarioMeanSleepStopMin();
+    const windowKm = readScenarioMovingWindowKm();
+    const gpsPace = scenarioGpsMovingPaceMin(windowKm);
+    const windowLabel =
+      windowKm == null ? "toda a travessia" : "últimos " + windowKm + " km";
+
+    if (shortAvgEl) {
+      shortAvgEl.innerHTML = days.length
+        ? `Média GPS: <strong>${shortMean} min/d</strong> (${days.length} dias)`
+        : "Sem dados de dias";
+    }
+    if (sleepAvgEl) {
+      sleepAvgEl.innerHTML = nights.length
+        ? `Média GPS: <strong>${sleepMean} min</strong> (${nights.length} noites)`
+        : "Sem paragens de sono";
+    }
+    const movingAvgEl = $("scenarios-moving-data-avg");
+    const movingRefEl = $("scenarios-moving-custom-ref");
+    const gpsChip =
+      gpsPace != null
+        ? `Ritmo GPS (${windowLabel}): <strong>${fmtPaceMin(gpsPace)}</strong>`
+        : "Sem ritmo GPS na janela";
+    if (movingAvgEl) movingAvgEl.innerHTML = gpsChip;
+    if (movingRefEl) movingRefEl.innerHTML = gpsChip;
+  }
+
+  function applyScenarioDefaultsToInputs(clearSaved) {
+    const defaults = defaultScenarioStopParams();
+    const sel = $("scenarios-moving-window");
+    const paceEl = $("scenarios-moving-pace");
+    const shortEl = $("scenarios-short-stop-min");
+    const sleepEl = $("scenarios-sleep-stop-min");
+    const gpsDefault = scenarioGpsMovingPaceMin(30);
+
+    document.querySelectorAll('input[name="scenarios-moving-mode"]').forEach((r) => {
+      r.checked = r.value === "window";
+    });
+    if (sel) sel.value = "30";
+    if (shortEl) shortEl.value = String(defaults.shortStopMinPerDay);
+    if (sleepEl) sleepEl.value = String(defaults.sleepStopMin);
+    if (paceEl) paceEl.value = gpsDefault != null ? formatPaceForInput(gpsDefault) : "";
+
+    if (clearSaved) {
+      try {
+        localStorage.removeItem("travessiaScenarioMovingMode");
+        localStorage.removeItem("travessiaScenarioMovingWindow");
+        localStorage.removeItem("travessiaScenarioMovingPace");
+        localStorage.removeItem("travessiaScenarioShortStopMin");
+        localStorage.removeItem("travessiaScenarioSleepStopMin");
+      } catch {}
+    }
+    syncScenarioMovingModeUI();
+  }
+
+  /** Parâmetros UI da tab Cenários (fonte única para os cálculos). */
+  function readScenarioCalcParams() {
+    const movingWindowKm = readScenarioMovingWindowKm();
+    const movingMode = readScenarioMovingMode();
+    const defaults = defaultScenarioStopParams();
+    const shortEl = $("scenarios-short-stop-min");
+    const sleepEl = $("scenarios-sleep-stop-min");
+    const paceEl = $("scenarios-moving-pace");
+    let shortStopMinPerDay = defaults.shortStopMinPerDay;
+    let sleepStopMin = defaults.sleepStopMin;
+    let customMovingPaceMin = parseScenarioPaceInput(paceEl && paceEl.value);
+    if (shortEl && shortEl.value !== "") {
+      const n = Number(shortEl.value);
+      if (Number.isFinite(n) && n >= 0) shortStopMinPerDay = Math.round(n);
+    }
+    if (sleepEl && sleepEl.value !== "") {
+      const n = Number(sleepEl.value);
+      if (Number.isFinite(n) && n >= 0) sleepStopMin = Math.round(n);
+    }
+    if (movingMode === "custom" && customMovingPaceMin == null) {
+      customMovingPaceMin = scenarioGpsMovingPaceMin(movingWindowKm);
+    }
+    return {
+      movingMode,
+      movingWindowKm,
+      customMovingPaceMin,
+      shortStopMinPerDay,
+      sleepStopMin,
+    };
+  }
+
+  function syncScenarioCalcParams() {
+    const p = readScenarioCalcParams();
+    scenarioMovingWindowKm = p.movingWindowKm;
+  }
+
+  function refreshScenariosMap(calcParams, anchorNow, scenarios) {
+    const payload = buildScenarioMapPayload(calcParams, anchorNow, scenarios);
+    window.__travessiaPendingScenariosMapPayload = payload;
+    if (!window.travessiaRefreshScenariosMap) return;
+    try {
+      window.travessiaRefreshScenariosMap(payload);
+    } catch (err) {
+      console.error("scenarios map:", err);
+    }
+  }
+
+  /** Recalcula cartões e mapa sempre que parâmetros ou dados base mudam. */
+  function recalcScenarios() {
+    syncScenarioCalcParams();
+    renderScenarios();
+  }
+
+  function initScenarioControls() {
+    const root = document.querySelector(".scenarios-controls");
+    if (!root || root.dataset.initDone) return;
+    root.dataset.initDone = "1";
+    const sel = $("scenarios-moving-window");
+    const paceEl = $("scenarios-moving-pace");
+    const shortEl = $("scenarios-short-stop-min");
+    const sleepEl = $("scenarios-sleep-stop-min");
+    const defaults = defaultScenarioStopParams();
+    try {
+      const savedMode = localStorage.getItem("travessiaScenarioMovingMode");
+      if (savedMode === "custom" || savedMode === "window") {
+        document.querySelectorAll('input[name="scenarios-moving-mode"]').forEach((r) => {
+          r.checked = r.value === savedMode;
+        });
+      }
+    } catch {}
+    if (sel) {
+      try {
+        const saved = localStorage.getItem("travessiaScenarioMovingWindow");
+        if (saved && sel.querySelector(`option[value="${saved}"]`)) sel.value = saved;
+      } catch {}
+    }
+    if (paceEl) {
+      const gpsDefault = scenarioGpsMovingPaceMin(readScenarioMovingWindowKm());
+      try {
+        const saved = localStorage.getItem("travessiaScenarioMovingPace");
+        paceEl.value =
+          saved != null ? saved : gpsDefault != null ? formatPaceForInput(gpsDefault) : "";
+      } catch {
+        paceEl.value = gpsDefault != null ? formatPaceForInput(gpsDefault) : "";
+      }
+    }
+    if (shortEl) {
+      try {
+        const saved = localStorage.getItem("travessiaScenarioShortStopMin");
+        shortEl.value = saved != null ? saved : String(defaults.shortStopMinPerDay);
+      } catch {
+        shortEl.value = String(defaults.shortStopMinPerDay);
+      }
+    }
+    if (sleepEl) {
+      try {
+        const saved = localStorage.getItem("travessiaScenarioSleepStopMin");
+        sleepEl.value = saved != null ? saved : String(defaults.sleepStopMin);
+      } catch {
+        sleepEl.value = String(defaults.sleepStopMin);
+      }
+    }
+    syncScenarioCalcParams();
+    syncScenarioMovingModeUI();
+    updateScenarioParamDataAvgs();
+    const onParamsChange = (e) => {
+      const t = e.target;
+      if (!t || !t.matches) return;
+      const isParam =
+        t.matches("[data-scenario-param]") ||
+        t.id === "scenarios-short-stop-min" ||
+        t.id === "scenarios-sleep-stop-min";
+      if (!isParam) return;
+      try {
+        if (t.name === "scenarios-moving-mode") {
+          localStorage.setItem("travessiaScenarioMovingMode", t.value);
+          syncScenarioMovingModeUI();
+        }
+        if (t.id === "scenarios-moving-window") {
+          localStorage.setItem("travessiaScenarioMovingWindow", t.value);
+        }
+        if (t.id === "scenarios-moving-pace") {
+          localStorage.setItem("travessiaScenarioMovingPace", t.value);
+        }
+        if (t.id === "scenarios-short-stop-min") {
+          localStorage.setItem("travessiaScenarioShortStopMin", t.value);
+        }
+        if (t.id === "scenarios-sleep-stop-min") {
+          localStorage.setItem("travessiaScenarioSleepStopMin", t.value);
+        }
+      } catch {}
+      recalcScenarios();
+    };
+    root.addEventListener("change", onParamsChange);
+    root.addEventListener("input", onParamsChange);
+    root.addEventListener("click", (e) => {
+      const avgBtn = e.target.closest("[data-apply-avg]");
+      if (avgBtn) {
+        const defaults = defaultScenarioStopParams();
+        if (avgBtn.dataset.applyAvg === "short") {
+          const el = $("scenarios-short-stop-min");
+          if (el) {
+            el.value = String(defaults.shortStopMinPerDay);
+            try {
+              localStorage.setItem("travessiaScenarioShortStopMin", el.value);
+            } catch {}
+          }
+        }
+        if (avgBtn.dataset.applyAvg === "sleep") {
+          const el = $("scenarios-sleep-stop-min");
+          if (el) {
+            el.value = String(defaults.sleepStopMin);
+            try {
+              localStorage.setItem("travessiaScenarioSleepStopMin", el.value);
+            } catch {}
+          }
+        }
+        recalcScenarios();
+        return;
+      }
+      if (e.target.id === "scenarios-reset-params") {
+        applyScenarioDefaultsToInputs(true);
+        recalcScenarios();
+      }
+    });
+  }
+
+  function splitsInKmWindow(windowKm) {
+    const endKm = currentKm;
+    const startKm = windowKm == null ? 0 : Math.max(0, endKm - windowKm);
+    return (D.splits || [])
+      .filter(
+        (s) =>
+          !s.unavailable &&
+          !s.partial &&
+          s.km > startKm &&
+          s.km <= endKm &&
+          s.segment_time_s != null &&
+          s.segment_time_s > 0
+      )
+      .sort((a, b) => a.km - b.km);
+  }
+
+  function movingPaceFromWindow(windowKm) {
+    const segs = splitsInKmWindow(windowKm);
+    const moving = segs.filter((s) => s.segment_time_s < SCENARIO_MOVING_THRESHOLD_S);
+    if (!moving.length) return { paceMin: null, movingCount: 0, totalCount: segs.length, startKm: null };
+    const secSum = moving.reduce((a, s) => a + s.segment_time_s, 0);
+    return {
+      paceMin: roundTo(secSum / moving.length / 60, 2),
+      movingCount: moving.length,
+      totalCount: segs.length,
+      startKm: moving[0].km,
+    };
+  }
+
+  function scenarioGpsMovingPaceMin(windowKm) {
+    const w = windowKm !== undefined ? windowKm : readScenarioMovingWindowKm();
+    const mov = movingPaceFromWindow(w);
+    return (
+      mov.paceMin ??
+      perf.recentPaceMin ??
+      perf.weightedPaceMin ??
+      params.basePaceMin ??
+      null
+    );
+  }
+
+  function resolveScenarioMovingPace(calcParams) {
+    const p = calcParams || readScenarioCalcParams();
+    if (p.movingMode === "custom" && p.customMovingPaceMin != null) {
+      return {
+        paceMin: p.customMovingPaceMin,
+        source: "custom",
+        windowKm: p.movingWindowKm,
+        mov: null,
+      };
+    }
+    const mov = movingPaceFromWindow(p.movingWindowKm);
+    const paceMin =
+      mov.paceMin ??
+      perf.recentPaceMin ??
+      perf.weightedPaceMin ??
+      params.basePaceMin;
+    return { paceMin, source: "window", windowKm: p.movingWindowKm, mov };
+  }
+
+  function avgMovingHoursPerDay() {
+    const days = (D.days && D.days.days) || [];
+    const recent = days.filter((d) => !d.inProgress && (d.movingHours || 0) > 0);
+    if (!recent.length) return 14;
+    return recent.reduce((a, d) => a + d.movingHours, 0) / recent.length;
+  }
+
+  /** Tempo total (movimento + paragens) para percorrer remainingKm ao ritmo dado. */
+  function estimateScenarioLeg(remainingKm, movingMin, shortStopMinPerDay, sleepStopMin) {
+    if (!remainingKm || remainingKm <= 0 || !movingMin || movingMin <= 0) {
+      return {
+        movingTimeMin: 0,
+        calendarDays: 0,
+        nights: 0,
+        shortTotalMin: 0,
+        sleepTotalMin: 0,
+        totalMin: 0,
+        kmDay: null,
+        avgMovingHours: avgMovingHoursPerDay(),
+      };
+    }
+    const avgMovingHours = avgMovingHoursPerDay();
+    const avgKmDay = scenarioAvgKmPerDay();
+    const movingTimeMin = remainingKm * movingMin;
+    const calendarDays = Math.max(movingTimeMin / 60 / avgMovingHours, 0.25);
+    const projectedDays = Math.max(remainingKm / avgKmDay, 0.25);
+    const nights = estimateScenarioNightStops(remainingKm);
+    const shortTotalMin = projectedDays * (shortStopMinPerDay || 0);
+    const sleepTotalMin = nights * (sleepStopMin || 0);
+    const totalMin = movingTimeMin + shortTotalMin + sleepTotalMin;
+    const kmDay = totalMin > 0 ? roundTo((remainingKm / totalMin) * 1440, 1) : null;
+    return {
+      movingTimeMin: roundTo(movingTimeMin, 1),
+      calendarDays: roundTo(calendarDays, 2),
+      projectedDays: roundTo(projectedDays, 2),
+      nights,
+      shortTotalMin: roundTo(shortTotalMin, 0),
+      sleepTotalMin: roundTo(sleepTotalMin, 0),
+      totalMin: roundTo(totalMin, 0),
+      kmDay,
+      avgMovingHours: roundTo(avgMovingHours, 2),
+    };
+  }
+
+  function requiredMovingMinForTarget(
+    remainingKm,
+    secLeft,
+    shortStopMinPerDay,
+    sleepStopMin
+  ) {
+    const budgetMin = secLeft / 60;
+    if (budgetMin <= 0 || remainingKm <= 0) return null;
+    let lo = 0;
+    let hi = Math.max(20, budgetMin / remainingKm);
+    while (estimateScenarioLeg(remainingKm, hi, shortStopMinPerDay, sleepStopMin).totalMin > budgetMin) {
+      hi *= 1.35;
+      if (hi > 180) break;
+    }
+    for (let i = 0; i < 48; i++) {
+      const mid = (lo + hi) / 2;
+      const total = estimateScenarioLeg(remainingKm, mid, shortStopMinPerDay, sleepStopMin).totalMin;
+      if (total > budgetMin) hi = mid;
+      else lo = mid;
+    }
+    return roundTo(hi, 2);
+  }
+
+  const SCENARIO_TARGETS = [
+    { id: "sat-17", label: "Chegada sábado 17h", target: "2026-05-30 17:00:00" },
+    { id: "sat-21", label: "Chegada sábado 21h", target: "2026-05-30 21:00:00" },
+    { id: "sun-0", label: "Chegada domingo 0h", target: "2026-05-31 00:00:00" },
+    { id: "sun-9", label: "Chegada domingo 9h", target: "2026-05-31 09:00:00" },
+  ];
+
+  const SCENARIO_MAP_COLORS = {
+    current: "#f59e0b",
+    "sat-17": "#3b82f6",
+    "sat-21": "#6366f1",
+    "sun-0": "#a855f7",
+    "sun-9": "#ec4899",
+  };
+
+  let routeKmSamplesCache = null;
+
+  function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function getRouteKmSamples() {
+    if (routeKmSamplesCache) return routeKmSamplesCache;
+    const route = D.map?.route;
+    if (!route || route.length < 2) return null;
+    const cum = [0];
+    for (let i = 1; i < route.length; i++) {
+      const a = route[i - 1];
+      const b = route[i];
+      cum.push(cum[i - 1] + haversineKm(a[0], a[1], b[0], b[1]));
+    }
+    const geoTotal = cum[cum.length - 1] || 1;
+    const scale = (totalKm || 642) / geoTotal;
+    routeKmSamplesCache = route.map((p, i) => ({
+      lat: p[0],
+      lng: p[1],
+      km: cum[i] * scale,
+    }));
+    return routeKmSamplesCache;
+  }
+
+  function invalidateRouteKmSamples() {
+    routeKmSamplesCache = null;
+  }
+
+  /** Posição lat/lng na polyline oficial do percurso (evita pontos fora da rota). */
+  function latLngAtRouteKm(km) {
+    const k = Number(km);
+    if (!Number.isFinite(k)) return null;
+    const samples = getRouteKmSamples();
+    if (!samples || samples.length < 2) return null;
+
+    if (k <= samples[0].km) {
+      return { lat: samples[0].lat, lng: samples[0].lng, km: k };
+    }
+    const last = samples[samples.length - 1];
+    if (k >= last.km) {
+      return { lat: last.lat, lng: last.lng, km: k };
+    }
+    for (let i = 0; i < samples.length - 1; i++) {
+      const a = samples[i];
+      const b = samples[i + 1];
+      if (k >= a.km && k <= b.km) {
+        const span = b.km - a.km;
+        const t = span <= 1e-6 ? 0 : (k - a.km) / span;
+        return {
+          lat: a.lat + t * (b.lat - a.lat),
+          lng: a.lng + t * (b.lng - a.lng),
+          km: k,
+        };
+      }
+    }
+    return { lat: last.lat, lng: last.lng, km: k };
+  }
+
+  /**
+   * Km onde o atleta deveria estar agora para cumprir a meta.
+   * Usa a margem dos cartões (projeção actual com parâmetros vs alvo) convertida
+   * em km ao ritmo necessário do cenário (movimento + paragens dos parâmetros).
+   */
+  function scenarioMapKmAtNow(scenarioTargetDt, calcParams) {
+    const p = calcParams || readScenarioCalcParams();
+    const anchorNow = scenarioAnchorNow();
+    const remainingKm = Number(D.current?.remainingKm ?? Math.max(0, totalKm - currentKm));
+
+    if (!scenarioTargetDt || remainingKm <= 0) {
+      return { km: currentKm, requiredMovingMin: null };
+    }
+
+    const secLeft = (scenarioTargetDt.getTime() - anchorNow.getTime()) / 1000;
+    if (secLeft <= 0) {
+      return { km: totalKm, requiredMovingMin: null };
+    }
+
+    const requiredMin = requiredMovingMinForTarget(
+      remainingKm,
+      secLeft,
+      p.shortStopMinPerDay,
+      p.sleepStopMin
+    );
+    if (!requiredMin) {
+      return { km: currentKm, requiredMovingMin: null };
+    }
+
+    const requiredLeg = estimateScenarioLeg(
+      remainingKm,
+      requiredMin,
+      p.shortStopMinPerDay,
+      p.sleepStopMin
+    );
+    const linear = linearScenarioProjection(p);
+    const projectedFinishMs =
+      anchorNow.getTime() + (linear.leg.totalMin || 0) * 60 * 1000;
+    const marginSec = (scenarioTargetDt.getTime() - projectedFinishMs) / 1000;
+    const secForRemaining = Math.max(1, (requiredLeg.totalMin || 1) * 60);
+    const kmPerSec = remainingKm / secForRemaining;
+    const expectedKm = currentKm - marginSec * kmPerSec;
+
+    return {
+      km: Math.min(totalKm, Math.max(0, expectedKm)),
+      requiredMovingMin: roundTo(requiredMin, 2),
+      marginMin: Math.round(marginSec / 60),
+    };
+  }
+
+  function kmAlongRouteAtInstant(scenarioTargetDt, calcParams) {
+    return scenarioMapKmAtNow(scenarioTargetDt, calcParams);
+  }
+
+  /** Comparação km on-track / previsto vs posição actual (cartões e mapa). */
+  function scenarioKmCompare(scenarioTargetDt, useV4Model, calcParams, anchorNow) {
+    const cur = Number(currentKm);
+    if (!Number.isFinite(cur)) return null;
+    const anchor = anchorNow || scenarioAnchorNow();
+
+    if (useV4Model) {
+      const pts = forecastTimelineMain();
+      const k = interpForecastKmAtTime(anchor, pts);
+      if (k == null || !Number.isFinite(k)) return null;
+      const onTrackKm = Math.min(totalKm, Math.max(0, k));
+      return {
+        onTrackKm,
+        currentKm: cur,
+        deltaKm: onTrackKm - cur,
+        onTrackLabel: "Km previsto (v4)",
+      };
+    }
+
+    const ot = scenarioMapKmAtNow(scenarioTargetDt, calcParams);
+    return {
+      onTrackKm: ot.km,
+      currentKm: cur,
+      deltaKm: ot.km - cur,
+      onTrackLabel: "Km on-track (agora)",
+    };
+  }
+
+  function fmtKmDeltaVsActual(deltaKm) {
+    if (!Number.isFinite(deltaKm)) return { text: "—", cls: "" };
+    if (Math.abs(deltaKm) < 0.05) return { text: "No GPS", cls: "good" };
+    const text = (deltaKm >= 0 ? "+" : "") + fmtNum(deltaKm, 1) + " km";
+    // À frente no percurso = devia estar mais longe = atrasado
+    const cls = deltaKm > 0 ? "bad" : "good";
+    return { text, cls };
+  }
+
+  function buildScenarioMapPayload(calcParams, anchorNow, scenarios) {
+    const points = [];
+    const cur = D.map?.current;
+    if (cur && cur.lat != null && cur.lng != null) {
+      points.push({
+        id: "current",
+        label: "Agora (GPS)",
+        lat: cur.lat,
+        lng: cur.lng,
+        km: currentKm,
+        color: SCENARIO_MAP_COLORS.current,
+        kind: "current",
+        hint: anchorNow
+          ? anchorNow.toLocaleString("pt-PT", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "",
+      });
+    }
+    (scenarios || []).forEach((sc) => {
+      if (!sc.targetDt || sc.dynamic || sc.id === "v4") return;
+      const onTrack = kmAlongRouteAtInstant(sc.targetDt, calcParams);
+      const km = onTrack.km;
+      const pos = latLngAtRouteKm(km);
+      if (!pos) return;
+      const deltaKm = km - currentKm;
+      const deltaTxt =
+        Number.isFinite(deltaKm) && Math.abs(deltaKm) >= 0.05
+          ? (deltaKm >= 0 ? "+" : "") + fmtNum(deltaKm, 1) + " km vs GPS"
+          : "no GPS";
+      const paceHint =
+        onTrack.requiredMovingMin != null
+          ? "Ritmo necessário " + fmtPaceMin(onTrack.requiredMovingMin) + " · "
+          : "";
+      const marginHint =
+        onTrack.marginMin != null ? "Margem projeção " + fmtHM(onTrack.marginMin) + " · " : "";
+      points.push({
+        id: sc.id,
+        label: sc.label,
+        lat: pos.lat,
+        lng: pos.lng,
+        km,
+        color: SCENARIO_MAP_COLORS[sc.id] || "#94a3b8",
+        kind: "scenario",
+        hint: "On-track · " + marginHint + paceHint + deltaTxt,
+      });
+    });
+    return {
+      route: D.map?.route,
+      points,
+    };
+  }
+
+  function scenarioAnchorNow() {
+    const projStr =
+      P.projectionTime || (D.live && D.live.gpsTime) || D.current?.lastCrossing || D.updatedAt;
+    return parseDataDate(projStr) || new Date();
+  }
+
+  function parseElapsedToHours(elapsedStr) {
+    if (!elapsedStr || elapsedStr === "—") return null;
+    const parts = String(elapsedStr)
+      .trim()
+      .split(":")
+      .map((x) => Number(x));
+    if (!parts.length || parts.some((n) => !Number.isFinite(n))) return null;
+    let sec = 0;
+    if (parts.length >= 3) sec = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    else if (parts.length === 2) sec = parts[0] * 3600 + parts[1] * 60;
+    return sec > 0 ? sec / 3600 : null;
+  }
+
+  /** Projeção linear: movimento + paragens curtas/dormir (sem modelo v4). */
+  function linearScenarioProjection(calcParams) {
+    const p = calcParams || readScenarioCalcParams();
+    const resolved = resolveScenarioMovingPace(p);
+    const movingMin = resolved.paceMin;
+    const remainingKm = Number(D.current?.remainingKm ?? Math.max(0, totalKm - currentKm));
+    const leg = estimateScenarioLeg(
+      remainingKm,
+      movingMin,
+      p.shortStopMinPerDay,
+      p.sleepStopMin
+    );
+    return {
+      movingMin,
+      kmDay: leg.kmDay,
+      windowKm: p.movingWindowKm,
+      movingMode: p.movingMode,
+      customMovingPaceMin: p.customMovingPaceMin,
+      mov: resolved.mov,
+      shortStopMinPerDay: p.shortStopMinPerDay,
+      sleepStopMin: p.sleepStopMin,
+      leg,
+    };
+  }
+
+  function buildScenarioMetrics(targetDt, anchorNow, useV4Model, calcParams) {
+    const remainingKm = Number(D.current?.remainingKm ?? Math.max(0, totalKm - currentKm));
+    if (!targetDt || !anchorNow || remainingKm <= 0) {
+      return { ok: false, reason: "Dados insuficientes" };
+    }
+    const secLeft = (targetDt.getTime() - anchorNow.getTime()) / 1000;
+    if (secLeft <= 0) {
+      return { ok: false, reason: "Prazo já ultrapassado", secLeft: 0, remainingKm };
+    }
+
+    const requiredKmDay = remainingKm / (secLeft / 86400);
+    const p =
+      calcParams ||
+      readScenarioCalcParams();
+
+    let actualMovingMin;
+    let actualKmDay;
+    let projectedLeg;
+    let projectedFinishMs;
+
+    if (useV4Model) {
+      actualMovingMin = P.movingPaceMin || perf.recentPaceMin || perf.weightedPaceMin || params.basePaceMin;
+      actualKmDay = P.kmPerDayProjected ?? null;
+      const finishDt = parseFinishDt(P.finishTimeIso || P.finishTime);
+      projectedFinishMs = finishDt
+        ? finishDt.getTime()
+        : anchorNow.getTime() +
+          (P.remainingHours || 0) * 3600000;
+      projectedLeg = null;
+    } else {
+      const linear = linearScenarioProjection(p);
+      actualMovingMin = linear.movingMin;
+      actualKmDay = linear.kmDay;
+      projectedLeg = linear.leg;
+      projectedFinishMs = anchorNow.getTime() + (projectedLeg.totalMin || 0) * 60 * 1000;
+    }
+
+    const requiredMovingMin = requiredMovingMinForTarget(
+      remainingKm,
+      secLeft,
+      p.shortStopMinPerDay,
+      p.sleepStopMin
+    );
+
+    const movingGap =
+      actualMovingMin != null && requiredMovingMin != null
+        ? actualMovingMin - requiredMovingMin
+        : null;
+    const kmDayGap = actualKmDay != null ? actualKmDay - requiredKmDay : null;
+    const marginMin = (targetDt.getTime() - projectedFinishMs) / 60000;
+
+    const paceBasis = useV4Model ? "modelo v4" : "projeção movimento + paragens";
+    let verdict = "warn";
+    let verdictText = "";
+    if (marginMin >= 30) {
+      verdict = "good";
+      verdictText =
+        "Com " + paceBasis + " chegas ~" + fmtHM(marginMin) + " antes deste alvo.";
+    } else if (marginMin >= -30) {
+      verdict = "warn";
+      verdictText = "Margem apertada (~" + fmtHM(marginMin) + " vs este alvo, " + paceBasis + ").";
+    } else {
+      verdict = "bad";
+      verdictText =
+        "Com " +
+        paceBasis +
+        " precisas de " +
+        (requiredMovingMin != null && actualMovingMin != null
+          ? fmtPaceDeltaMin(-(actualMovingMin - requiredMovingMin))
+          : "ritmo mais rápido") +
+        " em movimento (~" +
+        fmtHM(marginMin) +
+        ").";
+    }
+
+    return {
+      ok: true,
+      useV4Model: !!useV4Model,
+      remainingKm: roundTo(remainingKm, 1),
+      secLeft: Math.round(secLeft),
+      requiredMovingMin: requiredMovingMin != null ? roundTo(requiredMovingMin, 2) : null,
+      requiredKmDay: roundTo(requiredKmDay, 1),
+      actualMovingMin: roundTo(actualMovingMin, 2),
+      actualKmDay: actualKmDay != null ? roundTo(actualKmDay, 1) : null,
+      movingGap: movingGap != null ? roundTo(movingGap, 2) : null,
+      kmDayGap: kmDayGap != null ? roundTo(kmDayGap, 1) : null,
+      marginMin: Math.round(marginMin),
+      shortStopMinPerDay: p.shortStopMinPerDay,
+      sleepStopMin: p.sleepStopMin,
+      projectedShortMin: projectedLeg ? projectedLeg.shortTotalMin : null,
+      projectedSleepMin: projectedLeg ? projectedLeg.sleepTotalMin : null,
+      projectedNights: projectedLeg ? projectedLeg.nights : null,
+      verdict,
+      verdictText,
+    };
+  }
+
+  function fmtMsAsShortWhen(ms) {
+    if (!Number.isFinite(ms)) return "—";
+    const iso = fmtDataDateTime(new Date(ms));
+    return iso ? fmtShortWhen(iso) : "—";
+  }
+
+  function renderScenarios() {
+    const grid = $("scenarios-grid");
+    if (!grid) return;
+
+    syncScenarioMovingModeUI();
+    updateScenarioParamDataAvgs();
+    const calcParams = readScenarioCalcParams();
+    const windowKm = calcParams.movingWindowKm;
+    scenarioMovingWindowKm = windowKm;
+    const linearPreview = linearScenarioProjection(calcParams);
+    const summaryEl = $("scenarios-window-summary");
+    if (summaryEl) {
+      const leg = linearPreview.leg;
+      const movLabel = scenarioMovingSourceLabel(calcParams);
+      const paceStr = fmtPaceMin(linearPreview.movingMin);
+      summaryEl.textContent =
+        `${movLabel}: movimento ${paceStr}` +
+        ` · paragens curtas ${calcParams.shortStopMinPerDay} min/d` +
+        ` · sono tab Dias ${calcParams.sleepStopMin} min (${leg.nights}×)` +
+        ` · projectado ${fmtDurationFromMin(leg.totalMin)} (${fmtNum(leg.kmDay, 1)} km/d)` +
+        (leg.nights > 0
+          ? ` incl. ~${fmtDurationFromMin(leg.shortTotalMin)} curtas + ~${fmtDurationFromMin(leg.sleepTotalMin)} sono`
+          : "");
+    }
+
+    const anchorNow = scenarioAnchorNow();
+    const remainEl = $("scenarios-remain-km");
+    const anchorEl = $("scenarios-anchor-time");
+    const arrivalEl = $("scenarios-projected-arrival");
+    const remainingKm = Number(D.current?.remainingKm ?? Math.max(0, totalKm - currentKm));
+    if (remainEl) remainEl.textContent = fmtNum(remainingKm, 1);
+    if (anchorEl) anchorEl.textContent = fmtShortWhen(anchorNow);
+    if (arrivalEl && linearPreview.leg) {
+      const finishMs = anchorNow.getTime() + (linearPreview.leg.totalMin || 0) * 60 * 1000;
+      arrivalEl.textContent = fmtMsAsShortWhen(finishMs);
+    }
+
+    const finishStr = P.finishTimeIso || P.finishTime;
+    const finishDt = parseFinishDt(finishStr);
+    const scenarios = SCENARIO_TARGETS.map((s) => ({
+      ...s,
+      targetDt: parseDataDate(s.target),
+      dynamic: false,
+    }));
+    if (finishDt) {
+      scenarios.push({
+        id: "v4",
+        label: "Previsão modelo v4",
+        target: finishStr,
+        targetDt: finishDt,
+        dynamic: true,
+      });
+    }
+
+    grid.innerHTML = scenarios
+      .map((sc) => {
+        const m = buildScenarioMetrics(sc.targetDt, anchorNow, sc.dynamic, calcParams);
+        const targetLabel = sc.targetDt
+          ? sc.targetDt.toLocaleString("pt-PT", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—";
+
+        if (!m.ok) {
+          return (
+            `<article class="scenario-card${sc.dynamic ? " dynamic" : ""}">` +
+            `<header class="scenario-card-head"><h3>${sc.label}</h3>` +
+            `<p class="scenario-target">${targetLabel}</p></header>` +
+            `<p class="scenario-verdict muted">${m.reason || "—"}</p></article>`
+          );
+        }
+
+        const kmDayGapTxt =
+          m.kmDayGap != null
+            ? (m.kmDayGap >= 0 ? "+" : "") + fmtNum(m.kmDayGap, 1) + " km/d"
+            : "—";
+        const movSourceLabel = scenarioMovingSourceLabel(calcParams);
+        const marginLabel = m.useV4Model ? "Margem (modelo v4)" : "Margem (mov. + paragens)";
+        const movActualLabel = m.useV4Model
+          ? "Movimento projectado (v4)"
+          : "Movimento (" + movSourceLabel + ")";
+        const kmDayActualLabel = m.useV4Model ? "Km/dia projectado (v4)" : "Km/dia projectado";
+        const shortProj =
+          m.projectedShortMin != null ? fmtDurationFromMin(m.projectedShortMin) : "—";
+        const sleepProj =
+          m.projectedSleepMin != null
+            ? fmtDurationFromMin(m.projectedSleepMin) +
+              (m.projectedNights ? ` (${m.projectedNights}×)` : "")
+            : "—";
+        const kmCmp = scenarioKmCompare(sc.targetDt, sc.dynamic, calcParams, anchorNow);
+        const kmDeltaFmt = kmCmp ? fmtKmDeltaVsActual(kmCmp.deltaKm) : null;
+        const kmCompareStats = kmCmp
+          ? `<div><span class="k">${kmCmp.onTrackLabel}</span><span class="v">${fmtNum(kmCmp.onTrackKm, 1)}</span></div>` +
+            `<div><span class="k">Km actual (GPS)</span><span class="v">${fmtNum(kmCmp.currentKm, 1)}</span></div>` +
+            `<div><span class="k">Δ vs actual</span><span class="v${kmDeltaFmt.cls ? " " + kmDeltaFmt.cls : ""}">${kmDeltaFmt.text}</span></div>`
+          : "";
+        return (
+          `<article class="scenario-card${sc.dynamic ? " dynamic" : ""}">` +
+          `<header class="scenario-card-head"><h3>${sc.label}</h3>` +
+          `<p class="scenario-target">${targetLabel}</p></header>` +
+          `<div class="scenario-stats">` +
+          kmCompareStats +
+          `<div><span class="k">Tempo até ao alvo</span><span class="v">${fmtHoursLeft(m.secLeft)}</span></div>` +
+          `<div><span class="k">${marginLabel}</span><span class="v">${fmtHM(m.marginMin)}</span></div>` +
+          `<div><span class="k">Movimento necessário</span><span class="v">${fmtPaceMin(m.requiredMovingMin)}</span></div>` +
+          `<div><span class="k">Km/dia necessário</span><span class="v">${fmtNum(m.requiredKmDay, 1)}</span></div>` +
+          `<div><span class="k">${kmDayActualLabel}</span><span class="v">${fmtNum(m.actualKmDay, 1)}</span></div>` +
+          `</div>` +
+          `<div class="scenario-compare">` +
+          `<div class="scenario-compare-row"><span>${movActualLabel}</span><span>${fmtPaceMin(m.actualMovingMin)}</span></div>` +
+          (m.useV4Model
+            ? ""
+            : `<div class="scenario-compare-row"><span>Paragens curtas (estim.)</span><span>${shortProj}</span></div>` +
+              `<div class="scenario-compare-row"><span>Sono tab Dias (estim.)</span><span>${sleepProj}</span></div>`) +
+          `<div class="scenario-compare-row"><span>Δ movimento vs necessário</span><span class="${m.movingGap != null && m.movingGap <= 0 ? "good" : "bad"}">${m.movingGap != null ? fmtPaceDeltaMin(m.movingGap) : "—"}</span></div>` +
+          `<div class="scenario-compare-row"><span>Δ km/dia</span><span class="${m.kmDayGap != null && m.kmDayGap >= 0 ? "good" : "bad"}">${kmDayGapTxt}</span></div>` +
+          `</div>` +
+          `<p class="scenario-verdict ${m.verdict}">${m.verdictText}</p>` +
+          `</article>`
+        );
+      })
+      .join("");
+
+    refreshScenariosMap(calcParams, anchorNow, scenarios);
+  }
+
+  initScenarioControls();
+  window.travessiaRefreshScenarios = recalcScenarios;
 
   function marginMinutes(deadlineStr, finishDt) {
     return Math.round(
@@ -1466,9 +2520,9 @@
       " h restantes (" +
       fmtNum(main.days, 1) +
       " dias) · km " +
-      currentKm +
+      fmtNum(currentKm, 1) +
       " / " +
-      totalKm;
+      fmtNum(totalKm, 1);
 
     $("conf-finish-hours").textContent =
       fmtNum(main.hours, 1) + " h · " + fmtNum(main.days, 1) + " dias";
@@ -1535,7 +2589,11 @@
       ...confOpts,
     });
     renderModelReliabilityPanel();
-    renderConfidenceCard("conf-cal", calConf, "Prazo 31/05 23:59 · " + g.remainingKm + " km restantes");
+    renderConfidenceCard(
+      "conf-cal",
+      calConf,
+      "Prazo 31/05 23:59 · " + fmtNum(g.remainingKm, 1) + " km restantes"
+    );
     renderConfidenceCard("conf-rec", recConf, "Record " + (g.recordCurrent || "") + " · limite " + (g.recordDeadlineFromStart || "").replace(" ", " · "));
     window.__travessiaLastConf = { cal: calConf, rec: recConf };
     drawConfidenceEvolutionChart(calConf, recConf);
@@ -1548,6 +2606,11 @@
     renderMainScenarioDetail(finishes.main);
     renderInsightPanels();
     updateOverviewStats(finishes.main);
+    try {
+      recalcScenarios();
+    } catch (err) {
+      console.error("renderScenarios:", err);
+    }
   }
 
   try {
@@ -2499,11 +3562,11 @@
   }
 
   function medianNightStopMin(payload) {
-    const nights = payload.nightStops || [];
-    const mins = nights.map((n) => n.durationMin).filter((v) => Number.isFinite(v));
-    if (!mins.length) return 400;
+    const nights = (payload && payload.nightStops) || scenarioDaysPayload().nightStops || [];
+    const mins = nights.map((n) => n.durationMin).filter((v) => Number.isFinite(v) && v > 0);
+    if (!mins.length) return scenarioMedianSleepStopMin();
     mins.sort((a, b) => a - b);
-    return mins[Math.floor(mins.length / 2)];
+    return Math.round(mins[Math.floor(mins.length / 2)]);
   }
 
   function profileGainLossRange(kmFrom, kmTo) {
@@ -3350,6 +4413,11 @@
       }
     }
     if (window.travessiaUpdateMapLive) window.travessiaUpdateMapLive(patch);
+    try {
+      recalcScenarios();
+    } catch (err) {
+      console.error("renderScenarios:", err);
+    }
   };
 
   window.travessiaReloadAnalytics = function (next) {
@@ -3358,6 +4426,7 @@
     D = next;
     totalKm = D.event.totalKm;
     currentKm = D.current.km;
+    invalidateRouteKmSamples();
     profileFull = D.routeProfileFull || D.routeProfile;
     P = D.prediction;
     perf = P.performance || {};
@@ -3373,9 +4442,9 @@
 
     $("athlete-name").textContent = D.athlete.name;
     updatePageTitle();
-    $("progress-pct").textContent = D.current.progressPct + "%";
-    $("progress-km").textContent = currentKm + " / " + totalKm + " km";
-    $("progress-fill").style.width = D.current.progressPct + "%";
+    $("progress-pct").textContent = fmtNum(D.current.progressPct, 1) + "%";
+    $("progress-km").textContent = fmtNum(currentKm, 1) + " / " + fmtNum(totalKm, 1) + " km";
+    $("progress-fill").style.width = fmtNum(D.current.progressPct, 1) + "%";
 
     renderLive();
     try {
@@ -3402,6 +4471,11 @@
       renderDays();
     } catch (err) {
       console.error("renderDays:", err);
+    }
+    try {
+      recalcScenarios();
+    } catch (err) {
+      console.error("renderScenarios:", err);
     }
     const updatedEl = $("updated-at");
     if (updatedEl && D.updatedAt) {

@@ -1,1 +1,33 @@
-⌀ 䠀椀猀琀爀椀挀漀 搀攀 瀀爀攀瘀椀猀攀猀਀਀䌀愀搀愀 攀砀攀挀甀漀 搀攀 怀爀攀昀爀攀猀栀开搀愀琀愀⸀瀀礀怀 愀挀爀攀猀挀攀渀琀愀 甀洀愀 氀椀渀栀愀 愀 怀瀀爀攀搀椀挀琀椀漀渀猀⸀樀猀漀渀氀怀 攀 愀挀琀甀愀氀椀稀愀 怀氀愀琀攀猀琀开猀渀愀瀀猀栀漀琀⸀樀猀漀渀怀⸀਀਀⌀⌀ 䌀愀洀瀀漀猀 瀀爀椀渀挀椀瀀愀椀猀਀਀簀 䌀愀洀瀀漀 簀 䐀攀猀挀爀椀漀 簀਀簀ⴀⴀⴀⴀⴀⴀⴀ簀ⴀⴀⴀⴀⴀⴀⴀⴀⴀⴀⴀ簀਀簀 怀爀攀挀漀爀搀攀搀䄀琀怀 簀 䴀漀洀攀渀琀漀 攀洀 焀甀攀 漀 猀渀愀瀀猀栀漀琀 昀漀椀 最爀愀瘀愀搀漀 簀਀簀 怀挀甀爀爀攀渀琀怀 簀 䬀洀Ⰰ 爀攀猀琀愀渀琀攀Ⰰ 切氀琀椀洀漀 猀瀀氀椀琀 簀਀簀 怀洀漀搀攀氀怀 簀 嘀攀爀猀漀Ⰰ 瀀愀爀洀攀琀爀漀猀 攀 挀愀瀀猀 搀漀 洀漀搀攀氀漀 瘀㐀 簀਀簀 怀瀀攀爀昀漀爀洀愀渀挀攀怀 簀 刀椀琀洀漀猀Ⰰ 瀀愀爀愀最攀渀猀Ⰰ 昀愀搀椀最愀 洀攀搀椀搀漀猀 渀漀 䜀倀匀 簀਀簀 怀猀挀攀渀愀爀椀漀猀怀 簀 䌀栀攀最愀搀愀猀 漀瀀琀椀洀椀猀琀愀 ⼀ 瀀爀椀渀挀椀瀀愀氀 ⼀ 瀀攀猀猀椀洀椀猀琀愀 簀਀簀 怀挀漀渀昀椀搀攀渀挀攀怀 簀 ─ 挀愀氀挀甀氀愀搀愀 ⠀攀猀瀀攀氀栀愀 漀 琀愀戀 伀戀樀攀琀椀瘀漀猀⤀ 簀਀簀 怀瀀爀漀瘀攀渀怀 簀 䬀洀⼀搀椀愀 搀攀洀漀渀猀琀爀愀搀漀猀 ⠀最氀漀戀愀氀Ⰰ 㐀　 栀Ⰰ 瀀漀渀搀攀爀愀搀漀⤀ 簀਀簀 怀昀漀爀攀挀愀猀琀匀愀洀瀀氀攀怀 簀 倀爀椀洀攀椀爀漀猀 瀀漀渀琀漀猀 搀愀 挀甀爀瘀愀 瀀爀漀樀攀挀琀愀搀愀 簀਀਀⌀⌀ 唀猀漀 瀀愀爀愀 挀愀氀椀戀爀愀爀 漀 洀漀搀攀氀漀਀਀怀怀怀戀愀猀栀਀⌀ 切氀琀椀洀愀猀 ㈀　 攀渀琀爀愀搀愀猀਀琀愀椀氀 ⴀ㈀　 栀椀猀琀漀爀礀⼀瀀爀攀搀椀挀琀椀漀渀猀⸀樀猀漀渀氀 簀 瀀礀琀栀漀渀㌀ ⴀ洀 樀猀漀渀⸀琀漀漀氀਀਀⌀ 愀渀氀椀猀攀 挀漀洀 瀀愀渀搀愀猀 ⠀攀砀攀洀瀀氀漀⤀਀瀀礀琀栀漀渀㌀ ⴀ挀 ∀਀椀洀瀀漀爀琀 樀猀漀渀Ⰰ 瀀愀渀搀愀猀 愀猀 瀀搀਀爀漀眀猀 㴀 嬀樀猀漀渀⸀氀漀愀搀猀⠀氀⤀ 昀漀爀 氀 椀渀 漀瀀攀渀⠀✀栀椀猀琀漀爀礀⼀瀀爀攀搀椀挀琀椀漀渀猀⸀樀猀漀渀氀✀⤀崀਀搀昀 㴀 瀀搀⸀樀猀漀渀开渀漀爀洀愀氀椀稀攀⠀爀漀眀猀⤀਀瀀爀椀渀琀⠀搀昀嬀嬀✀爀攀挀漀爀搀攀搀䄀琀✀Ⰰ✀挀甀爀爀攀渀琀⸀欀洀✀Ⰰ✀挀漀渀昀椀搀攀渀挀攀⸀挀愀氀攀渀搀愀爀⸀瀀挀琀✀Ⰰ✀猀挀攀渀愀爀椀漀猀⸀洀愀椀渀⸀欀洀倀攀爀䐀愀礀✀崀崀⸀琀愀椀氀⠀⤀⤀਀∀਀怀怀怀਀਀䘀椀挀栀攀椀爀漀猀 爀漀琀愀挀椀漀渀愀搀漀猀 ⠀㸀㄀㈀ 䴀䈀⤀ 昀椀挀愀洀 攀洀 怀瀀爀攀搀椀挀琀椀漀渀猀开夀夀夀夀䴀䴀䐀䐀开䠀䠀䴀䴀匀匀⸀樀猀漀渀氀怀 挀漀洀 渀搀椀挀攀 攀洀 怀愀爀挀栀椀瘀攀开椀渀搀攀砀⸀琀砀琀怀⸀਀
+# Histórico de previsões
+
+Cada execução de `refresh_data.py` acrescenta uma linha a `predictions.jsonl` e actualiza `latest_snapshot.json`.
+
+## Campos principais
+
+| Campo | Descrição |
+|-------|-----------|
+| `recordedAt` | Momento em que o snapshot foi gravado |
+| `current` | Km, restante, último split |
+| `model` | Versão, parâmetros e caps do modelo v4 |
+| `performance` | Ritmos, paragens, fadiga medidos no GPS |
+| `scenarios` | Chegadas optimista / principal / pessimista |
+| `confidence` | % calculada (espelha o tab Objetivos) |
+| `proven` | Km/dia demonstrados (global, 40 h, ponderado) |
+| `forecastSample` | Primeiros pontos da curva projectada |
+
+## Uso para calibrar o modelo
+
+```bash
+# últimas 20 entradas
+tail -20 history/predictions.jsonl | python3 -m json.tool
+
+# análise com pandas (exemplo)
+python3 -c "
+import json, pandas as pd
+rows = [json.loads(l) for l in open('history/predictions.jsonl')]
+df = pd.json_normalize(rows)
+print(df[['recordedAt','current.km','confidence.calendar.pct','scenarios.main.kmPerDay']].tail())
+"
+```
+
+Ficheiros rotacionados (>12 MB) ficam em `predictions_YYYYMMDD_HHMMSS.jsonl` com índice em `archive_index.txt`.

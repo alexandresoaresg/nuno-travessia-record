@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static server with background data refresh (live 1 min, full 5 min)."""
+"""Static server with background data refresh (live 1 min, full 2 min)."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from background_pipeline import start_worker
 
 DIR = Path(__file__).resolve().parent
 LIVE_INTERVAL_S = 60
-FULL_INTERVAL_S = 300
+FULL_INTERVAL_S = 120
 
 _live_lock = threading.Lock()
 _full_lock = threading.Lock()

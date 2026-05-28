@@ -51,9 +51,10 @@ def _margin_main(snap: dict[str, Any]) -> int | None:
 def _calendar_conf(snap: dict[str, Any]) -> int | None:
     conf = snap.get("confidence") or {}
     cal = conf.get("calendar") or {}
-    hybrid = cal.get("hybrid")
-    if isinstance(hybrid, dict) and hybrid.get("pct") is not None:
-        return int(hybrid["pct"])
+    if cal.get("hybrid") and isinstance(cal["hybrid"], dict):
+        pct = cal["hybrid"].get("pct")
+        if pct is not None:
+            return int(pct)
     if cal.get("pct") is not None:
         return int(cal["pct"])
     return None
@@ -91,6 +92,7 @@ def _thin_snapshots(
     min_gap_min: float = 25.0,
     finish_delta_min: float = 20.0,
 ) -> list[dict[str, Any]]:
+    """Drop noisy duplicates; keep km jumps and meaningful finish revisions."""
     if not rows:
         return []
     kept: list[dict[str, Any]] = []
@@ -166,6 +168,7 @@ def _forecast_accuracy_summary(
             actual_dt = actual_by_km.get(km_i)
             if not actual_dt:
                 continue
+            # Only validate forward-looking predictions made before the real crossing.
             if rec and rec >= actual_dt:
                 continue
             if km_i > int(current_km):
@@ -179,11 +182,14 @@ def _forecast_accuracy_summary(
         return None
 
     def stats(vals: list[float]) -> dict[str, Any]:
+        # Local imports to avoid relying on module-level imports in cached runtimes.
+        import math as _math
+        import statistics as _statistics
         abs_vals = [abs(v) for v in vals]
-        mae = statistics.mean(abs_vals)
-        rmse = math.sqrt(statistics.mean([v * v for v in vals]))
-        bias = statistics.mean(vals)
-        p50 = statistics.median(abs_vals)
+        mae = _statistics.mean(abs_vals)
+        rmse = _math.sqrt(_statistics.mean([v * v for v in vals]))
+        bias = _statistics.mean(vals)
+        p50 = _statistics.median(abs_vals)
         p90 = sorted(abs_vals)[max(0, min(len(abs_vals) - 1, int(round((len(abs_vals) - 1) * 0.9))))]
         return {
             "n": len(vals),
@@ -201,7 +207,9 @@ def _forecast_accuracy_summary(
     return {
         "n": len(samples),
         "overall": stats([float(s["errMin"]) for s in samples]),
-        "byHorizon": {k: stats(v) for k, v in by_bucket.items() if v},
+        "byHorizon": {
+            k: stats(v) for k, v in by_bucket.items() if v
+        },
         "latestSamples": samples[-30:],
     }
 
@@ -213,6 +221,7 @@ def build_prediction_evolution(
     calendar_deadline: str | None = None,
     splits: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    """Timeline + backtest for Objetivos tab."""
     deadline = calendar_deadline or CALENDAR_DEADLINE
     raw = _load_all_snapshots()
     if not raw:
@@ -222,7 +231,7 @@ def build_prediction_evolution(
             "timeline": [],
             "backtest": [],
             "summary": None,
-            "label": "Sem historico de snapshots — corre refresh_data.py",
+            "label": "Sem histórico de snapshots — corre refresh_data.py",
         }
 
     thin = _thin_snapshots(raw)
@@ -250,6 +259,7 @@ def build_prediction_evolution(
             }
         )
 
+    # Append/sync current prediction if newer than last snapshot
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if current_finish_main:
         last = timeline[-1] if timeline else None

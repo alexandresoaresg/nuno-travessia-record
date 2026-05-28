@@ -42,7 +42,8 @@
       <button class="tab" data-tab="map" type="button">Mapa</button>
       <button class="tab" data-tab="splits" type="button">Splits</button>
       <button class="tab" data-tab="days" type="button">Dias</button>
-      <button class="tab" data-tab="prediction" type="button">Objetivos</button>
+      <button class="tab" data-tab="scenarios" type="button">Cenários</button>
+      <button class="tab" data-tab="prediction" type="button">Modelo de Projeção</button>
     </nav>
 
     <div class="tab-panels">
@@ -238,6 +239,196 @@
             <p class="chart-caption">Km em movimento por dia civil: corta só em paragens longas que sejam noite (22h–06h), retoma de manhã (04h–12h) ou paragem ≥6 h.</p>
           </div>
           <div class="days-grid" id="days-grid"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-panel="scenarios" hidden>
+        <section class="scenarios-section">
+          <h2>Cenários de chegada</h2>
+          <div class="panel scenarios-controls">
+            <header class="scenarios-controls-head">
+              <div>
+                <h3>Parâmetros dos cálculos</h3>
+                <p class="scenarios-controls-intro">
+                  Ajusta ritmo e paragens — os cenários actualizam de imediato.
+                </p>
+              </div>
+              <button type="button" class="scenarios-reset-btn" id="scenarios-reset-params">
+                Repor médias GPS
+              </button>
+            </header>
+
+            <div class="scenarios-outcome">
+              <div class="scenarios-outcome-main">
+                <span class="scenarios-outcome-k">Chegada estimada</span>
+                <span class="scenarios-outcome-v" id="scenarios-projected-arrival">—</span>
+              </div>
+              <p class="scenarios-outcome-meta">
+                <span id="scenarios-remain-km">—</span> km restantes · âncora
+                <span id="scenarios-anchor-time">—</span>
+              </p>
+              <p class="scenarios-outcome-detail" id="scenarios-window-summary">—</p>
+            </div>
+
+            <div class="scenarios-param-grid">
+              <section class="scenarios-param-card" aria-labelledby="scenarios-param-moving-title">
+                <h4 id="scenarios-param-moving-title">Ritmo em movimento</h4>
+                <div
+                  class="scenarios-segmented"
+                  role="radiogroup"
+                  aria-label="Origem do ritmo em movimento"
+                >
+                  <label class="scenarios-segmented-opt">
+                    <input
+                      type="radio"
+                      name="scenarios-moving-mode"
+                      value="window"
+                      data-scenario-param="movingMode"
+                      checked
+                    />
+                    <span>Últimos km (GPS)</span>
+                  </label>
+                  <label class="scenarios-segmented-opt">
+                    <input
+                      type="radio"
+                      name="scenarios-moving-mode"
+                      value="custom"
+                      data-scenario-param="movingMode"
+                    />
+                    <span>Ritmo fixo</span>
+                  </label>
+                </div>
+
+                <div class="scenarios-param-body" id="scenarios-moving-window-wrap">
+                  <label class="scenarios-field-label" for="scenarios-moving-window">Janela de km</label>
+                  <select id="scenarios-moving-window" data-scenario-param="movingWindow">
+                    <option value="10">Últimos 10 km</option>
+                    <option value="20">Últimos 20 km</option>
+                    <option value="30" selected>Últimos 30 km</option>
+                    <option value="50">Últimos 50 km</option>
+                    <option value="100">Últimos 100 km</option>
+                    <option value="all">Toda a travessia</option>
+                  </select>
+                  <p class="scenarios-data-chip" id="scenarios-moving-data-avg">—</p>
+                </div>
+
+                <div class="scenarios-param-body" id="scenarios-moving-custom-wrap" hidden>
+                  <label class="scenarios-field-label" for="scenarios-moving-pace">Ritmo (min/km)</label>
+                  <div class="scenarios-input-row">
+                    <input
+                      type="text"
+                      id="scenarios-moving-pace"
+                      data-scenario-param="movingPace"
+                      placeholder="10:30"
+                      inputmode="decimal"
+                      autocomplete="off"
+                    />
+                  </div>
+                  <p class="scenarios-field-hint">Formato <code>10:30</code> ou decimal <code>10.5</code></p>
+                  <p class="scenarios-data-chip" id="scenarios-moving-custom-ref">—</p>
+                </div>
+              </section>
+
+              <section
+                class="scenarios-param-card scenarios-param-card-stops"
+                aria-labelledby="scenarios-param-stops-title"
+              >
+                <h4 id="scenarios-param-stops-title">Paragens</h4>
+                <div class="scenarios-stop-grid">
+                  <div class="scenarios-stop-field">
+                    <label class="scenarios-field-label" for="scenarios-short-stop-min">
+                      Curtas <span class="scenarios-field-unit">min/dia</span>
+                    </label>
+                    <p class="scenarios-field-hint">15–60 min/km, excl. sono (tab Dias)</p>
+                    <div class="scenarios-input-with-action">
+                      <div class="scenarios-input-suffix">
+                        <input
+                          type="number"
+                          id="scenarios-short-stop-min"
+                          data-scenario-param="shortStopMinPerDay"
+                          min="0"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <span class="scenarios-suffix">min</span>
+                      </div>
+                      <button
+                        type="button"
+                        class="scenarios-use-avg"
+                        data-apply-avg="short"
+                        title="Preencher com a média dos dias"
+                      >
+                        Usar média
+                      </button>
+                    </div>
+                    <p class="scenarios-data-chip" id="scenarios-short-stop-data-avg">—</p>
+                  </div>
+
+                  <div class="scenarios-stop-field">
+                    <label class="scenarios-field-label" for="scenarios-sleep-stop-min">
+                      Dormir <span class="scenarios-field-unit">min/noite</span>
+                    </label>
+                    <p class="scenarios-field-hint">Paragens que partem o dia (tab Dias)</p>
+                    <div class="scenarios-input-with-action">
+                      <div class="scenarios-input-suffix">
+                        <input
+                          type="number"
+                          id="scenarios-sleep-stop-min"
+                          data-scenario-param="sleepStopMin"
+                          min="0"
+                          step="1"
+                          inputmode="numeric"
+                        />
+                        <span class="scenarios-suffix">min</span>
+                      </div>
+                      <button
+                        type="button"
+                        class="scenarios-use-avg"
+                        data-apply-avg="sleep"
+                        title="Preencher com a média das paragens de sono"
+                      >
+                        Usar média
+                      </button>
+                    </div>
+                    <p class="scenarios-data-chip" id="scenarios-sleep-stop-data-avg">—</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div class="scenarios-map-panel panel">
+            <h3 class="scenarios-map-title">Mapa dos cenários</h3>
+            <p class="scenarios-map-intro">
+              Posição GPS actual e, para cada meta, onde o Nuno <strong>deveria estar
+              agora</strong> para cumprir esse cenário — mesma lógica dos cartões (projeção
+              com os parâmetros vs hora-alvo, convertida em km ao ritmo necessário do cenário).
+              Marcador à frente do GPS = atrasado; atrás = avançado.
+            </p>
+            <div class="scenarios-map-stage">
+              <div
+                id="scenarios-map"
+                class="scenarios-map"
+                role="application"
+                aria-label="Mapa de posições por cenário"
+              ></div>
+              <div class="scenarios-map-actions">
+                <button
+                  type="button"
+                  class="map-map-btn scenarios-map-btn-fit"
+                  id="scenarios-map-fit-all"
+                  title="Enquadrar todos os marcadores no mapa"
+                >
+                  Ver todos os pontos
+                </button>
+              </div>
+            </div>
+            <ul class="scenarios-map-legend" id="scenarios-map-legend" aria-label="Legenda do mapa"></ul>
+          </div>
+          <p class="scenarios-lead">
+            Compara cada hora-alvo com a chegada estimada acima. O cartão
+            <strong>Previsão modelo v4</strong> usa o modelo completo, não estes parâmetros.
+          </p>
+          <div class="scenarios-grid" id="scenarios-grid"></div>
         </section>
       </section>
 
