@@ -19,26 +19,26 @@
       "recordDeadlineFromStart": "2026-06-02 13:29:00",
       "calendarDeadline": "2026-05-31 23:59:59",
       "requiredPaceRecord": "31:45/km",
-      "requiredPaceCalendar": "20:55/km",
+      "requiredPaceCalendar": "20:54/km",
       "requiredClockPaceRecord": "31:45/km",
-      "requiredClockPaceCalendar": "20:55/km",
+      "requiredClockPaceCalendar": "20:54/km",
       "hoursLeftCalendar": 72.3,
       "kmPerDayCalendar": 68.9,
       "kmPerHourCalendar": 2.87,
       "remainingKm": 207.4,
       "recordPaceNow": {
         "km": 319.7,
-        "lat": 39.400241,
-        "lng": -8.761604,
-        "alt": 166.7,
-        "time": "2026-05-28 23:43:11"
+        "lat": 39.399807,
+        "lng": -8.761747,
+        "alt": 162.4,
+        "time": "2026-05-28 23:44:12"
       },
       "calendarPaceNow": {
         "km": 385.9,
-        "lat": 38.919573,
-        "lng": -8.495654,
-        "alt": 43.9,
-        "time": "2026-05-28 23:43:11",
+        "lat": 38.919035,
+        "lng": -8.495557,
+        "alt": 44.0,
+        "time": "2026-05-28 23:44:12",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -16483,11 +16483,11 @@
     "alt": 109.2,
     "speed": 8.2,
     "status": "OK",
-    "batteryPct": 49.0,
-    "battery": "49%",
+    "batteryPct": 48.0,
+    "battery": "48%",
     "gpsTime": "2026-05-28 23:42:12",
     "gpsTimeUtc": "2026-05-28 22:42:12",
-    "lagMinutes": 1.0,
+    "lagMinutes": 2.0,
     "alongRouteKm": 436.0,
     "offRouteM": 5.0,
     "source": "position_new",
@@ -56621,28 +56621,28 @@
       "lng": -8.491456,
       "alt": 109.2,
       "time": "2026-05-28 23:42:12",
-      "battery": "49%",
-      "batteryPct": 49.0,
+      "battery": "48%",
+      "batteryPct": 48.0,
       "speed": 8.2,
       "status": "OK",
       "alongRouteKm": 436.0,
       "source": "position_new",
-      "lagMinutes": 1.0,
+      "lagMinutes": 2.0,
       "logTime": "2026-05-28 22:40:13"
     },
     "recordPace": {
       "km": 319.7,
-      "lat": 39.400241,
-      "lng": -8.761604,
-      "alt": 166.7,
-      "time": "2026-05-28 23:43:11"
+      "lat": 39.399807,
+      "lng": -8.761747,
+      "alt": 162.4,
+      "time": "2026-05-28 23:44:12"
     },
     "calendarPace": {
       "km": 385.9,
-      "lat": 38.919573,
-      "lng": -8.495654,
-      "alt": 43.9,
-      "time": "2026-05-28 23:43:11",
+      "lat": 38.919035,
+      "lng": -8.495557,
+      "alt": 44.0,
+      "time": "2026-05-28 23:44:12",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -67453,5 +67453,5 @@
     "gpsPoints": 5973,
     "gpsSkipped": 403
   },
-  "liveUpdatedAt": "2026-05-28 23:43:11"
+  "liveUpdatedAt": "2026-05-28 23:44:12"
 }
