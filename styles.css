@@ -1073,22 +1073,44 @@ body.is-loading-data header {
   overflow: hidden;
 }
 
-.map-btn-viewer {
+.map-map-actions {
   position: absolute;
   right: 0.75rem;
   bottom: 0.75rem;
   z-index: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  max-width: min(100% - 1.5rem, 11rem);
+}
+
+.map-map-btn {
   padding: 0.45rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text);
   background: rgba(15, 20, 28, 0.92);
-  border: 1px solid rgba(236, 72, 153, 0.55);
   border-radius: 8px;
   cursor: pointer;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  text-align: center;
+  white-space: nowrap;
 }
-.map-btn-viewer:hover {
+
+.map-map-btn-nuno {
+  border-color: rgba(251, 191, 36, 0.55);
+}
+.map-map-btn-nuno:hover {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.map-map-btn-viewer {
+  border-color: rgba(236, 72, 153, 0.55);
+}
+.map-map-btn-viewer:hover {
   border-color: #ec4899;
   background: rgba(236, 72, 153, 0.15);
 }

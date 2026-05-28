@@ -39,6 +39,47 @@
     osm.addTo(map);
   });
 
+  let centerSeq = 0;
+  let centerAnimating = false;
+
+  /** Centra o mapa num ponto; cancela animações/popups anteriores para cliques seguidos. */
+  function centerMapOn(lat, lng, opts) {
+    if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const minZoom = (opts && opts.minZoom) != null ? opts.minZoom : 12;
+    const zoom =
+      opts && opts.zoom != null ? opts.zoom : Math.max(map.getZoom(), minZoom);
+    const seq = ++centerSeq;
+    centerAnimating = true;
+
+    map.closePopup();
+    map.stop();
+
+    const target = L.latLng(lat, lng);
+    const alreadyThere =
+      map.getCenter().distanceTo(target) < 8 &&
+      Math.abs(map.getZoom() - zoom) < 0.25;
+
+    const finish = () => {
+      if (seq !== centerSeq) return;
+      centerAnimating = false;
+      map.invalidateSize({ pan: false });
+    };
+
+    if (alreadyThere) {
+      finish();
+      return;
+    }
+
+    const onDone = () => {
+      map.off("moveend", onDone);
+      clearTimeout(safetyTimer);
+      finish();
+    };
+    map.on("moveend", onDone);
+    const safetyTimer = setTimeout(onDone, 700);
+    map.flyTo(target, zoom, { animate: true, duration: 0.45, easeLinearity: 0.25 });
+  }
+
   const routeLayer = L.polyline(M.route, {
     color: "#5a6a82",
     weight: 2,
@@ -194,8 +235,7 @@
   function centerOnViewer() {
     if (!viewerLastPos) return;
     const z = viewerLastPos.accuracyM && viewerLastPos.accuracyM < 200 ? 14 : 12;
-    map.setView([viewerLastPos.lat, viewerLastPos.lng], z, { animate: true });
-    if (viewerMarker) viewerMarker.openPopup();
+    centerMapOn(viewerLastPos.lat, viewerLastPos.lng, { zoom: z });
   }
 
   if (viewerCenterBtn) {
@@ -324,12 +364,17 @@
   }
 
   function recenterCurrent() {
-    map.setView([M.current.lat, M.current.lng], Math.max(map.getZoom(), 12), {
-      animate: true,
-    });
+    const ll = currentMarker.getLatLng();
+    centerMapOn(ll.lat, ll.lng, { minZoom: 12 });
+  }
+
+  const nunoCenterBtn = document.getElementById("map-center-nuno");
+  if (nunoCenterBtn) {
+    nunoCenterBtn.addEventListener("click", recenterCurrent);
   }
 
   function refreshMapSize() {
+    if (centerAnimating) return;
     map.invalidateSize(true);
   }
   map.whenReady(refreshMapSize);
