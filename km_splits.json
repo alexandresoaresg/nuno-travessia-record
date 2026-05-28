@@ -7214,5 +7214,22 @@
     "categoryLabel": "Andar",
     "categoryShort": "Andar",
     "categoryColor": "#a78bfa"
+  },
+  {
+    "km": 426,
+    "unavailable": false,
+    "crossing_time": "2026-05-28 20:08:31",
+    "segment_time_s": 740.436977,
+    "segment_time": "12:20",
+    "pace": "12:20/km",
+    "elapsed_time_s": 378511.65434,
+    "elapsed_time": "105:08:32",
+    "battery_pct": 52.0,
+    "battery": "52%",
+    "partial": false,
+    "category": "andar",
+    "categoryLabel": "Andar",
+    "categoryShort": "Andar",
+    "categoryColor": "#a78bfa"
   }
 ]
