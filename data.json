@@ -18,27 +18,27 @@
       "recordCurrent": "9d 2h 29m",
       "recordDeadlineFromStart": "2026-06-02 13:29:00",
       "calendarDeadline": "2026-05-31 23:59:59",
-      "requiredPaceRecord": "31:14/km",
+      "requiredPaceRecord": "31:13/km",
       "requiredPaceCalendar": "20:44/km",
-      "requiredClockPaceRecord": "31:14/km",
+      "requiredClockPaceRecord": "31:13/km",
       "requiredClockPaceCalendar": "20:44/km",
       "hoursLeftCalendar": 74.1,
-      "kmPerDayCalendar": 69.4,
+      "kmPerDayCalendar": 69.5,
       "kmPerHourCalendar": 2.89,
       "remainingKm": 214.4,
       "recordPaceNow": {
-        "km": 314.3,
-        "lat": 39.438677,
-        "lng": -8.777211,
-        "alt": 129.5,
-        "time": "2026-05-28 21:54:03"
+        "km": 314.4,
+        "lat": 39.438313,
+        "lng": -8.777537,
+        "alt": 128.3,
+        "time": "2026-05-28 21:55:03"
       },
       "calendarPaceNow": {
-        "km": 379.4,
-        "lat": 38.958237,
-        "lng": -8.525699,
-        "alt": 21.5,
-        "time": "2026-05-28 21:54:03",
+        "km": 379.5,
+        "lat": 38.958164,
+        "lng": -8.525168,
+        "alt": 20.9,
+        "time": "2026-05-28 21:55:03",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -16269,7 +16269,7 @@
     "battery": "52%",
     "gpsTime": "2026-05-28 21:53:11",
     "gpsTimeUtc": "2026-05-28 20:53:11",
-    "lagMinutes": 0.9,
+    "lagMinutes": 1.9,
     "alongRouteKm": 429.0,
     "offRouteM": 2.0,
     "source": "position_new",
@@ -55797,22 +55797,22 @@
       "status": "OK",
       "alongRouteKm": 429.0,
       "source": "position_new",
-      "lagMinutes": 0.9,
+      "lagMinutes": 1.9,
       "logTime": "2026-05-28 20:50:12"
     },
     "recordPace": {
-      "km": 314.3,
-      "lat": 39.438677,
-      "lng": -8.777211,
-      "alt": 129.5,
-      "time": "2026-05-28 21:54:03"
+      "km": 314.4,
+      "lat": 39.438313,
+      "lng": -8.777537,
+      "alt": 128.3,
+      "time": "2026-05-28 21:55:03"
     },
     "calendarPace": {
-      "km": 379.4,
-      "lat": 38.958237,
-      "lng": -8.525699,
-      "alt": 21.5,
-      "time": "2026-05-28 21:54:03",
+      "km": 379.5,
+      "lat": 38.958164,
+      "lng": -8.525168,
+      "alt": 20.9,
+      "time": "2026-05-28 21:55:03",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -66987,5 +66987,5 @@
     "gpsPoints": 5866,
     "gpsSkipped": 403
   },
-  "liveUpdatedAt": "2026-05-28 21:54:03"
+  "liveUpdatedAt": "2026-05-28 21:55:03"
 }
