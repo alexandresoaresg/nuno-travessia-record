@@ -8455,5 +8455,22 @@
     "categoryLabel": "Corrida",
     "categoryShort": "Corrida",
     "categoryColor": "#3d8bfd"
+  },
+  {
+    "km": 499,
+    "unavailable": false,
+    "crossing_time": "2026-05-29 16:06:21",
+    "segment_time_s": 1717.441943,
+    "segment_time": "28:37",
+    "pace": "28:37/km",
+    "elapsed_time_s": 450381.594986,
+    "elapsed_time": "125:06:22",
+    "battery_pct": 91.0,
+    "battery": "91%",
+    "partial": false,
+    "category": "paragem",
+    "categoryLabel": "Paragem",
+    "categoryShort": "Paragem",
+    "categoryColor": "#f59e0b"
   }
 ]
