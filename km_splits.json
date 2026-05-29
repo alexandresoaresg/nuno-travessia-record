@@ -8506,5 +8506,22 @@
     "categoryLabel": "Paragem",
     "categoryShort": "Paragem",
     "categoryColor": "#f59e0b"
+  },
+  {
+    "km": 502,
+    "unavailable": false,
+    "crossing_time": "2026-05-29 16:58:46",
+    "segment_time_s": 1022.214398,
+    "segment_time": "17:02",
+    "pace": "17:02/km",
+    "elapsed_time_s": 453526.611918,
+    "elapsed_time": "125:58:47",
+    "battery_pct": 90.0,
+    "battery": "90%",
+    "partial": false,
+    "category": "paragem",
+    "categoryLabel": "Paragem",
+    "categoryShort": "Paragem",
+    "categoryColor": "#f59e0b"
   }
 ]
