@@ -7537,5 +7537,22 @@
     "categoryLabel": "Corrida leve",
     "categoryShort": "Leve",
     "categoryColor": "#38bdf8"
+  },
+  {
+    "km": 445,
+    "unavailable": false,
+    "crossing_time": "2026-05-29 05:53:34",
+    "segment_time_s": 511.547923,
+    "segment_time": "8:32",
+    "pace": "8:32/km",
+    "elapsed_time_s": 413614.893543,
+    "elapsed_time": "114:53:35",
+    "battery_pct": 100.0,
+    "battery": "100%",
+    "partial": false,
+    "category": "corrida_leve",
+    "categoryLabel": "Corrida leve",
+    "categoryShort": "Leve",
+    "categoryColor": "#38bdf8"
   }
 ]
