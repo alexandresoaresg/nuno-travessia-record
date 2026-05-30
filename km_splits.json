@@ -10359,5 +10359,22 @@
     "categoryLabel": "Paragem",
     "categoryShort": "Paragem",
     "categoryColor": "#f59e0b"
+  },
+  {
+    "km": 611,
+    "unavailable": false,
+    "crossing_time": "2026-05-30 16:07:20",
+    "segment_time_s": 496.206778,
+    "segment_time": "8:16",
+    "pace": "8:16/km",
+    "elapsed_time_s": 536840.17197,
+    "elapsed_time": "149:07:20",
+    "battery_pct": 60.0,
+    "battery": "60%",
+    "partial": false,
+    "category": "corrida_leve",
+    "categoryLabel": "Corrida leve",
+    "categoryShort": "Leve",
+    "categoryColor": "#38bdf8"
   }
 ]
