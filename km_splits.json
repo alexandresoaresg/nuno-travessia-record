@@ -10410,5 +10410,22 @@
     "categoryLabel": "Andar",
     "categoryShort": "Andar",
     "categoryColor": "#a78bfa"
+  },
+  {
+    "km": 614,
+    "unavailable": false,
+    "crossing_time": "2026-05-30 16:34:44",
+    "segment_time_s": 389.802875,
+    "segment_time": "6:30",
+    "pace": "6:30/km",
+    "elapsed_time_s": 538484.964823,
+    "elapsed_time": "149:34:45",
+    "battery_pct": 60.0,
+    "battery": "60%",
+    "partial": false,
+    "category": "corrida",
+    "categoryLabel": "Corrida",
+    "categoryShort": "Corrida",
+    "categoryColor": "#3d8bfd"
   }
 ]
