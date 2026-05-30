@@ -10886,5 +10886,22 @@
     "categoryLabel": "Paragem",
     "categoryShort": "Paragem",
     "categoryColor": "#f59e0b"
+  },
+  {
+    "km": 642,
+    "unavailable": false,
+    "crossing_time": "2026-05-30 21:58:32",
+    "segment_time_s": 815.122093,
+    "segment_time": "13:35",
+    "pace": "13:35/km",
+    "elapsed_time_s": 557912.407957,
+    "elapsed_time": "154:58:32",
+    "battery_pct": 55.0,
+    "battery": "55%",
+    "partial": false,
+    "category": "andar",
+    "categoryLabel": "Andar",
+    "categoryShort": "Andar",
+    "categoryColor": "#a78bfa"
   }
 ]
