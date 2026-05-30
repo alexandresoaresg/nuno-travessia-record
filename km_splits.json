@@ -9900,5 +9900,22 @@
     "categoryLabel": "Corrida leve",
     "categoryShort": "Leve",
     "categoryColor": "#38bdf8"
+  },
+  {
+    "km": 584,
+    "unavailable": false,
+    "crossing_time": "2026-05-30 11:46:55",
+    "segment_time_s": 638.417026,
+    "segment_time": "10:38",
+    "pace": "10:38/km",
+    "elapsed_time_s": 521215.164012,
+    "elapsed_time": "144:46:55",
+    "battery_pct": 64.3,
+    "battery": "64%",
+    "partial": false,
+    "category": "andar",
+    "categoryLabel": "Andar",
+    "categoryShort": "Andar",
+    "categoryColor": "#a78bfa"
   }
 ]
