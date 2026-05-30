@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-30 18:20:20",
+  "updatedAt": "2026-05-30 18:23:05",
   "athlete": {
     "name": "Nuno Faria",
     "bib": 1,
@@ -18,35 +18,35 @@
       "recordCurrent": "9d 2h 29m",
       "recordDeadlineFromStart": "2026-06-02 13:29:00",
       "calendarDeadline": "2026-05-31 23:59:59",
-      "requiredPaceRecord": "158:41/km",
-      "requiredPaceCalendar": "70:06/km",
-      "requiredClockPaceRecord": "158:41/km",
-      "requiredClockPaceCalendar": "70:06/km",
-      "hoursLeftCalendar": 29.7,
-      "kmPerDayCalendar": 20.5,
-      "kmPerHourCalendar": 0.86,
-      "remainingKm": 25.4,
+      "requiredPaceRecord": "165:04/km",
+      "requiredPaceCalendar": "72:51/km",
+      "requiredClockPaceRecord": "165:04/km",
+      "requiredClockPaceCalendar": "72:51/km",
+      "hoursLeftCalendar": 29.6,
+      "kmPerDayCalendar": 19.8,
+      "kmPerHourCalendar": 0.82,
+      "remainingKm": 24.4,
       "recordPaceNow": {
-        "km": 445.0,
-        "lat": 38.473058,
-        "lng": -8.506848,
-        "alt": 57.8,
-        "time": "2026-05-30 18:20:20"
+        "km": 445.1,
+        "lat": 38.471938,
+        "lng": -8.507419,
+        "alt": 46.4,
+        "time": "2026-05-30 18:23:05"
       },
       "calendarPaceNow": {
-        "km": 537.1,
-        "lat": 37.751937,
-        "lng": -8.660331,
-        "alt": 164.8,
-        "time": "2026-05-30 18:20:20",
+        "km": 537.3,
+        "lat": 37.750644,
+        "lng": -8.659576,
+        "alt": 163.3,
+        "time": "2026-05-30 18:23:05",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
-        "km": 617.0,
-        "lat": 37.199378,
-        "lng": -8.887822,
-        "alt": 16.6,
-        "time": "2026-05-30 18:20:20",
+        "km": 618.0,
+        "lat": 37.19065,
+        "lng": -8.890256,
+        "alt": 12.6,
+        "time": "2026-05-30 18:23:05",
         "deadline": "2026-05-31 23:59:59",
         "scenario": "main"
       },
@@ -56,11 +56,11 @@
     }
   },
   "current": {
-    "km": 617,
-    "remainingKm": 25.4,
-    "lastCrossing": "2026-05-30 17:00:38",
-    "elapsed": "150:00:39",
-    "progressPct": 96.0
+    "km": 618,
+    "remainingKm": 24.4,
+    "lastCrossing": "2026-05-30 17:21:00",
+    "elapsed": "150:21:00",
+    "progressPct": 96.2
   },
   "splits": [
     {
@@ -10542,6 +10542,23 @@
       "categoryLabel": "Corrida leve",
       "categoryShort": "Leve",
       "categoryColor": "#38bdf8"
+    },
+    {
+      "km": 618,
+      "unavailable": false,
+      "crossing_time": "2026-05-30 17:21:00",
+      "segment_time_s": 1221.482651,
+      "segment_time": "20:21",
+      "pace": "20:21/km",
+      "elapsed_time_s": 541260.404609,
+      "elapsed_time": "150:21:00",
+      "battery_pct": 57.0,
+      "battery": "57%",
+      "partial": false,
+      "category": "paragem",
+      "categoryLabel": "Paragem",
+      "categoryShort": "Paragem",
+      "categoryColor": "#f59e0b"
     }
   ],
   "categoryLegend": [
@@ -10587,15 +10604,15 @@
       "corrida": 85,
       "corrida_leve": 155,
       "andar": 279,
-      "paragem": 67
+      "paragem": 68
     },
-    "total": 607,
+    "total": 608,
     "pct": {
       "corrida_forte": 3.5,
       "corrida": 14.0,
       "corrida_leve": 25.5,
-      "andar": 46.0,
-      "paragem": 11.0
+      "andar": 45.9,
+      "paragem": 11.2
     }
   },
   "routeProfile": [
@@ -16478,7 +16495,7 @@
         },
         "splitsFromKm": 11,
         "splitsToKm": 97,
-        "vsGoalKmDay": 169.2,
+        "vsGoalKmDay": 169.9,
         "tempMinC": 17.5,
         "tempMaxC": 23.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16517,7 +16534,7 @@
         },
         "splitsFromKm": 98,
         "splitsToKm": 185,
-        "vsGoalKmDay": 106.9,
+        "vsGoalKmDay": 107.6,
         "tempMinC": 15.6,
         "tempMaxC": 20.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16555,7 +16572,7 @@
         },
         "splitsFromKm": 186,
         "splitsToKm": 269,
-        "vsGoalKmDay": 94.4,
+        "vsGoalKmDay": 95.1,
         "tempMinC": 13.1,
         "tempMaxC": 30.1,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16593,7 +16610,7 @@
         },
         "splitsFromKm": 270,
         "splitsToKm": 379,
-        "vsGoalKmDay": 86.5,
+        "vsGoalKmDay": 87.2,
         "tempMinC": 16.0,
         "tempMaxC": 34.8,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16630,7 +16647,7 @@
         },
         "splitsFromKm": 380,
         "splitsToKm": 438,
-        "vsGoalKmDay": 95.9,
+        "vsGoalKmDay": 96.6,
         "tempMinC": 21.2,
         "tempMaxC": 34.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16668,7 +16685,7 @@
         },
         "splitsFromKm": 439,
         "splitsToKm": 546,
-        "vsGoalKmDay": 100.5,
+        "vsGoalKmDay": 101.2,
         "tempMinC": 14.9,
         "tempMaxC": 32.8,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16677,33 +16694,33 @@
         "day": 7,
         "label": "Dia 7 · em curso",
         "kmFrom": 547,
-        "kmTo": 617,
-        "km": 70,
+        "kmTo": 618,
+        "km": 71,
         "startTime": "2026-05-30 06:03:15",
         "endTime": null,
-        "spanHours": 10.96,
-        "movingHours": 10.96,
-        "movingTime": "10h 57m",
+        "spanHours": 11.3,
+        "movingHours": 11.3,
+        "movingTime": "11h 17m",
         "shortStopMin": 237.0,
-        "kmPerDay": 153.3,
-        "movingPaceMin": 9.39,
-        "movingPace": "9:23/km",
-        "gainM": 1123.0,
-        "lossM": 1300.0,
+        "kmPerDay": 150.9,
+        "movingPaceMin": 9.55,
+        "movingPace": "9:33/km",
+        "gainM": 1134.0,
+        "lossM": 1310.0,
         "inProgress": true,
         "categories": {
           "corrida": 22,
           "corrida_leve": 28,
           "andar": 16,
-          "paragem": 3,
+          "paragem": 4,
           "corrida_forte": 1
         },
         "nightAfter": null,
         "splitsFromKm": 547,
-        "splitsToKm": 617,
-        "vsGoalKmDay": 132.8,
-        "tempMinC": 16.3,
-        "tempMaxC": 24.3,
+        "splitsToKm": 618,
+        "vsGoalKmDay": 131.1,
+        "tempMinC": 15.6,
+        "tempMaxC": 23.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
       }
     ],
@@ -16791,7 +16808,7 @@
         },
         "splitsFromKm": 11,
         "splitsToKm": 125,
-        "vsGoalKmDay": 162.5,
+        "vsGoalKmDay": 163.2,
         "tempMinC": 15.0,
         "tempMaxC": 25.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16831,7 +16848,7 @@
         },
         "splitsFromKm": 126,
         "splitsToKm": 215,
-        "vsGoalKmDay": 101.4,
+        "vsGoalKmDay": 102.1,
         "tempMinC": 14.0,
         "tempMaxC": 26.7,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16870,7 +16887,7 @@
         },
         "splitsFromKm": 216,
         "splitsToKm": 300,
-        "vsGoalKmDay": 97.7,
+        "vsGoalKmDay": 98.4,
         "tempMinC": 18.5,
         "tempMaxC": 34.2,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16909,7 +16926,7 @@
         },
         "splitsFromKm": 301,
         "splitsToKm": 385,
-        "vsGoalKmDay": 84.6,
+        "vsGoalKmDay": 85.3,
         "tempMinC": 17.0,
         "tempMaxC": 36.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16948,7 +16965,7 @@
         },
         "splitsFromKm": 386,
         "splitsToKm": 473,
-        "vsGoalKmDay": 102.8,
+        "vsGoalKmDay": 103.5,
         "tempMinC": 14.6,
         "tempMaxC": 34.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16987,7 +17004,7 @@
         },
         "splitsFromKm": 474,
         "splitsToKm": 580,
-        "vsGoalKmDay": 109.3,
+        "vsGoalKmDay": 110.0,
         "tempMinC": 14.6,
         "tempMaxC": 32.2,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16996,31 +17013,31 @@
         "day": 7,
         "label": "Dia 7 · em curso",
         "kmFrom": 580,
-        "kmTo": 617,
-        "km": 37,
+        "kmTo": 618,
+        "km": 38,
         "startTime": "2026-05-30 11:00:42",
         "endTime": null,
-        "spanHours": 6.01,
-        "movingHours": 6.15,
-        "movingTime": "6h 08m",
+        "spanHours": 6.35,
+        "movingHours": 6.49,
+        "movingTime": "6h 29m",
         "shortStopMin": 0,
-        "kmPerDay": 144.4,
-        "movingPaceMin": 9.97,
-        "movingPace": "9:58/km",
-        "gainM": 538.0,
-        "lossM": 594.0,
+        "kmPerDay": 140.6,
+        "movingPaceMin": 10.24,
+        "movingPace": "10:15/km",
+        "gainM": 549.0,
+        "lossM": 604.0,
         "inProgress": true,
         "categories": {
           "corrida_leve": 16,
-          "paragem": 3,
+          "paragem": 4,
           "andar": 7,
           "corrida": 10,
           "corrida_forte": 1
         },
         "nightAfter": null,
         "splitsFromKm": 581,
-        "splitsToKm": 617,
-        "vsGoalKmDay": 123.9,
+        "splitsToKm": 618,
+        "vsGoalKmDay": 120.8,
         "tempMinC": 19.7,
         "tempMaxC": 20.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17036,13 +17053,13 @@
     "regime": {
       "regime": "normal",
       "forecastSuspended": false,
-      "dataStaleHours": 1.29,
+      "dataStaleHours": 0.99,
       "dataStale": false,
       "lastStopKm": null,
       "lastStopMin": null,
       "note": null
     },
-    "dataStaleHours": 1.29,
+    "dataStaleHours": 0.99,
     "forecastSuspended": false,
     "projectionAnchor": "gps_live",
     "recentPaceMin": 8.85,
@@ -17051,108 +17068,99 @@
     "confidencePct": 76.0,
     "movingPaceMin": 8.6,
     "basePaceMin": 8.6,
-    "projectedClockPaceMin": 10.87,
+    "projectedClockPaceMin": 10.89,
     "fatigueRatePerKm": 0.00028,
     "climbSecPer100m": 28.0,
-    "kmPerDayProjected": 132.5,
+    "kmPerDayProjected": 132.3,
     "finishTime": "2026-05-30 22:45",
-    "finishTimeIso": "2026-05-30 22:45:32",
+    "finishTimeIso": "2026-05-30 22:45:45",
     "finishDate": "Sat 30 May 2026, 22:45",
-    "remainingHours": 4.5,
+    "remainingHours": 4.4,
     "remainingDays": 0.2,
     "optimisticFinish": "2026-05-30 23:09",
-    "optimisticFinishIso": "2026-05-30 23:09:26",
-    "pessimisticFinish": "2026-05-31 02:22",
-    "pessimisticFinishIso": "2026-05-31 02:22:14",
-    "projectionKm": 617.8,
-    "projectionTime": "2026-05-30 18:18:14",
+    "optimisticFinishIso": "2026-05-30 23:09:50",
+    "pessimisticFinish": "2026-05-31 02:19",
+    "pessimisticFinishIso": "2026-05-31 02:19:03",
+    "projectionKm": 618.0,
+    "projectionTime": "2026-05-30 18:20:17",
     "forecast": [
       {
-        "km": 617.8,
-        "predicted_crossing": "2026-05-30 18:18",
-        "predicted_crossing_iso": "2026-05-30 18:18:14",
-        "scenario": "main"
-      },
-      {
-        "km": 618,
-        "predicted_pace_min": 10.74,
+        "km": 618.0,
         "predicted_crossing": "2026-05-30 18:20",
-        "predicted_crossing_iso": "2026-05-30 18:20:22",
-        "gain": 10.9,
-        "elevation": 13.6,
+        "predicted_crossing_iso": "2026-05-30 18:20:17",
         "scenario": "main"
       },
       {
-        "km": 622,
-        "predicted_pace_min": 10.87,
-        "predicted_crossing": "2026-05-30 19:03",
-        "predicted_crossing_iso": "2026-05-30 19:03:42",
-        "gain": 35.2,
-        "elevation": 82.1,
+        "km": 623,
+        "predicted_pace_min": 10.82,
+        "predicted_crossing": "2026-05-30 19:14",
+        "predicted_crossing_iso": "2026-05-30 19:14:27",
+        "gain": 26.3,
+        "elevation": 109.2,
         "scenario": "main"
       },
       {
-        "km": 627,
+        "km": 628,
         "predicted_pace_min": 10.77,
-        "predicted_crossing": "2026-05-30 19:57",
-        "predicted_crossing_iso": "2026-05-30 19:57:34",
-        "gain": 13.0,
-        "elevation": 130.6,
+        "predicted_crossing": "2026-05-30 20:08",
+        "predicted_crossing_iso": "2026-05-30 20:08:18",
+        "gain": 11.4,
+        "elevation": 135.8,
         "scenario": "main"
       },
       {
-        "km": 632,
-        "predicted_pace_min": 10.69,
-        "predicted_crossing": "2026-05-30 20:51",
-        "predicted_crossing_iso": "2026-05-30 20:51:12",
-        "gain": 1.2,
-        "elevation": 109.8,
+        "km": 633,
+        "predicted_pace_min": 10.72,
+        "predicted_crossing": "2026-05-30 21:01",
+        "predicted_crossing_iso": "2026-05-30 21:01:54",
+        "gain": 2.0,
+        "elevation": 76.9,
         "scenario": "main"
       },
       {
-        "km": 637,
+        "km": 638,
         "predicted_pace_min": 10.73,
-        "predicted_crossing": "2026-05-30 21:44",
-        "predicted_crossing_iso": "2026-05-30 21:44:55",
-        "gain": 1.8,
-        "elevation": 55.1,
+        "predicted_crossing": "2026-05-30 21:55",
+        "predicted_crossing_iso": "2026-05-30 21:55:40",
+        "gain": 0.0,
+        "elevation": 47.5,
         "scenario": "main"
       },
       {
         "km": 642,
-        "predicted_pace_min": 12.99,
+        "predicted_pace_min": 13.17,
         "predicted_crossing": "2026-05-30 22:45",
-        "predicted_crossing_iso": "2026-05-30 22:45:32",
+        "predicted_crossing_iso": "2026-05-30 22:45:45",
         "gain": 19.2,
         "elevation": 26.9,
         "scenario": "main"
       }
     ],
     "performance": {
-      "kmCompleted": 617,
+      "kmCompleted": 618,
       "recentPaceSec": 530.7728222,
       "recentPaceMin": 8.85,
       "recentWindowKm": 15,
       "movingSegments": 540,
-      "stoppedSegments": 67,
-      "stopRatioPct": 11.0,
-      "stopProbPerKm": 0.1104,
-      "avgStopMin": 55.0,
-      "medianStopMin": 26.3,
-      "avgStopSec": 3298.0,
-      "medianStopSec": 1578.0,
+      "stoppedSegments": 68,
+      "stopRatioPct": 11.2,
+      "stopProbPerKm": 0.1118,
+      "avgStopMin": 54.5,
+      "medianStopMin": 26.1,
+      "avgStopSec": 3268.0,
+      "medianStopSec": 1569.0,
       "medianPaceMin": 10.13,
       "weightedPaceMin": 8.6,
       "p25PaceMin": 7.93,
       "p75PaceMin": 11.52,
-      "overallPaceMin": 14.83,
+      "overallPaceMin": 14.84,
       "fatigueSlopeSecPerKm": 0.145,
       "fatiguePctEarlyLate": 6.8,
       "fatiguePerKm": 0.00028,
       "decayPer10kmAfter100": 0.0,
       "nightSlowdownPct": 21.6,
       "nightFactor": 1.216,
-      "movingPaceSec": 515.9305954368532,
+      "movingPaceSec": 515.930595436853,
       "optimisticPaceSec": 476.052354,
       "pessimisticPaceSec": 691.17653825,
       "climbSecPer100m": 28.0
@@ -17208,8 +17216,8 @@
       "description": "v4: ritmo recente (15 km) no horizonte curto; paragens >=60 min suspendem forecast; E[min/km] = (1−p)×ritmo×fadiga×noite + p×paragem + terreno",
       "main": {
         "movingPaceMin": 8.6,
-        "stopProbPerKm": 0.1104,
-        "avgStopMin": 26.3,
+        "stopProbPerKm": 0.1118,
+        "avgStopMin": 26.1,
         "fatiguePerKm": 0.00028,
         "decayPer10kmAfter100": 0.0,
         "nightFactor": 1.216,
@@ -17219,16 +17227,16 @@
     },
     "scenarios": {
       "main": {
-        "hours": 4.5,
-        "kmPerDay": 132.5
+        "hours": 4.4,
+        "kmPerDay": 132.3
       },
       "optimistic": {
-        "hours": 4.9,
-        "kmPerDay": 121.6
+        "hours": 4.8,
+        "kmPerDay": 121.3
       },
       "pessimistic": {
-        "hours": 8.1,
-        "kmPerDay": 73.2
+        "hours": 8.0,
+        "kmPerDay": 73.4
       }
     }
   },
@@ -17401,7 +17409,7 @@
         "time": "2026-05-25 07:39:31",
         "calendarPct": 48,
         "calendarBasePct": 52,
-        "recordPct": 80,
+        "recordPct": 79,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
       },
@@ -18056,8 +18064,8 @@
       {
         "km": 470,
         "time": "2026-05-29 10:27:51",
-        "calendarPct": 77,
-        "calendarBasePct": 84,
+        "calendarPct": 76,
+        "calendarBasePct": 83,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18324,8 +18332,8 @@
         "isCurrent": false
       },
       {
-        "km": 617,
-        "time": "2026-05-30 17:00:38",
+        "km": 618,
+        "time": "2026-05-30 17:21:00",
         "calendarPct": 84,
         "calendarBasePct": 92,
         "recordPct": 84,
@@ -18335,7 +18343,7 @@
     ],
     "stepKm": 5,
     "current": {
-      "km": 617,
+      "km": 618,
       "calendarPct": 84,
       "recordPct": 84
     },
@@ -18343,7 +18351,7 @@
   },
   "predictionEvolution": {
     "ok": true,
-    "count": 1422,
+    "count": 1423,
     "timeline": [
       {
         "recordedAt": "2026-05-26 04:05:02",
@@ -21910,9 +21918,9 @@
         "modelVersion": 4
       },
       {
-        "recordedAt": "2026-05-30 18:20:21",
-        "km": 617,
-        "finishMain": "2026-05-30 22:45:32",
+        "recordedAt": "2026-05-30 18:23:06",
+        "km": 618,
+        "finishMain": "2026-05-30 22:45:45",
         "finishOptimistic": null,
         "finishPessimistic": null,
         "marginMainMin": 1514,
@@ -21927,220 +21935,184 @@
         "recordedAt": "2026-05-30 16:18:17",
         "kmThen": 606,
         "finishThen": "2026-05-30 22:20:50",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 25,
         "marginThenMin": 1539,
         "marginNowMin": 1514,
-        "kmSince": 11,
-        "hoursSince": 2.0,
-        "actualKmPerDay": 129.8
+        "kmSince": 12,
+        "hoursSince": 2.1,
+        "actualKmPerDay": 138.4
       },
       {
         "recordedAt": "2026-05-30 16:26:20",
         "kmThen": 607,
         "finishThen": "2026-05-30 22:23:08",
-        "finishNow": "2026-05-30 22:45:32",
-        "revisionMin": 22,
+        "finishNow": "2026-05-30 22:45:45",
+        "revisionMin": 23,
         "marginThenMin": 1537,
         "marginNowMin": 1514,
-        "kmSince": 10,
+        "kmSince": 11,
         "hoursSince": 1.9,
-        "actualKmPerDay": 126.3
+        "actualKmPerDay": 135.7
       },
       {
         "recordedAt": "2026-05-30 16:34:28",
         "kmThen": 608,
         "finishThen": "2026-05-30 22:17:08",
-        "finishNow": "2026-05-30 22:45:32",
-        "revisionMin": 28,
+        "finishNow": "2026-05-30 22:45:45",
+        "revisionMin": 29,
         "marginThenMin": 1543,
         "marginNowMin": 1514,
-        "kmSince": 9,
+        "kmSince": 10,
         "hoursSince": 1.8,
-        "actualKmPerDay": 122.4
+        "actualKmPerDay": 132.6
       },
       {
         "recordedAt": "2026-05-30 16:45:28",
         "kmThen": 609,
         "finishThen": "2026-05-30 22:23:26",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 22,
         "marginThenMin": 1537,
         "marginNowMin": 1514,
-        "kmSince": 8,
+        "kmSince": 9,
         "hoursSince": 1.6,
-        "actualKmPerDay": 121.4
+        "actualKmPerDay": 132.7
       },
       {
         "recordedAt": "2026-05-30 17:04:26",
         "kmThen": 610,
         "finishThen": "2026-05-30 22:32:44",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 13,
         "marginThenMin": 1527,
         "marginNowMin": 1514,
-        "kmSince": 7,
+        "kmSince": 8,
         "hoursSince": 1.3,
-        "actualKmPerDay": 132.8
+        "actualKmPerDay": 146.4
       },
       {
         "recordedAt": "2026-05-30 17:12:34",
         "kmThen": 611,
         "finishThen": "2026-05-30 22:31:44",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 14,
         "marginThenMin": 1528,
         "marginNowMin": 1514,
-        "kmSince": 6,
-        "hoursSince": 1.1,
-        "actualKmPerDay": 127.4
+        "kmSince": 7,
+        "hoursSince": 1.2,
+        "actualKmPerDay": 142.9
       },
       {
         "recordedAt": "2026-05-30 17:20:49",
         "kmThen": 612,
         "finishThen": "2026-05-30 22:31:05",
-        "finishNow": "2026-05-30 22:45:32",
-        "revisionMin": 14,
+        "finishNow": "2026-05-30 22:45:45",
+        "revisionMin": 15,
         "marginThenMin": 1529,
         "marginNowMin": 1514,
-        "kmSince": 5,
+        "kmSince": 6,
         "hoursSince": 1.0,
-        "actualKmPerDay": 120.9
+        "actualKmPerDay": 138.7
       },
       {
         "recordedAt": "2026-05-30 17:31:52",
         "kmThen": 613,
         "finishThen": "2026-05-30 22:45:34",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 0,
         "marginThenMin": 1514,
         "marginNowMin": 1514,
-        "kmSince": 4,
-        "hoursSince": 0.8,
-        "actualKmPerDay": 118.8
+        "kmSince": 5,
+        "hoursSince": 0.9,
+        "actualKmPerDay": 140.5
       },
       {
         "recordedAt": "2026-05-30 17:40:20",
         "kmThen": 614,
         "finishThen": "2026-05-30 22:35:02",
-        "finishNow": "2026-05-30 22:45:32",
-        "revisionMin": 10,
+        "finishNow": "2026-05-30 22:45:45",
+        "revisionMin": 11,
         "marginThenMin": 1525,
         "marginNowMin": 1514,
-        "kmSince": 3,
+        "kmSince": 4,
         "hoursSince": 0.7,
-        "actualKmPerDay": 107.9
+        "actualKmPerDay": 134.7
       },
       {
         "recordedAt": "2026-05-30 17:48:44",
         "kmThen": 615,
         "finishThen": "2026-05-30 22:41:05",
-        "finishNow": "2026-05-30 22:45:32",
-        "revisionMin": 4,
+        "finishNow": "2026-05-30 22:45:45",
+        "revisionMin": 5,
         "marginThenMin": 1519,
         "marginNowMin": 1514,
-        "kmSince": 2,
-        "hoursSince": 0.5,
-        "actualKmPerDay": 91.1
+        "kmSince": 3,
+        "hoursSince": 0.6,
+        "actualKmPerDay": 125.7
       },
       {
         "recordedAt": "2026-05-30 17:56:56",
         "kmThen": 616,
         "finishThen": "2026-05-30 22:39:29",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 6,
         "marginThenMin": 1520,
         "marginNowMin": 1514,
-        "kmSince": 1,
+        "kmSince": 2,
         "hoursSince": 0.4,
-        "actualKmPerDay": 61.5
+        "actualKmPerDay": 110.1
       },
       {
         "recordedAt": "2026-05-30 18:05:11",
         "kmThen": 617,
         "finishThen": "2026-05-30 22:33:46",
-        "finishNow": "2026-05-30 22:45:32",
+        "finishNow": "2026-05-30 22:45:45",
         "revisionMin": 12,
         "marginThenMin": 1526,
         "marginNowMin": 1514,
-        "kmSince": 0,
+        "kmSince": 1,
         "hoursSince": 0.3,
-        "actualKmPerDay": null
+        "actualKmPerDay": 80.4
       }
     ],
     "forecastAccuracy": {
-      "n": 31364,
+      "n": 31710,
       "overall": {
-        "n": 31364,
-        "maeMin": 99.8,
-        "rmseMin": 131.2,
-        "biasMin": 14.9,
-        "p50AbsMin": 78.6,
-        "p90AbsMin": 199.8
+        "n": 31710,
+        "maeMin": 100.3,
+        "rmseMin": 131.9,
+        "biasMin": 16.3,
+        "p50AbsMin": 78.9,
+        "p90AbsMin": 201.6
       },
       "byHorizon": {
         "short": {
-          "n": 5582,
+          "n": 5592,
           "maeMin": 79.0,
           "rmseMin": 97.0,
-          "biasMin": 8.9,
-          "p50AbsMin": 64.5,
+          "biasMin": 9.0,
+          "p50AbsMin": 64.4,
           "p90AbsMin": 152.4
         },
         "mid": {
-          "n": 10819,
-          "maeMin": 93.1,
-          "rmseMin": 108.5,
-          "biasMin": 4.4,
-          "p50AbsMin": 83.0,
-          "p90AbsMin": 168.7
+          "n": 10852,
+          "maeMin": 93.2,
+          "rmseMin": 108.7,
+          "biasMin": 4.8,
+          "p50AbsMin": 83.2,
+          "p90AbsMin": 168.8
         },
         "long": {
-          "n": 14963,
-          "maeMin": 112.4,
-          "rmseMin": 155.1,
-          "biasMin": 24.8,
-          "p50AbsMin": 84.8,
-          "p90AbsMin": 244.4
+          "n": 15266,
+          "maeMin": 113.1,
+          "rmseMin": 155.9,
+          "biasMin": 27.1,
+          "p50AbsMin": 85.2,
+          "p90AbsMin": 245.5
         }
       },
       "latestSamples": [
-        {
-          "km": 611,
-          "errMin": 62.03333333333333,
-          "aheadKm": 10,
-          "bucket": "short"
-        },
-        {
-          "km": 616,
-          "errMin": 68.16666666666667,
-          "aheadKm": 15,
-          "bucket": "short"
-        },
-        {
-          "km": 611,
-          "errMin": 60.96666666666667,
-          "aheadKm": 10,
-          "bucket": "short"
-        },
-        {
-          "km": 616,
-          "errMin": 67.1,
-          "aheadKm": 15,
-          "bucket": "short"
-        },
-        {
-          "km": 611,
-          "errMin": 63.9,
-          "aheadKm": 10,
-          "bucket": "short"
-        },
-        {
-          "km": 616,
-          "errMin": 70.03333333333333,
-          "aheadKm": 15,
-          "bucket": "short"
-        },
         {
           "km": 611,
           "errMin": 63.93333333333333,
@@ -22196,15 +22168,33 @@
           "bucket": "short"
         },
         {
-          "km": 613,
-          "errMin": 61.86666666666667,
-          "aheadKm": 10,
+          "km": 618,
+          "errMin": 62.21666666666667,
+          "aheadKm": 16,
           "bucket": "short"
         },
         {
           "km": 613,
           "errMin": 61.86666666666667,
           "aheadKm": 10,
+          "bucket": "short"
+        },
+        {
+          "km": 618,
+          "errMin": 60.65,
+          "aheadKm": 15,
+          "bucket": "short"
+        },
+        {
+          "km": 613,
+          "errMin": 61.86666666666667,
+          "aheadKm": 10,
+          "bucket": "short"
+        },
+        {
+          "km": 618,
+          "errMin": 60.63333333333333,
+          "aheadKm": 15,
           "bucket": "short"
         },
         {
@@ -22284,42 +22274,60 @@
           "errMin": 60.2,
           "aheadKm": 10,
           "bucket": "short"
+        },
+        {
+          "km": 618,
+          "errMin": 48.43333333333333,
+          "aheadKm": 10,
+          "bucket": "short"
+        },
+        {
+          "km": 618,
+          "errMin": 48.416666666666664,
+          "aheadKm": 10,
+          "bucket": "short"
+        },
+        {
+          "km": 618,
+          "errMin": 49.38333333333333,
+          "aheadKm": 10,
+          "bucket": "short"
         }
       ]
     },
     "summary": {
-      "snapshots": 1422,
+      "snapshots": 1423,
       "points": 325,
       "firstAt": "2026-05-26 04:05:02",
-      "lastAt": "2026-05-30 18:20:21",
+      "lastAt": "2026-05-30 18:23:06",
       "firstFinish": "2026-05-31 17:01:35",
-      "currentFinish": "2026-05-30 22:45:32",
+      "currentFinish": "2026-05-30 22:45:45",
       "finishSwingHours": 100.7,
       "revisionTotalMin": -1096,
       "marginFirstMin": 418,
       "marginCurrentMin": 1514,
       "marginSwingMin": 6044
     },
-    "label": "325 pontos · 1422 snapshots gravados",
+    "label": "325 pontos · 1423 snapshots gravados",
     "calendarDeadline": "2026-05-31 23:59:59"
   },
   "live": {
-    "lat": 37.19265,
-    "lng": -8.889975,
-    "alt": 0.4,
-    "speed": 0.0,
+    "lat": 37.191645,
+    "lng": -8.890003,
+    "alt": 0.6,
+    "speed": 7.9,
     "status": "OK",
     "batteryPct": 57.0,
     "battery": "57%",
-    "gpsTime": "2026-05-30 18:18:14",
-    "gpsTimeUtc": "2026-05-30 17:18:14",
-    "lagMinutes": 0.7,
-    "alongRouteKm": 617.8,
-    "offRouteM": 8.0,
+    "gpsTime": "2026-05-30 18:20:17",
+    "gpsTimeUtc": "2026-05-30 17:20:17",
+    "lagMinutes": 1.4,
+    "alongRouteKm": 617.9,
+    "offRouteM": 6.0,
     "source": "position_new",
     "deviceName": "535",
     "name": "Nuno Faria",
-    "logTime": "2026-05-30 17:18:14"
+    "logTime": "2026-05-30 17:21:14"
   },
   "map": {
     "route": [
@@ -25291,11 +25299,11 @@
         7.8
       ],
       [
-        41.420037,
-        -8.765542,
-        36.5,
-        "2026-05-24 17:12:01",
-        8.1
+        41.4184,
+        -8.765905,
+        31.7,
+        "2026-05-24 17:13:04",
+        10.0
       ],
       [
         41.394267,
@@ -25333,11 +25341,11 @@
         9.7
       ],
       [
-        41.345779,
-        -8.737589,
-        43.3,
-        "2026-05-24 18:50:01",
-        5.2
+        41.344465,
+        -8.736785,
+        50.1,
+        "2026-05-24 18:51:02",
+        12.9
       ],
       [
         41.330417,
@@ -25375,11 +25383,11 @@
         4.8
       ],
       [
-        41.258586,
-        -8.65872,
-        104.3,
-        "2026-05-24 20:27:01",
-        5.3
+        41.257784,
+        -8.657315,
+        103.5,
+        "2026-05-24 20:28:02",
+        5.6
       ],
       [
         41.239777,
@@ -25417,11 +25425,11 @@
         8.1
       ],
       [
-        41.171707,
-        -8.626305,
-        123.5,
-        "2026-05-24 22:08:02",
-        6.6
+        41.170458,
+        -8.626211,
+        157.8,
+        "2026-05-24 22:09:07",
+        4.9
       ],
       [
         41.160973,
@@ -25452,17 +25460,17 @@
         1.4
       ],
       [
-        41.118718,
-        -8.615107,
-        169.8,
-        "2026-05-24 23:31:02",
+        41.118689,
+        -8.615182,
+        150.0,
+        "2026-05-24 23:32:01",
         0.0
       ],
       [
         41.118044,
         -8.617962,
         72.7,
-        "2026-05-24 23:47:01",
+        "2026-05-24 23:48:03",
         0.0
       ],
       [
@@ -25497,14 +25505,14 @@
         41.118191,
         -8.617601,
         119.3,
-        "2026-05-25 01:09:02",
+        "2026-05-25 01:10:03",
         0.0
       ],
       [
         41.118219,
         -8.617615,
         119.3,
-        "2026-05-25 01:25:02",
+        "2026-05-25 01:26:01",
         0.0
       ],
       [
@@ -25539,14 +25547,14 @@
         41.118403,
         -8.617412,
         119.3,
-        "2026-05-25 02:46:03",
+        "2026-05-25 02:47:02",
         0.0
       ],
       [
         41.118403,
         -8.617412,
         119.3,
-        "2026-05-25 03:02:02",
+        "2026-05-25 03:03:03",
         0.0
       ],
       [
@@ -25588,7 +25596,7 @@
         41.118383,
         -8.617414,
         119.3,
-        "2026-05-25 04:40:02",
+        "2026-05-25 04:41:03",
         0.0
       ],
       [
@@ -25616,14 +25624,14 @@
         41.118137,
         -8.617394,
         119.3,
-        "2026-05-25 05:46:01",
+        "2026-05-25 05:47:02",
         0.0
       ],
       [
         41.118137,
         -8.617394,
         119.3,
-        "2026-05-25 06:02:03",
+        "2026-05-25 06:03:01",
         0.0
       ],
       [
@@ -25655,18 +25663,18 @@
         9.9
       ],
       [
-        41.075335,
-        -8.625087,
-        97.2,
-        "2026-05-25 07:24:01",
-        3.9
+        41.074358,
+        -8.625207,
+        107.8,
+        "2026-05-25 07:25:02",
+        6.7
       ],
       [
-        41.058259,
-        -8.626971,
-        75.0,
-        "2026-05-25 07:40:06",
-        5.5
+        41.057451,
+        -8.626546,
+        83.1,
+        "2026-05-25 07:41:02",
+        7.0
       ],
       [
         41.040129,
@@ -25697,18 +25705,18 @@
         7.1
       ],
       [
-        40.976836,
-        -8.630554,
-        34.9,
-        "2026-05-25 09:02:02",
-        5.8
+        40.976136,
+        -8.629971,
+        35.6,
+        "2026-05-25 09:03:03",
+        4.7
       ],
       [
-        40.959341,
-        -8.627435,
-        70.0,
-        "2026-05-25 09:18:02",
-        5.8
+        40.958466,
+        -8.627,
+        68.8,
+        "2026-05-25 09:19:03",
+        4.7
       ],
       [
         40.953645,
@@ -25732,25 +25740,25 @@
         9.9
       ],
       [
-        40.930886,
-        -8.615774,
-        64.6,
-        "2026-05-25 10:23:01",
-        10.2
+        40.927744,
+        -8.616506,
+        70.3,
+        "2026-05-25 10:25:03",
+        6.6
       ],
       [
-        40.905871,
-        -8.612808,
-        69.9,
-        "2026-05-25 10:41:01",
-        9.6
+        40.904914,
+        -8.612981,
+        84.7,
+        "2026-05-25 10:42:03",
+        6.7
       ],
       [
-        40.884655,
-        -8.616593,
-        56.8,
-        "2026-05-25 10:57:03",
-        5.2
+        40.883078,
+        -8.616853,
+        51.4,
+        "2026-05-25 10:58:02",
+        10.5
       ],
       [
         40.868467,
@@ -25774,25 +25782,25 @@
         5.6
       ],
       [
-        40.826872,
-        -8.574877,
-        63.3,
-        "2026-05-25 12:02:01",
-        5.7
+        40.826026,
+        -8.574454,
+        73.7,
+        "2026-05-25 12:03:02",
+        4.4
       ],
       [
-        40.80842,
-        -8.57236,
-        76.4,
-        "2026-05-25 12:19:03",
-        0.0
+        40.808283,
+        -8.572304,
+        55.3,
+        "2026-05-25 12:20:01",
+        5.1
       ],
       [
-        40.793897,
-        -8.567183,
-        -41.9,
-        "2026-05-25 12:35:03",
-        4.8
+        40.792846,
+        -8.567361,
+        -33.3,
+        "2026-05-25 12:36:02",
+        6.1
       ],
       [
         40.777671,
@@ -25816,25 +25824,25 @@
         0.0
       ],
       [
-        40.762894,
-        -8.571553,
-        18.9,
-        "2026-05-25 13:40:01",
-        0.0
+        40.762911,
+        -8.571653,
+        29.9,
+        "2026-05-25 13:41:02",
+        0.6
       ],
       [
-        40.751635,
-        -8.571632,
-        78.4,
-        "2026-05-25 13:56:05",
-        3.6
+        40.751166,
+        -8.571094,
+        91.7,
+        "2026-05-25 13:57:04",
+        4.1
       ],
       [
-        40.739611,
-        -8.561907,
-        130.5,
-        "2026-05-25 14:12:04",
-        14.0
+        40.737253,
+        -8.561323,
+        52.7,
+        "2026-05-25 14:14:07",
+        5.5
       ],
       [
         40.720225,
@@ -25858,25 +25866,25 @@
         6.4
       ],
       [
-        40.683452,
-        -8.56961,
+        40.683247,
+        -8.570762,
         17.5,
-        "2026-05-25 15:21:01",
-        5.9
+        "2026-05-25 15:22:02",
+        6.0
       ],
       [
-        40.680153,
-        -8.588564,
-        20.7,
-        "2026-05-25 15:37:02",
-        6.4
+        40.679945,
+        -8.589846,
+        21.7,
+        "2026-05-25 15:38:03",
+        5.1
       ],
       [
-        40.672816,
-        -8.604204,
-        46.8,
-        "2026-05-25 15:53:04",
-        5.5
+        40.672124,
+        -8.604845,
+        49.9,
+        "2026-05-25 15:54:03",
+        2.5
       ],
       [
         40.660833,
@@ -25893,32 +25901,32 @@
         0.0
       ],
       [
-        40.658529,
-        -8.615391,
-        35.5,
-        "2026-05-25 16:42:06",
-        6.2
+        40.657789,
+        -8.616021,
+        31.8,
+        "2026-05-25 16:43:05",
+        4.6
       ],
       [
-        40.647055,
-        -8.625777,
-        55.9,
-        "2026-05-25 16:58:03",
-        6.3
+        40.646319,
+        -8.6264,
+        46.0,
+        "2026-05-25 16:59:04",
+        3.8
       ],
       [
-        40.635313,
-        -8.636373,
-        69.2,
-        "2026-05-25 17:14:04",
-        6.2
+        40.634727,
+        -8.637157,
+        69.8,
+        "2026-05-25 17:15:03",
+        4.0
       ],
       [
-        40.626181,
-        -8.647991,
-        68.3,
-        "2026-05-25 17:30:04",
-        5.9
+        40.625602,
+        -8.648618,
+        79.1,
+        "2026-05-25 17:31:05",
+        5.4
       ],
       [
         40.615995,
@@ -25935,31 +25943,31 @@
         2.9
       ],
       [
-        40.596551,
-        -8.672228,
-        51.0,
-        "2026-05-25 18:19:03",
-        3.0
+        40.595905,
+        -8.672762,
+        56.7,
+        "2026-05-25 18:20:04",
+        4.9
       ],
       [
-        40.584667,
-        -8.679692,
-        -33.3,
-        "2026-05-25 18:35:03",
-        5.0
+        40.583953,
+        -8.680148,
+        -63.4,
+        "2026-05-25 18:36:04",
+        4.3
       ],
       [
-        40.575774,
-        -8.679455,
-        -53.7,
-        "2026-05-25 18:51:04",
-        5.5
+        40.575052,
+        -8.679631,
+        -66.6,
+        "2026-05-25 18:52:03",
+        5.3
       ],
       [
-        40.571787,
-        -8.682669,
-        -7.6,
-        "2026-05-25 19:07:03",
+        40.571731,
+        -8.682649,
+        -11.8,
+        "2026-05-25 19:08:04",
         0.0
       ],
       [
@@ -25977,31 +25985,31 @@
         3.4
       ],
       [
-        40.536394,
-        -8.676892,
-        46.4,
-        "2026-05-25 19:56:02",
-        3.4
+        40.53552,
+        -8.677171,
+        32.4,
+        "2026-05-25 19:57:04",
+        4.9
       ],
       [
         40.52915,
         -8.679155,
         20.3,
-        "2026-05-25 20:12:03",
+        "2026-05-25 20:13:04",
         0.0
       ],
       [
-        40.519388,
-        -8.679065,
-        15.2,
-        "2026-05-25 20:28:03",
-        0.7
+        40.519377,
+        -8.679145,
+        16.6,
+        "2026-05-25 20:29:04",
+        0.6
       ],
       [
-        40.519571,
-        -8.679032,
-        29.6,
-        "2026-05-25 20:44:02",
+        40.519655,
+        -8.678954,
+        34.0,
+        "2026-05-25 20:45:02",
         0.0
       ],
       [
@@ -26019,32 +26027,32 @@
         5.1
       ],
       [
-        40.486663,
-        -8.688021,
-        32.8,
-        "2026-05-25 21:33:04",
-        1.4
+        40.485865,
+        -8.688413,
+        56.3,
+        "2026-05-25 21:34:02",
+        2.6
       ],
       [
-        40.476243,
-        -8.695743,
-        61.3,
-        "2026-05-25 21:49:03",
-        0.0
+        40.475501,
+        -8.696044,
+        66.0,
+        "2026-05-25 21:50:02",
+        4.1
       ],
       [
-        40.464364,
-        -8.700043,
-        66.2,
-        "2026-05-25 22:05:03",
-        3.1
+        40.463508,
+        -8.700512,
+        69.3,
+        "2026-05-25 22:06:04",
+        3.5
       ],
       [
-        40.456406,
-        -8.707691,
-        29.2,
-        "2026-05-25 22:21:02",
-        3.4
+        40.456336,
+        -8.708545,
+        43.9,
+        "2026-05-25 22:22:03",
+        3.9
       ],
       [
         40.449163,
@@ -26054,38 +26062,38 @@
         0.0
       ],
       [
-        40.440228,
-        -8.728067,
-        61.8,
-        "2026-05-25 22:54:04",
-        8.3
+        40.439495,
+        -8.728004,
+        62.8,
+        "2026-05-25 22:55:03",
+        3.8
       ],
       [
-        40.429609,
-        -8.730028,
-        75.3,
-        "2026-05-25 23:10:03",
-        4.6
+        40.428837,
+        -8.729926,
+        49.9,
+        "2026-05-25 23:11:04",
+        5.0
       ],
       [
         40.42652,
         -8.730094,
         88.0,
-        "2026-05-25 23:26:05",
+        "2026-05-25 23:27:03",
         0.0
       ],
       [
         40.42652,
         -8.730094,
         88.0,
-        "2026-05-25 23:42:03",
+        "2026-05-25 23:43:04",
         0.0
       ],
       [
         40.426368,
         -8.730037,
         51.8,
-        "2026-05-25 23:58:04",
+        "2026-05-26 00:00:04",
         0.0
       ],
       [
@@ -26099,28 +26107,28 @@
         40.426399,
         -8.72995,
         51.8,
-        "2026-05-26 00:32:03",
+        "2026-05-26 00:33:06",
         0.0
       ],
       [
         40.426387,
         -8.730035,
         51.8,
-        "2026-05-26 00:48:05",
+        "2026-05-26 00:49:04",
         0.0
       ],
       [
         40.426379,
         -8.730074,
         51.8,
-        "2026-05-26 01:04:05",
+        "2026-05-26 01:05:06",
         0.0
       ],
       [
         40.426379,
         -8.730074,
         51.8,
-        "2026-05-26 01:20:06",
+        "2026-05-26 01:21:05",
         0.0
       ],
       [
@@ -26141,28 +26149,28 @@
         40.426379,
         -8.730074,
         51.8,
-        "2026-05-26 02:09:03",
+        "2026-05-26 02:10:04",
         0.0
       ],
       [
         40.426379,
         -8.730074,
         51.8,
-        "2026-05-26 02:25:03",
+        "2026-05-26 02:26:04",
         0.0
       ],
       [
         40.426379,
         -8.730074,
         51.8,
-        "2026-05-26 02:41:04",
+        "2026-05-26 02:42:05",
         0.0
       ],
       [
         40.426383,
         -8.730097,
         48.9,
-        "2026-05-26 02:57:03",
+        "2026-05-26 02:58:04",
         0.0
       ],
       [
@@ -26176,35 +26184,35 @@
         40.426388,
         -8.730134,
         48.9,
-        "2026-05-26 03:30:03",
+        "2026-05-26 03:31:02",
         0.0
       ],
       [
         40.426431,
         -8.730084,
         48.9,
-        "2026-05-26 03:46:04",
+        "2026-05-26 03:47:05",
         0.0
       ],
       [
         40.426431,
         -8.730084,
         48.9,
-        "2026-05-26 04:02:04",
+        "2026-05-26 04:03:05",
         0.0
       ],
       [
         40.426507,
         -8.730108,
         48.9,
-        "2026-05-26 04:18:04",
+        "2026-05-26 04:19:02",
         0.0
       ],
       [
         40.426507,
         -8.730108,
         48.9,
-        "2026-05-26 04:34:03",
+        "2026-05-26 04:35:04",
         0.0
       ],
       [
@@ -26215,39 +26223,39 @@
         0.0
       ],
       [
-        40.425739,
-        -8.734852,
-        32.9,
-        "2026-05-26 05:07:05",
-        3.5
+        40.425174,
+        -8.735568,
+        56.0,
+        "2026-05-26 05:08:07",
+        4.5
       ],
       [
-        40.415244,
-        -8.73557,
-        2.9,
-        "2026-05-26 05:23:04",
-        5.6
+        40.414278,
+        -8.735543,
+        44.6,
+        "2026-05-26 05:24:05",
+        6.0
       ],
       [
-        40.404539,
-        -8.735081,
-        22.7,
-        "2026-05-26 05:39:05",
-        8.3
-      ],
-      [
-        40.392131,
-        -8.736245,
-        27.7,
-        "2026-05-26 05:54:04",
+        40.403744,
+        -8.735214,
+        26.3,
+        "2026-05-26 05:40:06",
         0.0
       ],
       [
-        40.380352,
-        -8.744425,
-        29.4,
-        "2026-05-26 06:11:04",
-        5.2
+        40.390787,
+        -8.7373,
+        39.5,
+        "2026-05-26 05:56:04",
+        5.5
+      ],
+      [
+        40.379588,
+        -8.744514,
+        30.4,
+        "2026-05-26 06:12:03",
+        4.9
       ],
       [
         40.366852,
@@ -26257,39 +26265,39 @@
         5.4
       ],
       [
-        40.354203,
-        -8.747919,
-        44.8,
-        "2026-05-26 06:44:03",
-        4.7
-      ],
-      [
-        40.342054,
-        -8.749533,
-        57.3,
-        "2026-05-26 07:00:05",
-        5.4
-      ],
-      [
-        40.329129,
-        -8.751147,
-        83.0,
-        "2026-05-26 07:16:03",
-        5.2
-      ],
-      [
-        40.315624,
-        -8.753091,
-        69.3,
-        "2026-05-26 07:32:04",
-        5.5
-      ],
-      [
-        40.302616,
-        -8.759224,
-        61.6,
-        "2026-05-26 07:48:04",
+        40.353378,
+        -8.748026,
+        45.5,
+        "2026-05-26 06:45:04",
         5.6
+      ],
+      [
+        40.34127,
+        -8.749662,
+        65.8,
+        "2026-05-26 07:01:04",
+        4.8
+      ],
+      [
+        40.328191,
+        -8.751344,
+        69.2,
+        "2026-05-26 07:17:05",
+        4.8
+      ],
+      [
+        40.314717,
+        -8.753281,
+        60.6,
+        "2026-05-26 07:33:07",
+        5.1
+      ],
+      [
+        40.301897,
+        -8.75973,
+        53.6,
+        "2026-05-26 07:49:05",
+        3.8
       ],
       [
         40.291101,
@@ -26299,2692 +26307,2692 @@
         4.8
       ],
       [
-        40.279139,
-        -8.772292,
-        78.0,
-        "2026-05-26 08:21:06",
+        40.278351,
+        -8.772637,
+        78.6,
+        "2026-05-26 08:22:04",
+        6.2
+      ],
+      [
+        40.265898,
+        -8.779479,
+        72.8,
+        "2026-05-26 08:38:03",
+        5.7
+      ],
+      [
+        40.253396,
+        -8.782427,
+        64.4,
+        "2026-05-26 08:54:04",
+        5.6
+      ],
+      [
+        40.246459,
+        -8.787837,
+        83.8,
+        "2026-05-26 09:10:04",
         5.2
       ],
       [
-        40.266711,
-        -8.779014,
-        67.4,
-        "2026-05-26 08:37:04",
-        5.9
-      ],
-      [
-        40.254146,
-        -8.78188,
-        64.7,
-        "2026-05-26 08:53:05",
-        4.6
-      ],
-      [
-        40.247091,
-        -8.787319,
-        76.7,
-        "2026-05-26 09:09:05",
-        5.4
-      ],
-      [
-        40.235881,
-        -8.795827,
-        75.9,
-        "2026-05-26 09:25:04",
+        40.235115,
+        -8.796426,
+        82.0,
+        "2026-05-26 09:26:05",
         5.5
       ],
       [
-        40.223271,
-        -8.805611,
-        94.9,
-        "2026-05-26 09:42:04",
-        5.7
-      ],
-      [
-        40.222729,
-        -8.805936,
-        117.5,
-        "2026-05-26 09:58:05",
+        40.222704,
+        -8.805961,
+        111.9,
+        "2026-05-26 09:43:05",
         0.0
       ],
       [
-        40.213956,
-        -8.815486,
-        97.2,
-        "2026-05-26 10:14:05",
-        7.0
+        40.222766,
+        -8.805995,
+        95.5,
+        "2026-05-26 09:59:03",
+        0.8
       ],
       [
-        40.205428,
-        -8.827619,
-        98.4,
-        "2026-05-26 10:30:08",
+        40.213514,
+        -8.816385,
+        90.6,
+        "2026-05-26 10:15:04",
         5.4
       ],
       [
-        40.193817,
-        -8.832288,
-        155.3,
-        "2026-05-26 10:46:04",
-        6.5
+        40.204735,
+        -8.827767,
+        74.4,
+        "2026-05-26 10:31:07",
+        5.2
       ],
       [
-        40.180843,
-        -8.828799,
-        109.4,
-        "2026-05-26 11:02:04",
-        5.7
+        40.19316,
+        -8.831545,
+        149.6,
+        "2026-05-26 10:47:05",
+        6.1
       ],
       [
-        40.173873,
-        -8.830221,
-        93.7,
-        "2026-05-26 11:19:05",
-        5.3
+        40.180004,
+        -8.828836,
+        103.8,
+        "2026-05-26 11:03:04",
+        5.9
       ],
       [
-        40.163899,
-        -8.84032,
-        30.4,
-        "2026-05-26 11:35:05",
-        2.8
+        40.173429,
+        -8.830976,
+        102.2,
+        "2026-05-26 11:20:04",
+        4.4
       ],
       [
-        40.149754,
-        -8.841619,
-        31.3,
-        "2026-05-26 11:51:03",
-        5.7
+        40.162775,
+        -8.840274,
+        31.2,
+        "2026-05-26 11:36:06",
+        6.6
       ],
       [
-        40.138037,
-        -8.846183,
-        29.1,
-        "2026-05-26 12:07:04",
+        40.14896,
+        -8.841698,
+        32.3,
+        "2026-05-26 11:52:04",
+        4.5
+      ],
+      [
+        40.13762,
+        -8.847122,
+        32.1,
+        "2026-05-26 12:08:03",
         5.8
       ],
       [
-        40.130461,
-        -8.854595,
-        20.3,
-        "2026-05-26 12:23:06",
-        7.6
+        40.129914,
+        -8.854249,
+        15.8,
+        "2026-05-26 12:24:05",
+        2.8
       ],
       [
         40.131697,
         -8.854792,
         15.3,
-        "2026-05-26 12:39:05",
+        "2026-05-26 12:40:04",
         0.0
       ],
       [
-        40.130117,
-        -8.854483,
-        18.2,
-        "2026-05-26 12:56:05",
+        40.129395,
+        -8.854081,
+        15.4,
+        "2026-05-26 12:57:06",
+        5.2
+      ],
+      [
+        40.117457,
+        -8.84598,
+        14.7,
+        "2026-05-26 13:13:09",
         5.1
       ],
       [
-        40.118183,
-        -8.84655,
-        17.9,
-        "2026-05-26 13:12:06",
-        2.6
-      ],
-      [
-        40.104587,
-        -8.838832,
-        21.4,
-        "2026-05-26 13:28:04",
-        5.9
-      ],
-      [
-        40.091108,
-        -8.838941,
-        45.6,
-        "2026-05-26 13:44:05",
-        5.3
-      ],
-      [
-        40.081202,
-        -8.830036,
-        63.3,
-        "2026-05-26 14:00:05",
-        5.1
-      ],
-      [
-        40.072921,
-        -8.819297,
-        95.6,
-        "2026-05-26 14:16:05",
-        3.0
-      ],
-      [
-        40.070643,
-        -8.816809,
-        98.7,
-        "2026-05-26 14:34:05",
-        5.8
-      ],
-      [
-        40.057219,
-        -8.814212,
-        121.3,
-        "2026-05-26 14:50:07",
-        8.4
-      ],
-      [
-        40.044803,
-        -8.817776,
-        177.4,
-        "2026-05-26 15:06:06",
-        9.3
-      ],
-      [
-        40.025217,
-        -8.820079,
-        180.4,
-        "2026-05-26 15:22:23",
+        40.103595,
+        -8.838708,
+        33.4,
+        "2026-05-26 13:29:06",
         6.9
       ],
       [
-        40.015665,
-        -8.814115,
-        -109.4,
-        "2026-05-26 15:37:05",
+        40.090356,
+        -8.838229,
+        43.9,
+        "2026-05-26 13:45:06",
+        5.4
+      ],
+      [
+        40.08068,
+        -8.829207,
+        68.5,
+        "2026-05-26 14:01:06",
+        5.2
+      ],
+      [
+        40.072819,
+        -8.819239,
+        95.4,
+        "2026-05-26 14:17:11",
         0.0
       ],
       [
-        40.004936,
-        -8.805785,
-        102.6,
-        "2026-05-26 15:54:03",
-        0.0
+        40.070071,
+        -8.815981,
+        95.7,
+        "2026-05-26 14:35:06",
+        5.7
       ],
       [
-        39.992062,
-        -8.802437,
-        115.9,
-        "2026-05-26 16:11:05",
-        5.0
+        40.056272,
+        -8.81431,
+        103.6,
+        "2026-05-26 14:51:06",
+        5.9
       ],
       [
-        39.979415,
-        -8.798911,
-        117.5,
-        "2026-05-26 16:27:04",
-        4.5
+        40.043426,
+        -8.81817,
+        171.1,
+        "2026-05-26 15:07:07",
+        11.1
+      ],
+      [
+        40.024455,
+        -8.819704,
+        192.8,
+        "2026-05-26 15:23:21",
+        5.3
+      ],
+      [
+        40.014232,
+        -8.812251,
+        87.8,
+        "2026-05-26 15:39:05",
+        4.9
+      ],
+      [
+        40.003613,
+        -8.805512,
+        107.3,
+        "2026-05-26 15:56:04",
+        6.2
+      ],
+      [
+        39.991495,
+        -8.802278,
+        111.6,
+        "2026-05-26 16:12:06",
+        6.5
+      ],
+      [
+        39.978554,
+        -8.798926,
+        117.4,
+        "2026-05-26 16:28:05",
+        5.8
       ],
       [
         39.976949,
         -8.79839,
         125.9,
-        "2026-05-26 16:43:05",
+        "2026-05-26 16:44:07",
         0.0
       ],
       [
-        39.976007,
-        -8.797752,
-        127.0,
-        "2026-05-26 16:59:05",
-        4.1
+        39.975167,
+        -8.797449,
+        120.8,
+        "2026-05-26 17:00:04",
+        5.4
       ],
       [
-        39.964418,
-        -8.790759,
-        129.8,
-        "2026-05-26 17:15:07",
-        5.3
-      ],
-      [
-        39.953067,
-        -8.787577,
-        140.8,
-        "2026-05-26 17:31:04",
-        0.3
-      ],
-      [
-        39.942265,
-        -8.792972,
-        138.3,
-        "2026-05-26 17:48:06",
-        3.6
-      ],
-      [
-        39.933447,
-        -8.800349,
-        89.0,
-        "2026-05-26 18:04:06",
+        39.963725,
+        -8.790276,
+        125.7,
+        "2026-05-26 17:16:04",
         4.8
       ],
       [
-        39.923411,
-        -8.808878,
-        69.7,
-        "2026-05-26 18:20:07",
-        0.7
+        39.951741,
+        -8.788359,
+        143.8,
+        "2026-05-26 17:33:07",
+        4.0
       ],
       [
-        39.919439,
-        -8.811905,
-        73.8,
-        "2026-05-26 18:36:06",
-        6.2
+        39.941686,
+        -8.793328,
+        167.0,
+        "2026-05-26 17:49:05",
+        3.9
       ],
       [
-        39.910492,
-        -8.82135,
-        84.5,
-        "2026-05-26 18:52:06",
-        9.2
-      ],
-      [
-        39.899144,
-        -8.827277,
-        58.8,
-        "2026-05-26 19:09:05",
-        4.3
-      ],
-      [
-        39.891626,
-        -8.834695,
-        51.7,
-        "2026-05-26 19:25:08",
-        4.5
-      ],
-      [
-        39.879476,
-        -8.838068,
-        51.1,
-        "2026-05-26 19:41:09",
+        39.932833,
+        -8.800855,
+        91.7,
+        "2026-05-26 18:05:05",
         5.0
       ],
       [
-        39.866552,
-        -8.838898,
-        29.3,
-        "2026-05-26 19:57:10",
-        4.9
+        39.9234,
+        -8.808983,
+        30.2,
+        "2026-05-26 18:21:05",
+        0.0
       ],
       [
-        39.854301,
-        -8.835519,
-        68.5,
-        "2026-05-26 20:13:05",
-        4.9
+        39.918737,
+        -8.812081,
+        114.0,
+        "2026-05-26 18:37:05",
+        4.6
       ],
       [
-        39.843724,
-        -8.841221,
-        27.8,
-        "2026-05-26 20:29:07",
-        7.3
+        39.909734,
+        -8.821395,
+        46.9,
+        "2026-05-26 18:53:09",
+        5.0
       ],
       [
-        39.831407,
-        -8.83992,
-        64.5,
-        "2026-05-26 20:46:06",
-        4.2
+        39.898922,
+        -8.82746,
+        64.7,
+        "2026-05-26 19:10:06",
+        0.6
       ],
       [
-        39.818737,
-        -8.84134,
-        63.2,
-        "2026-05-26 21:02:07",
+        39.890797,
+        -8.834899,
+        58.8,
+        "2026-05-26 19:26:09",
+        4.7
+      ],
+      [
+        39.878692,
+        -8.837892,
+        59.7,
+        "2026-05-26 19:42:07",
+        2.8
+      ],
+      [
+        39.86577,
+        -8.838688,
+        39.4,
+        "2026-05-26 19:58:06",
         5.3
       ],
       [
-        39.808806,
-        -8.841303,
-        41.8,
-        "2026-05-26 21:21:05",
-        4.5
+        39.853386,
+        -8.835825,
+        55.0,
+        "2026-05-26 20:14:07",
+        5.1
       ],
       [
-        39.797838,
-        -8.836875,
-        28.4,
-        "2026-05-26 21:37:05",
+        39.841965,
+        -8.840425,
+        41.1,
+        "2026-05-26 20:31:07",
+        7.1
+      ],
+      [
+        39.830525,
+        -8.839845,
+        53.5,
+        "2026-05-26 20:47:07",
+        4.8
+      ],
+      [
+        39.818005,
+        -8.841732,
+        53.7,
+        "2026-05-26 21:03:08",
+        4.9
+      ],
+      [
+        39.808386,
+        -8.840538,
+        44.0,
+        "2026-05-26 21:22:06",
+        5.4
+      ],
+      [
+        39.797122,
+        -8.836432,
+        35.3,
+        "2026-05-26 21:38:06",
+        5.4
+      ],
+      [
+        39.787921,
+        -8.827213,
+        45.2,
+        "2026-05-26 21:54:05",
         5.2
       ],
       [
-        39.788522,
-        -8.827825,
-        38.7,
-        "2026-05-26 21:53:06",
-        5.3
+        39.776487,
+        -8.820967,
+        48.6,
+        "2026-05-26 22:11:07",
+        4.3
       ],
       [
-        39.777749,
-        -8.822138,
-        49.1,
-        "2026-05-26 22:09:06",
-        5.5
+        39.76594,
+        -8.81541,
+        69.6,
+        "2026-05-26 22:27:06",
+        4.7
       ],
       [
-        39.766681,
-        -8.815222,
-        78.8,
-        "2026-05-26 22:26:07",
-        5.3
-      ],
-      [
-        39.755144,
-        -8.815761,
-        49.9,
-        "2026-05-26 22:42:07",
-        5.1
+        39.754754,
+        -8.815681,
+        72.1,
+        "2026-05-26 22:43:16",
+        4.9
       ],
       [
         39.750604,
         -8.812388,
         31.9,
-        "2026-05-26 22:58:06",
+        "2026-05-26 22:59:05",
         0.0
       ],
       [
         39.750667,
         -8.812167,
         71.6,
-        "2026-05-26 23:14:05",
+        "2026-05-26 23:15:06",
         0.0
       ],
       [
         39.750667,
         -8.812167,
         71.6,
-        "2026-05-26 23:30:06",
+        "2026-05-26 23:31:07",
         0.0
       ],
       [
-        39.750569,
-        -8.812374,
-        40.1,
-        "2026-05-26 23:46:07",
+        39.750563,
+        -8.81238,
+        41.7,
+        "2026-05-26 23:48:06",
         0.0
       ],
       [
         39.750573,
         -8.812396,
         35.4,
-        "2026-05-27 00:04:05",
+        "2026-05-27 00:05:06",
         0.0
       ],
       [
-        39.750555,
+        39.750556,
         -8.812374,
         35.4,
-        "2026-05-27 00:20:06",
-        0.0
-      ],
-      [
-        39.750557,
-        -8.812379,
-        35.4,
-        "2026-05-27 00:36:07",
+        "2026-05-27 00:21:08",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 00:52:06",
+        "2026-05-27 00:37:05",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 01:08:07",
+        "2026-05-27 00:53:09",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 01:24:09",
+        "2026-05-27 01:09:05",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 01:41:07",
+        "2026-05-27 01:26:10",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 01:57:06",
+        "2026-05-27 01:42:08",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 02:13:06",
+        "2026-05-27 01:58:05",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 02:29:06",
+        "2026-05-27 02:14:07",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 02:45:07",
+        "2026-05-27 02:30:08",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 03:01:08",
+        "2026-05-27 02:47:07",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 03:18:08",
+        "2026-05-27 03:03:05",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 03:34:10",
+        "2026-05-27 03:19:06",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 03:50:05",
+        "2026-05-27 03:35:09",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 04:06:05",
+        "2026-05-27 03:51:06",
         0.0
       ],
       [
         39.750559,
         -8.812377,
         35.4,
-        "2026-05-27 04:22:06",
+        "2026-05-27 04:07:07",
+        0.0
+      ],
+      [
+        39.750559,
+        -8.812377,
+        35.4,
+        "2026-05-27 04:24:06",
         0.0
       ],
       [
         39.750663,
         -8.812271,
         50.4,
-        "2026-05-27 04:38:06",
+        "2026-05-27 04:40:07",
         0.0
       ],
       [
         39.750563,
         -8.81232,
         30.4,
-        "2026-05-27 04:55:07",
+        "2026-05-27 04:56:06",
         0.0
       ],
       [
-        39.747665,
-        -8.815253,
-        64.6,
-        "2026-05-27 05:11:07",
-        4.1
+        39.746961,
+        -8.815051,
+        57.0,
+        "2026-05-27 05:12:06",
+        5.4
       ],
       [
-        39.736877,
-        -8.808777,
-        97.5,
-        "2026-05-27 05:27:06",
+        39.735977,
+        -8.808536,
+        94.3,
+        "2026-05-27 05:28:07",
+        4.9
+      ],
+      [
+        39.724108,
+        -8.814488,
+        68.1,
+        "2026-05-27 05:44:08",
+        5.3
+      ],
+      [
+        39.714147,
+        -8.812057,
+        93.4,
+        "2026-05-27 06:01:06",
         5.1
       ],
       [
-        39.724838,
-        -8.814226,
-        79.3,
-        "2026-05-27 05:43:07",
-        5.3
-      ],
-      [
-        39.715386,
-        -8.810775,
-        102.0,
-        "2026-05-27 05:59:06",
-        6.1
-      ],
-      [
-        39.704867,
-        -8.815669,
-        90.7,
-        "2026-05-27 06:15:06",
-        5.0
-      ],
-      [
-        39.691469,
-        -8.82026,
-        61.6,
-        "2026-05-27 06:32:09",
-        5.7
-      ],
-      [
-        39.679135,
-        -8.81942,
-        78.5,
-        "2026-05-27 06:48:12",
-        5.2
-      ],
-      [
-        39.669223,
-        -8.820322,
-        81.3,
-        "2026-05-27 07:04:05",
-        5.3
-      ],
-      [
-        39.660387,
-        -8.818514,
-        87.0,
-        "2026-05-27 07:20:07",
-        5.6
-      ],
-      [
-        39.648433,
-        -8.817315,
+        39.703248,
+        -8.815982,
         90.8,
-        "2026-05-27 07:36:04",
-        8.5
+        "2026-05-27 06:17:06",
+        5.8
       ],
       [
-        39.633801,
-        -8.821709,
-        106.0,
-        "2026-05-27 07:52:07",
+        39.69069,
+        -8.819841,
+        72.9,
+        "2026-05-27 06:33:10",
+        5.9
+      ],
+      [
+        39.678426,
+        -8.819426,
+        79.7,
+        "2026-05-27 06:49:05",
         5.7
       ],
       [
-        39.622313,
-        -8.823022,
-        117.7,
-        "2026-05-27 08:09:07",
-        5.0
+        39.668445,
+        -8.820228,
+        84.0,
+        "2026-05-27 07:05:07",
+        5.5
       ],
       [
-        39.609691,
-        -8.822077,
-        131.4,
-        "2026-05-27 08:25:07",
-        3.3
+        39.659617,
+        -8.818078,
+        90.6,
+        "2026-05-27 07:21:05",
+        3.9
       ],
       [
-        39.59462,
-        -8.818317,
-        157.0,
-        "2026-05-27 08:41:08",
-        5.0
+        39.646184,
+        -8.818178,
+        93.1,
+        "2026-05-27 07:38:06",
+        5.9
       ],
       [
-        39.582275,
-        -8.823494,
-        176.0,
-        "2026-05-27 08:57:05",
-        6.2
-      ],
-      [
-        39.57522,
-        -8.82426,
-        270.1,
-        "2026-05-27 09:13:07",
-        5.6
-      ],
-      [
-        39.56224,
-        -8.831025,
-        335.5,
-        "2026-05-27 09:29:08",
-        5.7
-      ],
-      [
-        39.569115,
-        -8.822005,
-        432.1,
-        "2026-05-27 09:46:06",
-        6.0
-      ],
-      [
-        39.563105,
-        -8.814219,
-        436.0,
-        "2026-05-27 10:03:05",
-        5.7
-      ],
-      [
-        39.557654,
-        -8.811561,
-        426.8,
-        "2026-05-27 10:19:07",
-        0.0
-      ],
-      [
-        39.544679,
-        -8.80878,
-        450.4,
-        "2026-05-27 10:38:07",
+        39.632801,
+        -8.823446,
+        107.7,
+        "2026-05-27 07:54:07",
         5.2
       ],
       [
-        39.532984,
-        -8.795551,
-        501.9,
-        "2026-05-27 10:57:07",
+        39.621533,
+        -8.823199,
+        131.8,
+        "2026-05-27 08:10:08",
+        4.2
+      ],
+      [
+        39.608823,
+        -8.82215,
+        141.2,
+        "2026-05-27 08:26:08",
+        5.1
+      ],
+      [
+        39.593589,
+        -8.81845,
+        149.7,
+        "2026-05-27 08:42:05",
+        8.8
+      ],
+      [
+        39.580633,
+        -8.82367,
+        198.1,
+        "2026-05-27 08:59:05",
+        5.7
+      ],
+      [
+        39.573706,
+        -8.825107,
+        277.0,
+        "2026-05-27 09:15:07",
+        5.4
+      ],
+      [
+        39.560481,
+        -8.830946,
+        394.7,
+        "2026-05-27 09:31:08",
+        5.8
+      ],
+      [
+        39.569707,
+        -8.821309,
+        435.0,
+        "2026-05-27 09:47:07",
+        5.4
+      ],
+      [
+        39.562445,
+        -8.814914,
+        435.2,
+        "2026-05-27 10:04:07",
+        5.5
+      ],
+      [
+        39.557578,
+        -8.811336,
+        420.0,
+        "2026-05-27 10:20:06",
+        4.8
+      ],
+      [
+        39.543547,
+        -8.807677,
+        457.1,
+        "2026-05-27 10:40:06",
+        8.1
+      ],
+      [
+        39.531515,
+        -8.794506,
+        512.3,
+        "2026-05-27 10:59:08",
+        6.7
+      ],
+      [
+        39.522578,
+        -8.789539,
+        484.2,
+        "2026-05-27 11:15:09",
         5.3
-      ],
-      [
-        39.524233,
-        -8.789422,
-        479.9,
-        "2026-05-27 11:13:05",
-        5.2
       ],
       [
         39.516104,
         -8.78943,
         491.2,
-        "2026-05-27 11:30:07",
+        "2026-05-27 11:31:08",
         0.0
       ],
       [
-        39.50928,
-        -8.792515,
-        472.7,
-        "2026-05-27 11:46:06",
-        5.9
+        39.508447,
+        -8.792531,
+        469.0,
+        "2026-05-27 11:47:07",
+        5.6
       ],
       [
-        39.496499,
-        -8.791593,
-        406.6,
-        "2026-05-27 12:02:08",
-        5.0
+        39.495804,
+        -8.791395,
+        431.5,
+        "2026-05-27 12:03:07",
+        0.8
       ],
       [
-        39.492022,
-        -8.780331,
-        397.2,
-        "2026-05-27 12:18:07",
+        39.491909,
+        -8.780487,
+        404.0,
+        "2026-05-27 12:20:10",
         0.0
       ],
       [
-        39.483118,
-        -8.771524,
-        325.3,
-        "2026-05-27 12:34:10",
+        39.481624,
+        -8.769604,
+        320.1,
+        "2026-05-27 12:37:07",
+        8.0
+      ],
+      [
+        39.471349,
+        -8.767864,
+        234.8,
+        "2026-05-27 12:53:08",
+        9.3
+      ],
+      [
+        39.458541,
+        -8.767334,
+        229.9,
+        "2026-05-27 13:09:07",
         5.1
       ],
       [
-        39.473249,
-        -8.767039,
-        231.2,
-        "2026-05-27 12:51:06",
-        5.8
+        39.446411,
+        -8.763376,
+        140.0,
+        "2026-05-27 13:25:07",
+        9.2
       ],
       [
-        39.458927,
-        -8.768326,
-        235.4,
-        "2026-05-27 13:08:06",
-        6.0
-      ],
-      [
-        39.447087,
-        -8.762495,
-        140.8,
-        "2026-05-27 13:24:06",
-        5.0
-      ],
-      [
-        39.434353,
-        -8.780957,
-        118.4,
-        "2026-05-27 13:40:08",
-        9.6
+        39.432894,
+        -8.781856,
+        117.6,
+        "2026-05-27 13:41:11",
+        9.0
       ],
       [
         39.431533,
         -8.781906,
         114.6,
-        "2026-05-27 13:56:08",
+        "2026-05-27 13:58:08",
         0.0
       ],
       [
         39.431467,
         -8.781943,
         123.0,
-        "2026-05-27 14:12:07",
+        "2026-05-27 14:14:07",
         0.0
-      ],
-      [
-        39.43147,
-        -8.781855,
-        124.8,
-        "2026-05-27 14:29:06",
-        0.1
       ],
       [
         39.431464,
         -8.78189,
         117.8,
-        "2026-05-27 14:45:06",
+        "2026-05-27 14:30:08",
         0.0
       ],
       [
-        39.431449,
-        -8.78192,
-        114.2,
-        "2026-05-27 15:01:07",
+        39.431464,
+        -8.78189,
+        117.8,
+        "2026-05-27 14:46:07",
         0.0
       ],
       [
-        39.423154,
-        -8.77504,
-        152.0,
-        "2026-05-27 15:17:10",
-        4.0
-      ],
-      [
-        39.410994,
-        -8.766557,
-        208.9,
-        "2026-05-27 15:33:07",
-        5.9
-      ],
-      [
-        39.398919,
-        -8.761741,
-        125.9,
-        "2026-05-27 15:50:07",
+        39.431453,
+        -8.781897,
+        121.5,
+        "2026-05-27 15:02:06",
         0.0
       ],
       [
-        39.385506,
-        -8.765231,
-        111.5,
-        "2026-05-27 16:07:06",
+        39.421434,
+        -8.774452,
+        156.6,
+        "2026-05-27 15:19:08",
+        6.2
+      ],
+      [
+        39.408879,
+        -8.765318,
+        201.5,
+        "2026-05-27 15:35:07",
+        5.2
+      ],
+      [
+        39.397621,
+        -8.761812,
+        111.6,
+        "2026-05-27 15:52:07",
+        4.2
+      ],
+      [
+        39.384593,
+        -8.765524,
+        112.6,
+        "2026-05-27 16:08:08",
+        4.9
+      ],
+      [
+        39.374628,
+        -8.770555,
+        93.1,
+        "2026-05-27 16:24:07",
+        0.0
+      ],
+      [
+        39.362571,
+        -8.763181,
+        101.8,
+        "2026-05-27 16:41:08",
         5.1
       ],
       [
-        39.375041,
-        -8.77059,
-        74.4,
-        "2026-05-27 16:22:14",
-        0.0
+        39.356374,
+        -8.760607,
+        134.4,
+        "2026-05-27 16:58:08",
+        0.9
       ],
       [
-        39.363213,
-        -8.763664,
-        90.1,
-        "2026-05-27 16:40:07",
-        4.8
-      ],
-      [
-        39.356123,
-        -8.760541,
-        94.6,
-        "2026-05-27 16:56:09",
-        0.0
-      ],
-      [
-        39.348891,
-        -8.754918,
-        153.5,
-        "2026-05-27 17:13:07",
+        39.347282,
+        -8.755196,
+        157.4,
+        "2026-05-27 17:15:07",
         5.3
       ],
       [
-        39.337079,
-        -8.749657,
-        163.9,
-        "2026-05-27 17:29:09",
-        5.6
+        39.335551,
+        -8.750034,
+        170.8,
+        "2026-05-27 17:31:08",
+        5.0
       ],
       [
-        39.327165,
-        -8.746412,
-        161.0,
-        "2026-05-27 17:46:07",
-        5.4
+        39.326593,
+        -8.745646,
+        156.2,
+        "2026-05-27 17:47:08",
+        4.9
       ],
       [
-        39.319707,
-        -8.736797,
-        153.0,
-        "2026-05-27 18:02:07",
+        39.319756,
+        -8.736785,
+        176.3,
+        "2026-05-27 18:03:10",
         0.0
       ],
       [
-        39.319016,
-        -8.735359,
-        133.4,
-        "2026-05-27 18:20:07",
-        4.3
+        39.318475,
+        -8.73486,
+        140.6,
+        "2026-05-27 18:21:06",
+        4.4
       ],
       [
-        39.307934,
-        -8.732148,
-        113.1,
-        "2026-05-27 18:36:07",
-        5.2
+        39.306482,
+        -8.732094,
+        110.6,
+        "2026-05-27 18:38:06",
+        4.9
       ],
       [
-        39.296097,
-        -8.729735,
-        92.1,
-        "2026-05-27 18:52:08",
-        4.8
+        39.294612,
+        -8.729787,
+        92.3,
+        "2026-05-27 18:54:08",
+        5.0
       ],
       [
-        39.285989,
-        -8.72155,
-        79.0,
-        "2026-05-27 19:08:06",
-        5.2
-      ],
-      [
-        39.277677,
-        -8.708126,
-        61.5,
-        "2026-05-27 19:25:08",
+        39.284883,
+        -8.720083,
+        77.9,
+        "2026-05-27 19:10:07",
         5.1
       ],
       [
-        39.269951,
-        -8.697511,
-        89.5,
-        "2026-05-27 19:41:06",
-        4.3
+        39.277316,
+        -8.707312,
+        63.5,
+        "2026-05-27 19:26:07",
+        5.1
+      ],
+      [
+        39.269357,
+        -8.696773,
+        79.1,
+        "2026-05-27 19:42:07",
+        4.8
       ],
       [
         39.267003,
         -8.696397,
         93.6,
-        "2026-05-27 19:57:08",
+        "2026-05-27 19:59:10",
         0.0
       ],
       [
-        39.264379,
-        -8.695905,
-        94.0,
-        "2026-05-27 20:13:08",
-        4.6
+        39.263752,
+        -8.694681,
+        74.4,
+        "2026-05-27 20:15:07",
+        5.1
       ],
       [
-        39.256332,
-        -8.690086,
-        76.9,
-        "2026-05-27 20:29:10",
-        5.0
+        39.254912,
+        -8.689568,
+        73.8,
+        "2026-05-27 20:31:10",
+        4.8
       ],
       [
-        39.247137,
-        -8.68738,
-        73.0,
-        "2026-05-27 20:45:06",
-        4.5
-      ],
-      [
-        39.246121,
-        -8.680382,
-        61.1,
-        "2026-05-27 21:02:08",
-        0.0
-      ],
-      [
-        39.246121,
-        -8.680382,
-        61.1,
-        "2026-05-27 21:18:06",
-        0.0
-      ],
-      [
-        39.244915,
-        -8.677997,
-        44.3,
-        "2026-05-27 21:34:07",
-        4.5
-      ],
-      [
-        39.235073,
-        -8.673995,
-        40.2,
-        "2026-05-27 21:50:07",
-        4.5
-      ],
-      [
-        39.230082,
-        -8.659893,
-        27.1,
-        "2026-05-27 22:06:09",
-        5.3
-      ],
-      [
-        39.230894,
-        -8.656417,
-        19.9,
-        "2026-05-27 22:22:07",
-        0.0
-      ],
-      [
-        39.230918,
-        -8.655577,
-        25.6,
-        "2026-05-27 22:39:08",
-        5.6
-      ],
-      [
-        39.2223,
-        -8.644105,
-        21.9,
-        "2026-05-27 22:55:08",
-        4.6
-      ],
-      [
-        39.212613,
-        -8.634219,
-        16.9,
-        "2026-05-27 23:11:09",
-        4.2
-      ],
-      [
-        39.206378,
-        -8.630559,
-        -14.6,
-        "2026-05-27 23:27:23",
-        0.0
-      ],
-      [
-        39.204061,
-        -8.628903,
-        38.4,
-        "2026-05-27 23:43:08",
-        5.8
-      ],
-      [
-        39.192477,
-        -8.625787,
-        81.5,
-        "2026-05-28 00:00:12",
-        5.5
-      ],
-      [
-        39.181148,
-        -8.622667,
-        55.8,
-        "2026-05-28 00:17:10",
-        2.9
-      ],
-      [
-        39.172281,
-        -8.620698,
-        33.5,
-        "2026-05-28 00:33:10",
-        5.8
-      ],
-      [
-        39.160739,
-        -8.620494,
-        66.5,
-        "2026-05-28 00:49:13",
-        4.3
-      ],
-      [
-        39.153617,
-        -8.61951,
-        66.4,
-        "2026-05-28 01:05:15",
-        0.0
-      ],
-      [
-        39.144322,
-        -8.614543,
-        56.8,
-        "2026-05-28 01:21:10",
-        4.9
-      ],
-      [
-        39.132592,
-        -8.608555,
-        63.7,
-        "2026-05-28 01:39:12",
-        4.6
-      ],
-      [
-        39.126215,
-        -8.603914,
-        68.5,
-        "2026-05-28 01:56:12",
-        3.4
-      ],
-      [
-        39.117313,
-        -8.596722,
-        62.0,
-        "2026-05-28 02:12:11",
-        0.0
-      ],
-      [
-        39.115973,
-        -8.586548,
-        41.1,
-        "2026-05-28 02:28:08",
-        4.6
-      ],
-      [
-        39.111586,
-        -8.577615,
-        27.1,
-        "2026-05-28 02:44:09",
-        0.2
-      ],
-      [
-        39.106983,
-        -8.58049,
-        38.4,
-        "2026-05-28 03:00:19",
+        39.247412,
+        -8.685848,
+        72.8,
+        "2026-05-27 20:47:06",
         4.7
       ],
       [
-        39.097598,
-        -8.575741,
-        95.6,
-        "2026-05-28 03:16:09",
-        5.3
+        39.246121,
+        -8.680382,
+        61.1,
+        "2026-05-27 21:03:09",
+        0.0
       ],
       [
-        39.08562,
-        -8.570463,
-        68.5,
-        "2026-05-28 03:33:07",
+        39.246121,
+        -8.680382,
+        61.1,
+        "2026-05-27 21:19:07",
+        0.0
+      ],
+      [
+        39.244122,
+        -8.676508,
+        37.5,
+        "2026-05-27 21:36:08",
+        4.1
+      ],
+      [
+        39.234156,
+        -8.672516,
+        44.9,
+        "2026-05-27 21:52:07",
+        5.1
+      ],
+      [
+        39.230548,
+        -8.658036,
+        27.7,
+        "2026-05-27 22:08:08",
+        4.2
+      ],
+      [
+        39.230795,
+        -8.656465,
+        12.8,
+        "2026-05-27 22:24:06",
+        0.0
+      ],
+      [
+        39.230594,
+        -8.654643,
+        30.2,
+        "2026-05-27 22:40:07",
+        4.8
+      ],
+      [
+        39.221868,
+        -8.643264,
+        21.9,
+        "2026-05-27 22:56:07",
         5.6
       ],
       [
-        39.076067,
-        -8.566499,
-        90.5,
-        "2026-05-28 03:49:09",
+        39.211527,
+        -8.632969,
+        20.9,
+        "2026-05-27 23:13:07",
+        4.2
+      ],
+      [
+        39.206296,
+        -8.630666,
+        0.7,
+        "2026-05-27 23:29:07",
+        0.0
+      ],
+      [
+        39.202753,
+        -8.628171,
+        38.4,
+        "2026-05-27 23:45:07",
+        5.8
+      ],
+      [
+        39.191148,
+        -8.625346,
+        128.1,
+        "2026-05-28 00:02:14",
         5.0
       ],
       [
-        39.066875,
-        -8.565061,
-        47.5,
-        "2026-05-28 04:05:07",
-        4.3
+        39.180356,
+        -8.622569,
+        87.5,
+        "2026-05-28 00:18:12",
+        5.8
       ],
       [
-        39.051816,
-        -8.565426,
-        87.0,
-        "2026-05-28 04:33:09",
+        39.171543,
+        -8.620556,
+        30.1,
+        "2026-05-28 00:34:11",
+        5.0
+      ],
+      [
+        39.159282,
+        -8.620368,
+        44.0,
+        "2026-05-28 00:51:10",
+        3.0
+      ],
+      [
+        39.151382,
+        -8.61919,
+        286.2,
+        "2026-05-28 01:07:27",
         0.0
       ],
       [
-        39.043616,
-        -8.563303,
-        115.8,
-        "2026-05-28 04:50:09",
-        4.3
+        39.142294,
+        -8.613469,
+        59.5,
+        "2026-05-28 01:24:10",
+        4.4
       ],
       [
-        39.03231,
-        -8.560925,
-        122.0,
-        "2026-05-28 05:08:09",
-        3.1
+        39.13152,
+        -8.607656,
+        64.9,
+        "2026-05-28 01:41:12",
+        1.5
       ],
       [
-        39.021453,
-        -8.561553,
-        76.3,
-        "2026-05-28 05:25:07",
-        5.4
+        39.125653,
+        -8.603478,
+        68.7,
+        "2026-05-28 01:57:08",
+        4.6
       ],
       [
-        39.011745,
-        -8.563594,
-        -27.8,
-        "2026-05-28 05:40:09",
+        39.117248,
+        -8.596764,
+        67.0,
+        "2026-05-28 02:14:09",
         0.0
       ],
       [
-        39.00149,
-        -8.558592,
-        70.0,
-        "2026-05-28 05:57:09",
-        5.6
+        39.115478,
+        -8.584987,
+        23.5,
+        "2026-05-28 02:30:08",
+        4.7
       ],
       [
-        38.990578,
-        -8.553214,
-        63.7,
-        "2026-05-28 06:14:10",
-        5.4
+        39.111576,
+        -8.577601,
+        37.8,
+        "2026-05-28 02:46:07",
+        0.0
       ],
       [
-        38.979264,
-        -8.544901,
-        90.8,
-        "2026-05-28 06:30:08",
-        5.5
+        39.105668,
+        -8.57991,
+        53.1,
+        "2026-05-28 03:02:11",
+        0.0
       ],
       [
-        38.970468,
-        -8.53694,
-        67.5,
-        "2026-05-28 06:46:09",
+        39.096105,
+        -8.575442,
+        88.1,
+        "2026-05-28 03:18:09",
+        5.2
+      ],
+      [
+        39.085027,
+        -8.569746,
+        72.3,
+        "2026-05-28 03:34:08",
         5.3
       ],
       [
-        38.961191,
-        -8.528492,
-        69.9,
-        "2026-05-28 07:03:09",
-        6.5
-      ],
-      [
-        38.958172,
-        -8.52271,
-        32.0,
-        "2026-05-28 07:19:09",
+        39.075285,
+        -8.566298,
+        87.7,
+        "2026-05-28 03:51:09",
         0.0
       ],
       [
-        38.958287,
-        -8.522327,
-        7.2,
-        "2026-05-28 07:35:09",
+        39.062818,
+        -8.5652,
+        47.1,
+        "2026-05-28 04:12:08",
+        0.0
+      ],
+      [
+        39.051779,
+        -8.565416,
+        82.1,
+        "2026-05-28 04:35:08",
+        0.0
+      ],
+      [
+        39.042616,
+        -8.563114,
+        110.3,
+        "2026-05-28 04:52:09",
+        0.0
+      ],
+      [
+        39.031013,
+        -8.561695,
+        123.4,
+        "2026-05-28 05:10:08",
+        4.2
+      ],
+      [
+        39.020702,
+        -8.561772,
+        52.2,
+        "2026-05-28 05:26:08",
+        5.7
+      ],
+      [
+        39.009797,
+        -8.562528,
+        72.3,
+        "2026-05-28 05:43:08",
+        5.5
+      ],
+      [
+        39.000158,
+        -8.557588,
+        65.3,
+        "2026-05-28 05:59:07",
+        4.9
+      ],
+      [
+        38.989145,
+        -8.552608,
+        65.1,
+        "2026-05-28 06:16:09",
+        5.4
+      ],
+      [
+        38.978056,
+        -8.543667,
+        83.2,
+        "2026-05-28 06:32:08",
+        5.5
+      ],
+      [
+        38.969124,
+        -8.536244,
+        58.6,
+        "2026-05-28 06:48:09",
+        5.9
+      ],
+      [
+        38.960964,
+        -8.52901,
+        78.3,
+        "2026-05-28 07:04:10",
+        4.0
+      ],
+      [
+        38.958372,
+        -8.522691,
+        13.1,
+        "2026-05-28 07:21:10",
         0.0
       ],
       [
         38.958075,
         -8.522306,
         50.8,
-        "2026-05-28 07:51:10",
+        "2026-05-28 07:37:09",
         0.0
       ],
       [
-        38.958176,
-        -8.522409,
+        38.958075,
+        -8.522306,
         50.8,
-        "2026-05-28 08:07:08",
+        "2026-05-28 07:53:09",
         0.0
       ],
       [
-        38.958166,
-        -8.522323,
+        38.958172,
+        -8.522408,
         50.8,
-        "2026-05-28 08:23:09",
-        0.0
-      ],
-      [
-        38.958166,
-        -8.522323,
-        50.8,
-        "2026-05-28 08:40:11",
+        "2026-05-28 08:09:10",
         0.0
       ],
       [
         38.958166,
         -8.522323,
         50.8,
-        "2026-05-28 08:56:09",
+        "2026-05-28 08:25:09",
         0.0
       ],
       [
         38.958166,
         -8.522323,
         50.8,
-        "2026-05-28 09:12:09",
+        "2026-05-28 08:42:09",
+        0.0
+      ],
+      [
+        38.958166,
+        -8.522323,
+        50.8,
+        "2026-05-28 08:58:08",
+        0.0
+      ],
+      [
+        38.958166,
+        -8.522323,
+        50.8,
+        "2026-05-28 09:14:08",
         0.0
       ],
       [
         38.958116,
         -8.522418,
         48.9,
-        "2026-05-28 09:28:10",
+        "2026-05-28 09:30:09",
         0.0
       ],
       [
-        38.958081,
-        -8.5223,
-        61.7,
-        "2026-05-28 09:44:09",
-        0.3
-      ],
-      [
-        38.954448,
-        -8.520211,
-        29.0,
-        "2026-05-28 10:01:09",
-        3.1
-      ],
-      [
-        38.949791,
-        -8.503792,
-        -8.9,
-        "2026-05-28 10:17:08",
-        6.2
-      ],
-      [
-        38.938979,
-        -8.506466,
-        10.8,
-        "2026-05-28 10:33:10",
-        3.7
-      ],
-      [
-        38.929982,
-        -8.501826,
-        -2.0,
-        "2026-05-28 10:49:10",
-        4.0
-      ],
-      [
-        38.916608,
-        -8.494996,
-        25.9,
-        "2026-05-28 11:06:09",
-        0.0
-      ],
-      [
-        38.90427,
-        -8.486684,
+        38.958108,
+        -8.522268,
         37.4,
-        "2026-05-28 11:22:10",
-        5.9
-      ],
-      [
-        38.896441,
-        -8.482685,
-        80.1,
-        "2026-05-28 11:32:09",
+        "2026-05-28 09:46:13",
         0.0
       ],
       [
-        38.866643,
-        -8.47003,
-        -11.7,
-        "2026-05-28 12:12:10",
-        6.4
-      ],
-      [
-        38.857981,
-        -8.459432,
-        24.4,
-        "2026-05-28 12:28:11",
-        4.8
-      ],
-      [
-        38.853512,
-        -8.450338,
-        -9.4,
-        "2026-05-28 12:44:19",
-        2.6
-      ],
-      [
-        38.845073,
-        -8.443554,
-        9.8,
-        "2026-05-28 13:00:14",
-        6.2
-      ],
-      [
-        38.834545,
-        -8.45518,
-        -11.5,
-        "2026-05-28 13:16:12",
+        38.954046,
+        -8.518859,
+        87.2,
+        "2026-05-28 10:02:16",
         3.9
       ],
       [
-        38.833703,
-        -8.455595,
-        96.5,
-        "2026-05-28 13:33:10",
+        38.948808,
+        -8.502002,
+        25.0,
+        "2026-05-28 10:19:11",
+        4.1
+      ],
+      [
+        38.939871,
+        -8.509782,
+        40.9,
+        "2026-05-28 10:35:11",
+        4.1
+      ],
+      [
+        38.928389,
+        -8.500689,
+        12.7,
+        "2026-05-28 10:51:10",
+        4.9
+      ],
+      [
+        38.915562,
+        -8.493608,
+        19.7,
+        "2026-05-28 11:08:11",
+        4.3
+      ],
+      [
+        38.902662,
+        -8.486028,
+        34.4,
+        "2026-05-28 11:24:09",
+        5.7
+      ],
+      [
+        38.891508,
+        -8.478598,
+        119.0,
+        "2026-05-28 11:40:10",
+        5.9
+      ],
+      [
+        38.865132,
+        -8.470138,
+        -22.0,
+        "2026-05-28 12:14:10",
+        5.8
+      ],
+      [
+        38.857961,
+        -8.459103,
+        -28.3,
+        "2026-05-28 12:30:09",
         0.0
       ],
       [
-        38.827154,
-        -8.448763,
-        95.6,
-        "2026-05-28 13:49:10",
-        6.4
-      ],
-      [
-        38.817763,
-        -8.436941,
-        127.4,
-        "2026-05-28 14:05:09",
+        38.852932,
+        -8.449484,
+        37.9,
+        "2026-05-28 12:46:12",
         4.8
       ],
       [
-        38.808879,
-        -8.424987,
-        143.0,
-        "2026-05-28 14:21:09",
-        4.5
+        38.843382,
+        -8.444577,
+        8.4,
+        "2026-05-28 13:02:13",
+        2.1
       ],
       [
-        38.804283,
-        -8.412184,
-        116.5,
-        "2026-05-28 14:37:09",
-        4.2
+        38.833905,
+        -8.455361,
+        43.3,
+        "2026-05-28 13:18:16",
+        0.0
       ],
       [
-        38.79199,
-        -8.413318,
-        118.7,
-        "2026-05-28 14:53:10",
-        6.2
+        38.833882,
+        -8.455502,
+        99.0,
+        "2026-05-28 13:35:09",
+        0.0
+      ],
+      [
+        38.826542,
+        -8.446801,
+        109.3,
+        "2026-05-28 13:51:10",
+        5.4
+      ],
+      [
+        38.816431,
+        -8.435278,
+        120.9,
+        "2026-05-28 14:07:09",
+        4.9
+      ],
+      [
+        38.808857,
+        -8.423887,
+        133.9,
+        "2026-05-28 14:23:09",
+        4.4
+      ],
+      [
+        38.80256,
+        -8.411363,
+        134.1,
+        "2026-05-28 14:39:11",
+        6.0
+      ],
+      [
+        38.791751,
+        -8.41326,
+        182.8,
+        "2026-05-28 14:55:13",
+        0.0
       ],
       [
         38.791558,
         -8.413349,
         179.0,
-        "2026-05-28 15:09:22",
+        "2026-05-28 15:12:08",
         0.0
       ],
       [
         38.791798,
         -8.413269,
         179.0,
-        "2026-05-28 15:26:11",
+        "2026-05-28 15:28:10",
         0.0
       ],
       [
-        38.791884,
-        -8.413325,
-        117.7,
-        "2026-05-28 15:42:11",
-        7.2
+        38.791581,
+        -8.413486,
+        130.0,
+        "2026-05-28 15:44:11",
+        4.2
       ],
       [
-        38.781904,
-        -8.41846,
-        85.0,
-        "2026-05-28 15:58:10",
-        1.6
+        38.780175,
+        -8.419174,
+        112.8,
+        "2026-05-28 16:00:13",
+        2.4
       ],
       [
-        38.76956,
-        -8.419547,
-        -47.5,
-        "2026-05-28 16:14:12",
-        2.2
+        38.76808,
+        -8.420015,
+        -44.2,
+        "2026-05-28 16:16:20",
+        0.0
       ],
       [
-        38.755719,
-        -8.422282,
-        101.7,
-        "2026-05-28 16:31:09",
+        38.754046,
+        -8.422588,
+        84.0,
+        "2026-05-28 16:33:11",
         5.4
       ],
       [
-        38.742873,
-        -8.425384,
-        90.9,
-        "2026-05-28 16:48:10",
-        4.0
+        38.741124,
+        -8.424926,
+        98.6,
+        "2026-05-28 16:50:12",
+        4.3
       ],
       [
         38.732948,
         -8.425031,
         110.5,
-        "2026-05-28 17:04:15",
+        "2026-05-28 17:06:28",
         0.0
       ],
       [
-        38.726292,
-        -8.426936,
-        94.4,
-        "2026-05-28 17:20:10",
-        6.0
+        38.724651,
+        -8.427986,
+        85.2,
+        "2026-05-28 17:22:11",
+        4.4
       ],
       [
-        38.708711,
-        -8.429195,
-        116.5,
-        "2026-05-28 17:38:12",
-        9.7
+        38.706555,
+        -8.4284,
+        123.9,
+        "2026-05-28 17:40:12",
+        3.0
       ],
       [
-        38.690951,
-        -8.438977,
-        140.1,
-        "2026-05-28 17:57:12",
-        6.3
+        38.689032,
+        -8.440739,
+        137.1,
+        "2026-05-28 17:59:10",
+        5.6
       ],
       [
-        38.677925,
-        -8.449312,
-        135.5,
-        "2026-05-28 18:13:10",
-        4.8
+        38.676699,
+        -8.450396,
+        174.1,
+        "2026-05-28 18:15:12",
+        2.7
       ],
       [
-        38.673374,
-        -8.467185,
-        159.3,
-        "2026-05-28 18:30:10",
-        6.3
+        38.672096,
+        -8.467831,
+        218.7,
+        "2026-05-28 18:32:13",
+        0.0
       ],
       [
-        38.659599,
-        -8.466813,
-        101.1,
-        "2026-05-28 18:46:11",
-        7.1
+        38.658252,
+        -8.466297,
+        94.5,
+        "2026-05-28 18:48:11",
+        5.2
       ],
       [
         38.653291,
         -8.463118,
         91.0,
-        "2026-05-28 19:02:10",
+        "2026-05-28 19:04:10",
         0.0
       ],
       [
         38.653333,
         -8.463353,
         105.3,
-        "2026-05-28 19:18:12",
+        "2026-05-28 19:20:10",
         0.0
       ],
       [
-        38.646366,
-        -8.45812,
-        119.0,
-        "2026-05-28 19:34:10",
-        4.9
-      ],
-      [
-        38.632738,
-        -8.455921,
-        111.5,
-        "2026-05-28 19:50:10",
-        6.0
-      ],
-      [
-        38.619527,
-        -8.457584,
-        104.4,
-        "2026-05-28 20:07:11",
-        3.8
-      ],
-      [
-        38.611207,
-        -8.451924,
-        109.6,
-        "2026-05-28 20:23:10",
-        5.0
-      ],
-      [
-        38.607012,
-        -8.450571,
-        134.6,
-        "2026-05-28 20:39:10",
-        0.0
-      ],
-      [
-        38.598751,
-        -8.462941,
-        150.7,
-        "2026-05-28 20:55:13",
-        4.5
-      ],
-      [
-        38.594583,
-        -8.477387,
-        122.0,
-        "2026-05-28 21:11:11",
-        3.9
-      ],
-      [
-        38.585581,
-        -8.487396,
-        118.0,
-        "2026-05-28 21:27:11",
+        38.644977,
+        -8.456705,
+        108.7,
+        "2026-05-28 19:36:10",
         3.3
       ],
       [
-        38.580155,
-        -8.490377,
-        73.3,
-        "2026-05-28 21:44:10",
-        0.5
+        38.629869,
+        -8.456259,
+        114.8,
+        "2026-05-28 19:53:11",
+        4.6
       ],
       [
-        38.580233,
-        -8.490346,
-        82.4,
-        "2026-05-28 22:00:11",
+        38.617798,
+        -8.457842,
+        102.3,
+        "2026-05-28 20:09:09",
+        4.8
+      ],
+      [
+        38.609601,
+        -8.451615,
+        132.9,
+        "2026-05-28 20:25:12",
+        3.1
+      ],
+      [
+        38.606009,
+        -8.451095,
+        101.2,
+        "2026-05-28 20:41:09",
+        3.8
+      ],
+      [
+        38.598398,
+        -8.464579,
+        137.3,
+        "2026-05-28 20:57:12",
+        5.3
+      ],
+      [
+        38.593695,
+        -8.479029,
+        105.3,
+        "2026-05-28 21:13:11",
+        5.2
+      ],
+      [
+        38.584388,
+        -8.48822,
+        66.9,
+        "2026-05-28 21:30:10",
+        0.9
+      ],
+      [
+        38.580184,
+        -8.490363,
+        64.2,
+        "2026-05-28 21:46:12",
+        0.3
+      ],
+      [
+        38.580198,
+        -8.490441,
+        68.0,
+        "2026-05-28 22:02:11",
+        1.2
+      ],
+      [
+        38.567148,
+        -8.487876,
+        95.8,
+        "2026-05-28 22:18:11",
+        5.1
+      ],
+      [
+        38.557311,
+        -8.490148,
+        97.4,
+        "2026-05-28 22:36:11",
+        3.2
+      ],
+      [
+        38.536754,
+        -8.490705,
+        69.6,
+        "2026-05-28 22:55:12",
+        5.2
+      ],
+      [
+        38.52957,
+        -8.492014,
+        48.7,
+        "2026-05-28 23:12:12",
         0.0
       ],
       [
-        38.56903,
-        -8.487886,
-        80.9,
-        "2026-05-28 22:16:11",
-        3.0
-      ],
-      [
-        38.558963,
-        -8.489163,
-        90.1,
-        "2026-05-28 22:34:12",
-        6.9
-      ],
-      [
-        38.539158,
-        -8.490866,
-        67.8,
-        "2026-05-28 22:53:09",
-        7.2
-      ],
-      [
-        38.529501,
-        -8.492133,
-        48.3,
-        "2026-05-28 23:09:11",
-        0.8
-      ],
-      [
-        38.529478,
-        -8.492152,
-        48.8,
-        "2026-05-28 23:26:11",
+        38.529675,
+        -8.492004,
+        28.5,
+        "2026-05-28 23:28:09",
         0.0
       ],
       [
         38.529479,
         -8.492151,
         48.3,
-        "2026-05-28 23:42:11",
+        "2026-05-28 23:44:11",
         0.0
       ],
       [
         38.529492,
         -8.492159,
         48.6,
-        "2026-05-28 23:58:12",
+        "2026-05-29 00:01:12",
         0.0
       ],
       [
         38.529529,
         -8.4922,
         48.3,
-        "2026-05-29 00:15:11",
+        "2026-05-29 00:17:13",
         0.0
       ],
       [
-        38.529529,
-        -8.4922,
+        38.52952,
+        -8.492141,
         48.3,
-        "2026-05-29 00:31:10",
+        "2026-05-29 00:33:10",
         0.0
       ],
       [
-        38.529514,
-        -8.492146,
+        38.529516,
+        -8.492148,
         48.3,
-        "2026-05-29 00:47:11",
+        "2026-05-29 00:50:11",
         0.0
       ],
       [
         38.529518,
         -8.492137,
         44.1,
-        "2026-05-29 01:04:10",
+        "2026-05-29 01:06:14",
         0.0
       ],
       [
         38.529493,
         -8.492152,
         49.0,
-        "2026-05-29 01:20:12",
+        "2026-05-29 01:22:12",
         0.0
       ],
       [
         38.529473,
         -8.492143,
         55.4,
-        "2026-05-29 01:36:11",
+        "2026-05-29 01:38:15",
         0.0
       ],
       [
-        38.529501,
-        -8.492128,
+        38.5295,
+        -8.492129,
         55.4,
-        "2026-05-29 01:52:11",
+        "2026-05-29 01:54:12",
         0.0
       ],
       [
         38.529516,
         -8.492103,
         53.8,
-        "2026-05-29 02:08:19",
-        0.0
-      ],
-      [
-        38.529497,
-        -8.492177,
-        53.8,
-        "2026-05-29 02:24:14",
+        "2026-05-29 02:11:25",
         0.0
       ],
       [
         38.529495,
         -8.492053,
         37.9,
-        "2026-05-29 02:41:20",
+        "2026-05-29 02:27:12",
         0.0
       ],
       [
-        38.529519,
-        -8.492177,
+        38.529495,
+        -8.492053,
         37.9,
-        "2026-05-29 02:57:15",
+        "2026-05-29 02:43:18",
         0.0
       ],
       [
-        38.529575,
-        -8.492129,
-        42.2,
-        "2026-05-29 03:13:20",
+        38.52947,
+        -8.492141,
+        37.9,
+        "2026-05-29 02:59:14",
+        0.0
+      ],
+      [
+        38.529622,
+        -8.492104,
+        22.6,
+        "2026-05-29 03:15:15",
         0.0
       ],
       [
         38.529479,
         -8.49202,
         62.0,
-        "2026-05-29 03:29:21",
+        "2026-05-29 03:31:15",
         0.0
       ],
       [
-        38.529469,
-        -8.492149,
+        38.529478,
+        -8.492153,
         62.0,
-        "2026-05-29 03:45:21",
+        "2026-05-29 03:48:20",
         0.0
       ],
       [
-        38.5295,
-        -8.492168,
-        39.9,
-        "2026-05-29 04:02:11",
-        0.0
+        38.529466,
+        -8.492164,
+        42.2,
+        "2026-05-29 04:04:12",
+        2.2
       ],
       [
         38.529505,
         -8.492105,
         47.5,
-        "2026-05-29 04:18:12",
+        "2026-05-29 04:20:11",
         0.0
       ],
       [
         38.529277,
         -8.492125,
         44.0,
-        "2026-05-29 04:34:11",
+        "2026-05-29 04:36:11",
         0.0
       ],
       [
-        38.525709,
-        -8.493377,
-        47.0,
-        "2026-05-29 04:50:09",
-        4.0
-      ],
-      [
-        38.514062,
-        -8.497236,
-        51.2,
-        "2026-05-29 05:06:12",
-        5.0
-      ],
-      [
-        38.500926,
-        -8.499898,
-        53.0,
-        "2026-05-29 05:22:10",
-        2.6
-      ],
-      [
-        38.487216,
-        -8.503761,
-        16.8,
-        "2026-05-29 05:39:12",
-        8.9
-      ],
-      [
-        38.472353,
-        -8.507179,
-        52.6,
-        "2026-05-29 05:55:11",
-        5.2
-      ],
-      [
-        38.456188,
-        -8.510021,
-        29.7,
-        "2026-05-29 06:11:11",
-        6.5
-      ],
-      [
-        38.441365,
-        -8.515112,
-        20.3,
-        "2026-05-29 06:26:12",
-        0.0
-      ],
-      [
-        38.427671,
-        -8.520181,
-        38.1,
-        "2026-05-29 06:43:11",
-        5.2
-      ],
-      [
-        38.412419,
-        -8.516547,
-        45.7,
-        "2026-05-29 06:59:11",
-        7.7
-      ],
-      [
-        38.400093,
-        -8.517938,
-        29.7,
-        "2026-05-29 07:16:13",
-        0.0
-      ],
-      [
-        38.387476,
-        -8.523318,
-        -29.3,
-        "2026-05-29 07:32:11",
-        4.6
-      ],
-      [
-        38.379002,
-        -8.525907,
-        63.9,
-        "2026-05-29 07:48:11",
-        3.4
-      ],
-      [
-        38.366451,
-        -8.523965,
-        40.2,
-        "2026-05-29 08:04:13",
-        4.5
-      ],
-      [
-        38.361222,
-        -8.521591,
-        69.5,
-        "2026-05-29 08:20:11",
-        3.8
-      ],
-      [
-        38.346169,
-        -8.518053,
-        74.9,
-        "2026-05-29 08:36:10",
-        4.8
-      ],
-      [
-        38.330128,
-        -8.522851,
-        114.4,
-        "2026-05-29 08:53:13",
+        38.524555,
+        -8.494135,
+        41.5,
+        "2026-05-29 04:52:10",
         3.1
       ],
       [
-        38.317083,
-        -8.526713,
-        100.2,
-        "2026-05-29 09:09:13",
-        3.3
+        38.512416,
+        -8.497576,
+        57.9,
+        "2026-05-29 05:08:10",
+        5.7
       ],
       [
-        38.308313,
-        -8.530233,
-        69.4,
-        "2026-05-29 09:26:12",
+        38.500268,
+        -8.499978,
+        45.4,
+        "2026-05-29 05:25:12",
+        3.7
+      ],
+      [
+        38.484988,
+        -8.504846,
+        65.2,
+        "2026-05-29 05:41:13",
+        7.1
+      ],
+      [
+        38.470487,
+        -8.508007,
+        46.6,
+        "2026-05-29 05:57:11",
+        7.4
+      ],
+      [
+        38.454276,
+        -8.510961,
+        19.8,
+        "2026-05-29 06:13:10",
+        9.3
+      ],
+      [
+        38.439183,
+        -8.516527,
+        23.5,
+        "2026-05-29 06:29:11",
+        4.9
+      ],
+      [
+        38.426159,
+        -8.51903,
+        44.9,
+        "2026-05-29 06:45:13",
         0.0
       ],
       [
-        38.298985,
-        -8.532866,
-        114.1,
-        "2026-05-29 09:42:12",
-        7.2
-      ],
-      [
-        38.282105,
-        -8.537987,
-        84.1,
-        "2026-05-29 09:58:11",
-        8.8
-      ],
-      [
-        38.267514,
-        -8.542523,
-        76.3,
-        "2026-05-29 10:14:10",
-        7.7
-      ],
-      [
-        38.25456,
-        -8.546461,
-        -83.0,
-        "2026-05-29 10:31:14",
-        9.6
-      ],
-      [
-        38.239059,
-        -8.551566,
-        55.6,
-        "2026-05-29 10:47:11",
-        6.7
-      ],
-      [
-        38.224488,
-        -8.556088,
-        77.1,
-        "2026-05-29 11:03:11",
-        3.6
-      ],
-      [
-        38.214946,
-        -8.559055,
-        85.9,
-        "2026-05-29 11:19:11",
-        6.5
-      ],
-      [
-        38.201916,
-        -8.563323,
-        85.9,
-        "2026-05-29 11:35:12",
-        0.0
-      ],
-      [
-        38.19111,
-        -8.566466,
-        89.9,
-        "2026-05-29 11:51:10",
-        7.2
-      ],
-      [
-        38.181263,
-        -8.566767,
-        103.7,
-        "2026-05-29 12:07:14",
-        0.0
-      ],
-      [
-        38.164264,
-        -8.568702,
-        95.9,
-        "2026-05-29 12:24:15",
-        3.5
-      ],
-      [
-        38.155944,
-        -8.568905,
-        100.2,
-        "2026-05-29 12:41:10",
+        38.408899,
+        -8.51607,
+        34.1,
+        "2026-05-29 07:02:11",
         4.8
       ],
       [
-        38.146649,
-        -8.568194,
-        112.8,
-        "2026-05-29 12:58:11",
-        4.4
+        38.398697,
+        -8.518629,
+        5.9,
+        "2026-05-29 07:18:12",
+        4.8
       ],
       [
-        38.146426,
-        -8.568249,
-        112.1,
-        "2026-05-29 13:14:11",
-        0.0
+        38.385875,
+        -8.523777,
+        25.5,
+        "2026-05-29 07:34:12",
+        3.1
       ],
       [
-        38.133431,
-        -8.563249,
-        148.2,
-        "2026-05-29 13:30:10",
-        5.2
+        38.377331,
+        -8.526485,
+        56.3,
+        "2026-05-29 07:50:11",
+        5.7
       ],
       [
-        38.119698,
-        -8.561173,
-        198.2,
-        "2026-05-29 13:47:11",
-        6.6
+        38.365813,
+        -8.523716,
+        47.4,
+        "2026-05-29 08:06:13",
+        0.2
       ],
       [
-        38.110858,
-        -8.56028,
-        213.7,
-        "2026-05-29 14:03:13",
-        0.4
-      ],
-      [
-        38.099243,
-        -8.554038,
-        206.4,
-        "2026-05-29 14:19:11",
-        4.2
-      ],
-      [
-        38.086016,
-        -8.553471,
-        233.8,
-        "2026-05-29 14:35:16",
-        3.3
-      ],
-      [
-        38.074254,
-        -8.558878,
-        232.9,
-        "2026-05-29 14:53:11",
-        5.6
-      ],
-      [
-        38.053352,
-        -8.564784,
-        210.1,
-        "2026-05-29 15:12:15",
-        0.1
-      ],
-      [
-        38.034055,
-        -8.557366,
-        211.2,
-        "2026-05-29 15:30:12",
-        11.0
-      ],
-      [
-        38.019835,
-        -8.55335,
-        168.5,
-        "2026-05-29 15:46:14",
-        0.0
-      ],
-      [
-        38.019435,
-        -8.553312,
-        166.7,
-        "2026-05-29 16:02:31",
-        4.5
-      ],
-      [
-        38.008218,
-        -8.557771,
-        129.2,
-        "2026-05-29 16:18:13",
-        5.6
-      ],
-      [
-        38.005676,
-        -8.560322,
-        118.4,
-        "2026-05-29 16:35:12",
-        4.3
-      ],
-      [
-        37.997684,
-        -8.55735,
-        138.6,
-        "2026-05-29 16:52:11",
-        3.8
-      ],
-      [
-        37.984156,
-        -8.552475,
-        135.8,
-        "2026-05-29 17:09:14",
-        4.0
-      ],
-      [
-        37.972367,
-        -8.554605,
-        146.0,
-        "2026-05-29 17:25:14",
+        38.358913,
+        -8.521058,
+        67.8,
+        "2026-05-29 08:23:12",
         5.4
       ],
       [
-        37.957498,
-        -8.550504,
-        111.0,
-        "2026-05-29 17:41:13",
-        8.2
+        38.34345,
+        -8.518604,
+        72.8,
+        "2026-05-29 08:39:11",
+        5.5
       ],
       [
-        37.937997,
-        -8.542327,
-        133.1,
-        "2026-05-29 17:59:13",
-        8.0
+        38.327937,
+        -8.52343,
+        101.7,
+        "2026-05-29 08:55:13",
+        2.3
       ],
       [
-        37.923078,
-        -8.544186,
-        94.7,
-        "2026-05-29 18:15:11",
-        7.3
+        38.31579,
+        -8.52741,
+        163.9,
+        "2026-05-29 09:11:14",
+        7.0
       ],
       [
-        37.914086,
-        -8.553709,
-        109.6,
-        "2026-05-29 18:32:12",
+        38.308226,
+        -8.530364,
+        110.5,
+        "2026-05-29 09:28:10",
+        0.0
+      ],
+      [
+        38.296881,
+        -8.533475,
+        95.2,
+        "2026-05-29 09:44:12",
+        5.4
+      ],
+      [
+        38.278799,
+        -8.539025,
+        104.5,
+        "2026-05-29 10:01:12",
+        10.3
+      ],
+      [
+        38.265174,
+        -8.543292,
+        82.6,
+        "2026-05-29 10:17:15",
+        3.5
+      ],
+      [
+        38.251374,
+        -8.54745,
+        -23.3,
+        "2026-05-29 10:33:19",
+        8.8
+      ],
+      [
+        38.236745,
+        -8.552231,
+        67.5,
+        "2026-05-29 10:49:11",
+        12.0
+      ],
+      [
+        38.222072,
+        -8.55684,
+        80.7,
+        "2026-05-29 11:05:11",
+        7.0
+      ],
+      [
+        38.212515,
+        -8.559841,
+        84.5,
+        "2026-05-29 11:21:11",
+        8.9
+      ],
+      [
+        38.201324,
+        -8.563264,
+        83.1,
+        "2026-05-29 11:38:10",
+        3.8
+      ],
+      [
+        38.187709,
+        -8.567603,
+        83.2,
+        "2026-05-29 11:54:15",
+        4.0
+      ],
+      [
+        38.179003,
+        -8.566521,
+        96.9,
+        "2026-05-29 12:09:18",
+        0.0
+      ],
+      [
+        38.162992,
+        -8.567883,
+        105.0,
+        "2026-05-29 12:26:18",
+        3.0
+      ],
+      [
+        38.154814,
+        -8.568995,
+        114.9,
+        "2026-05-29 12:43:10",
+        6.0
+      ],
+      [
+        38.146591,
+        -8.56806,
+        100.3,
+        "2026-05-29 13:01:12",
+        0.0
+      ],
+      [
+        38.145572,
+        -8.568,
+        122.6,
+        "2026-05-29 13:17:13",
+        7.7
+      ],
+      [
+        38.130733,
+        -8.563232,
+        154.0,
+        "2026-05-29 13:33:15",
+        11.8
+      ],
+      [
+        38.117401,
+        -8.559824,
+        204.1,
+        "2026-05-29 13:49:11",
+        8.4
+      ],
+      [
+        38.110217,
+        -8.559992,
+        202.0,
+        "2026-05-29 14:05:10",
+        7.0
+      ],
+      [
+        38.097597,
+        -8.554461,
+        218.1,
+        "2026-05-29 14:21:14",
+        6.0
+      ],
+      [
+        38.083696,
+        -8.553416,
+        221.8,
+        "2026-05-29 14:38:11",
+        5.3
+      ],
+      [
+        38.071587,
+        -8.560161,
+        229.4,
+        "2026-05-29 14:56:13",
+        7.4
+      ],
+      [
+        38.05095,
+        -8.562637,
+        199.1,
+        "2026-05-29 15:15:20",
+        12.1
+      ],
+      [
+        38.03115,
+        -8.557532,
+        180.9,
+        "2026-05-29 15:32:12",
+        9.8
+      ],
+      [
+        38.019932,
+        -8.553598,
+        104.5,
+        "2026-05-29 15:48:13",
+        0.0
+      ],
+      [
+        38.018218,
+        -8.552925,
+        161.6,
+        "2026-05-29 16:04:13",
+        5.3
+      ],
+      [
+        38.007976,
+        -8.558226,
+        138.8,
+        "2026-05-29 16:22:12",
+        0.0
+      ],
+      [
+        38.004756,
+        -8.56241,
+        109.5,
+        "2026-05-29 16:38:11",
+        0.9
+      ],
+      [
+        37.995955,
+        -8.557038,
+        110.6,
+        "2026-05-29 16:55:12",
+        0.1
+      ],
+      [
+        37.983427,
+        -8.552412,
+        121.8,
+        "2026-05-29 17:11:13",
+        4.5
+      ],
+      [
+        37.970766,
+        -8.554539,
+        128.9,
+        "2026-05-29 17:27:11",
+        3.1
+      ],
+      [
+        37.955263,
+        -8.549597,
+        98.0,
+        "2026-05-29 17:43:16",
+        4.5
+      ],
+      [
+        37.933934,
+        -8.542512,
+        110.8,
+        "2026-05-29 18:02:15",
+        8.9
+      ],
+      [
+        37.920707,
+        -8.545038,
+        105.0,
+        "2026-05-29 18:18:14",
+        7.1
+      ],
+      [
+        37.914159,
+        -8.553626,
+        93.3,
+        "2026-05-29 18:35:13",
         0.0
       ],
       [
         37.913987,
         -8.55372,
         114.9,
-        "2026-05-29 18:49:13",
+        "2026-05-29 18:51:12",
         0.0
       ],
       [
-        37.913171,
-        -8.554886,
-        100.5,
-        "2026-05-29 19:07:13",
-        4.0
-      ],
-      [
-        37.903614,
-        -8.573994,
-        131.8,
-        "2026-05-29 19:23:14",
-        8.0
-      ],
-      [
-        37.892044,
-        -8.591063,
-        175.2,
-        "2026-05-29 19:39:13",
-        7.9
-      ],
-      [
-        37.880124,
-        -8.605205,
-        144.8,
-        "2026-05-29 19:55:13",
+        37.912343,
+        -8.556033,
+        101.6,
+        "2026-05-29 19:09:13",
         5.0
       ],
       [
-        37.87204,
-        -8.614511,
-        154.8,
-        "2026-05-29 20:11:14",
-        5.1
+        37.901592,
+        -8.578242,
+        144.5,
+        "2026-05-29 19:26:13",
+        5.8
       ],
       [
-        37.858373,
-        -8.620272,
-        149.1,
-        "2026-05-29 20:28:14",
-        6.2
+        37.88907,
+        -8.594693,
+        160.4,
+        "2026-05-29 19:42:14",
+        9.1
       ],
       [
-        37.842537,
-        -8.619676,
-        135.2,
-        "2026-05-29 20:45:12",
-        9.2
+        37.878094,
+        -8.607602,
+        162.3,
+        "2026-05-29 19:58:12",
+        5.8
       ],
       [
-        37.839015,
-        -8.61324,
-        90.2,
-        "2026-05-29 21:06:13",
-        5.4
+        37.870069,
+        -8.615361,
+        142.9,
+        "2026-05-29 20:14:13",
+        4.9
       ],
       [
-        37.830587,
-        -8.608869,
-        83.6,
-        "2026-05-29 21:22:14",
-        6.3
+        37.856669,
+        -8.621094,
+        156.1,
+        "2026-05-29 20:30:13",
+        7.7
       ],
       [
-        37.816683,
-        -8.620973,
-        159.6,
-        "2026-05-29 21:39:11",
+        37.839531,
+        -8.619532,
+        106.8,
+        "2026-05-29 20:47:25",
+        6.0
+      ],
+      [
+        37.838742,
+        -8.610324,
+        86.4,
+        "2026-05-29 21:09:12",
+        7.0
+      ],
+      [
+        37.828402,
+        -8.611869,
+        135.9,
+        "2026-05-29 21:26:13",
+        2.6
+      ],
+      [
+        37.814283,
+        -8.622349,
+        132.7,
+        "2026-05-29 21:42:13",
+        5.8
+      ],
+      [
+        37.806973,
+        -8.636932,
+        95.4,
+        "2026-05-29 21:58:29",
         5.6
       ],
       [
-        37.808162,
-        -8.63365,
-        145.6,
-        "2026-05-29 21:55:15",
-        7.6
+        37.805509,
+        -8.63985,
+        129.0,
+        "2026-05-29 22:14:14",
+        0.7
       ],
       [
-        37.805497,
-        -8.639818,
-        139.0,
-        "2026-05-29 22:12:13",
-        0.2
+        37.799861,
+        -8.654602,
+        146.8,
+        "2026-05-29 22:30:13",
+        7.4
       ],
       [
-        37.800743,
-        -8.651962,
-        143.5,
-        "2026-05-29 22:28:15",
-        6.2
+        37.788939,
+        -8.665774,
+        180.4,
+        "2026-05-29 22:47:13",
+        5.2
       ],
       [
-        37.79098,
-        -8.667017,
-        183.6,
-        "2026-05-29 22:44:14",
+        37.781174,
+        -8.662665,
+        159.9,
+        "2026-05-29 23:03:12",
         0.0
       ],
       [
-        37.781159,
-        -8.662635,
-        173.0,
-        "2026-05-29 23:00:12",
-        2.0
-      ],
-      [
-        37.781188,
-        -8.662723,
-        163.0,
-        "2026-05-29 23:19:13",
+        37.780482,
+        -8.662766,
+        165.1,
+        "2026-05-29 23:22:14",
         0.0
       ],
       [
-        37.769676,
-        -8.662318,
-        177.8,
-        "2026-05-29 23:37:15",
-        4.3
-      ],
-      [
-        37.758715,
-        -8.663474,
-        189.7,
-        "2026-05-29 23:53:16",
-        5.4
-      ],
-      [
-        37.74736,
-        -8.657669,
-        152.7,
-        "2026-05-30 00:13:12",
+        37.7686,
+        -8.662396,
+        170.7,
+        "2026-05-29 23:39:12",
         5.1
       ],
       [
-        37.736463,
-        -8.65656,
-        171.9,
-        "2026-05-30 00:29:11",
-        5.0
-      ],
-      [
-        37.725067,
-        -8.656715,
-        179.8,
-        "2026-05-30 00:45:15",
-        5.0
-      ],
-      [
-        37.720698,
-        -8.660028,
-        170.7,
-        "2026-05-30 01:01:14",
-        5.4
-      ],
-      [
-        37.712192,
-        -8.666415,
-        181.5,
-        "2026-05-30 01:18:13",
-        4.4
-      ],
-      [
-        37.7013,
-        -8.6634,
-        203.8,
-        "2026-05-30 01:34:13",
-        2.8
-      ],
-      [
-        37.69007,
-        -8.659948,
-        159.6,
-        "2026-05-30 01:49:14",
+        37.757474,
+        -8.663005,
+        190.1,
+        "2026-05-29 23:55:12",
         0.0
       ],
       [
-        37.678293,
-        -8.657291,
-        149.1,
-        "2026-05-30 02:06:12",
-        5.5
+        37.745448,
+        -8.657913,
+        151.0,
+        "2026-05-30 00:16:12",
+        3.8
       ],
       [
-        37.674089,
-        -8.656544,
-        44.6,
-        "2026-05-30 02:22:14",
-        17.8
+        37.734179,
+        -8.655931,
+        171.6,
+        "2026-05-30 00:32:12",
+        4.9
+      ],
+      [
+        37.724785,
+        -8.65704,
+        178.9,
+        "2026-05-30 00:48:12",
+        0.0
+      ],
+      [
+        37.719762,
+        -8.661016,
+        159.6,
+        "2026-05-30 01:04:12",
+        5.4
+      ],
+      [
+        37.710886,
+        -8.666697,
+        182.6,
+        "2026-05-30 01:20:13",
+        3.6
+      ],
+      [
+        37.699873,
+        -8.663537,
+        179.7,
+        "2026-05-30 01:36:18",
+        1.7
+      ],
+      [
+        37.68792,
+        -8.659212,
+        167.2,
+        "2026-05-30 01:52:14",
+        0.0
+      ],
+      [
+        37.676048,
+        -8.656819,
+        152.7,
+        "2026-05-30 02:09:13",
+        4.7
+      ],
+      [
+        37.674138,
+        -8.656368,
+        133.1,
+        "2026-05-30 02:25:14",
+        0.0
       ],
       [
         37.674093,
         -8.656275,
         160.2,
-        "2026-05-30 02:38:12",
+        "2026-05-30 02:41:17",
         0.0
       ],
       [
         37.674081,
         -8.656258,
         160.2,
-        "2026-05-30 02:55:14",
+        "2026-05-30 02:57:14",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 03:11:13",
+        "2026-05-30 03:13:13",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 03:27:14",
+        "2026-05-30 03:30:13",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 03:43:13",
+        "2026-05-30 03:46:14",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 03:59:13",
+        "2026-05-30 04:02:14",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 04:15:13",
+        "2026-05-30 04:18:14",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 04:32:14",
+        "2026-05-30 04:34:14",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 04:48:13",
+        "2026-05-30 04:50:16",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 05:04:14",
+        "2026-05-30 05:07:13",
         0.0
       ],
       [
         37.674076,
         -8.656198,
         160.2,
-        "2026-05-30 05:20:14",
+        "2026-05-30 05:23:16",
         0.0
       ],
       [
-        37.674061,
-        -8.656308,
-        167.3,
-        "2026-05-30 05:36:14",
+        37.674128,
+        -8.6565,
+        125.0,
+        "2026-05-30 05:39:14",
         0.0
       ],
       [
-        37.674072,
-        -8.656239,
-        161.6,
-        "2026-05-30 05:53:14",
-        0.0
+        37.674087,
+        -8.65638,
+        168.3,
+        "2026-05-30 05:56:14",
+        0.2
       ],
       [
-        37.660989,
-        -8.652144,
-        129.6,
-        "2026-05-30 06:10:15",
-        3.6
-      ],
-      [
-        37.641997,
-        -8.640137,
-        125.4,
-        "2026-05-30 06:26:13",
-        3.7
-      ],
-      [
-        37.632106,
-        -8.62622,
-        33.9,
-        "2026-05-30 06:42:15",
-        5.4
-      ],
-      [
-        37.618848,
-        -8.625478,
-        82.5,
-        "2026-05-30 06:58:13",
-        5.7
-      ],
-      [
-        37.606896,
-        -8.637489,
-        73.0,
-        "2026-05-30 07:14:15",
-        6.2
-      ],
-      [
-        37.593064,
-        -8.652225,
-        18.0,
-        "2026-05-30 07:30:14",
-        4.5
-      ],
-      [
-        37.579753,
-        -8.657504,
-        136.8,
-        "2026-05-30 07:47:12",
-        5.7
-      ],
-      [
-        37.568581,
-        -8.67168,
-        152.0,
-        "2026-05-30 08:03:19",
-        6.7
-      ],
-      [
-        37.553702,
-        -8.678165,
-        174.7,
-        "2026-05-30 08:19:15",
+        37.658575,
+        -8.650729,
+        126.3,
+        "2026-05-30 06:12:15",
         7.5
       ],
       [
-        37.54178,
-        -8.688167,
-        137.4,
-        "2026-05-30 08:35:26",
-        6.1
+        37.638304,
+        -8.639647,
+        135.4,
+        "2026-05-30 06:29:14",
+        5.6
       ],
       [
-        37.526212,
-        -8.699454,
-        250.1,
-        "2026-05-30 08:54:21",
-        6.9
-      ],
-      [
-        37.514089,
-        -8.710617,
-        235.6,
-        "2026-05-30 09:10:23",
-        5.4
-      ],
-      [
-        37.504108,
-        -8.719506,
-        123.1,
-        "2026-05-30 09:27:16",
-        5.8
-      ],
-      [
-        37.484539,
-        -8.721159,
-        180.1,
-        "2026-05-30 09:44:16",
-        5.2
-      ],
-      [
-        37.475331,
-        -8.729605,
-        279.6,
-        "2026-05-30 10:00:14",
-        5.8
-      ],
-      [
-        37.463258,
-        -8.734561,
-        249.5,
-        "2026-05-30 10:15:16",
-        5.0
-      ],
-      [
-        37.451487,
-        -8.740959,
-        283.5,
-        "2026-05-30 10:31:29",
+        37.628854,
+        -8.625437,
+        55.9,
+        "2026-05-30 06:45:14",
         5.3
       ],
       [
-        37.441809,
-        -8.745341,
-        27.8,
-        "2026-05-30 10:48:16",
-        4.5
+        37.616817,
+        -8.62681,
+        118.2,
+        "2026-05-30 07:01:14",
+        4.1
       ],
       [
-        37.434134,
-        -8.758422,
-        128.6,
-        "2026-05-30 11:05:22",
-        4.9
+        37.603011,
+        -8.64018,
+        58.9,
+        "2026-05-30 07:17:15",
+        7.6
       ],
       [
-        37.43384,
-        -8.759778,
-        21.3,
-        "2026-05-30 11:21:18",
-        0.3
-      ],
-      [
-        37.431071,
-        -8.768124,
-        37.2,
-        "2026-05-30 11:37:20",
-        5.2
-      ],
-      [
-        37.420258,
-        -8.766784,
-        118.6,
-        "2026-05-30 11:53:18",
-        8.5
-      ],
-      [
-        37.406483,
-        -8.772136,
-        109.9,
-        "2026-05-30 12:09:18",
-        3.1
-      ],
-      [
-        37.396117,
-        -8.783105,
-        112.2,
-        "2026-05-30 12:25:14",
-        2.4
-      ],
-      [
-        37.383712,
-        -8.793039,
-        104.7,
-        "2026-05-30 12:42:14",
-        4.6
-      ],
-      [
-        37.371564,
-        -8.799972,
-        93.5,
-        "2026-05-30 12:58:17",
-        0.0
-      ],
-      [
-        37.371562,
-        -8.800019,
-        105.5,
-        "2026-05-30 13:14:13",
-        0.0
-      ],
-      [
-        37.359946,
-        -8.800516,
-        36.3,
-        "2026-05-30 13:30:14",
-        9.2
-      ],
-      [
-        37.340445,
-        -8.796188,
-        52.7,
-        "2026-05-30 13:46:20",
-        0.7
-      ],
-      [
-        37.320509,
-        -8.798359,
-        13.6,
-        "2026-05-30 14:02:19",
-        7.4
-      ],
-      [
-        37.300537,
-        -8.799373,
-        22.0,
-        "2026-05-30 14:19:16",
+        37.591556,
+        -8.653804,
+        51.6,
+        "2026-05-30 07:33:13",
         2.5
       ],
       [
-        37.288167,
-        -8.799759,
-        -68.6,
-        "2026-05-30 14:35:18",
-        5.1
+        37.576931,
+        -8.657985,
+        136.5,
+        "2026-05-30 07:49:14",
+        9.2
       ],
       [
-        37.273684,
-        -8.806355,
-        -9.1,
-        "2026-05-30 14:51:21",
+        37.566289,
+        -8.672504,
+        155.8,
+        "2026-05-30 08:06:14",
+        4.7
+      ],
+      [
+        37.551491,
+        -8.679533,
+        175.3,
+        "2026-05-30 08:22:14",
+        3.6
+      ],
+      [
+        37.539234,
+        -8.689931,
+        129.0,
+        "2026-05-30 08:38:17",
+        5.4
+      ],
+      [
+        37.522831,
+        -8.70042,
+        214.6,
+        "2026-05-30 08:57:22",
+        3.2
+      ],
+      [
+        37.512557,
+        -8.712241,
+        132.7,
+        "2026-05-30 09:13:17",
+        3.9
+      ],
+      [
+        37.501279,
+        -8.717735,
+        295.9,
+        "2026-05-30 09:29:34",
+        8.5
+      ],
+      [
+        37.482008,
+        -8.721519,
+        173.6,
+        "2026-05-30 09:47:13",
+        4.0
+      ],
+      [
+        37.472271,
+        -8.730642,
+        129.2,
+        "2026-05-30 10:03:19",
+        2.5
+      ],
+      [
+        37.460168,
+        -8.73586,
+        253.8,
+        "2026-05-30 10:18:23",
+        2.7
+      ],
+      [
+        37.450041,
+        -8.743141,
+        211.2,
+        "2026-05-30 10:34:20",
+        6.2
+      ],
+      [
+        37.440682,
+        -8.747354,
+        58.4,
+        "2026-05-30 10:51:18",
+        6.2
+      ],
+      [
+        37.434001,
+        -8.758928,
+        158.0,
+        "2026-05-30 11:07:29",
+        0.0
+      ],
+      [
+        37.433887,
+        -8.759714,
+        31.8,
+        "2026-05-30 11:24:20",
+        0.5
+      ],
+      [
+        37.430503,
+        -8.768405,
+        63.2,
+        "2026-05-30 11:40:18",
+        4.7
+      ],
+      [
+        37.41676,
+        -8.766733,
+        128.7,
+        "2026-05-30 11:56:18",
+        6.7
+      ],
+      [
+        37.404705,
+        -8.774176,
+        113.7,
+        "2026-05-30 12:12:14",
+        5.8
+      ],
+      [
+        37.393898,
+        -8.784898,
+        110.0,
+        "2026-05-30 12:28:17",
+        3.8
+      ],
+      [
+        37.381545,
+        -8.794754,
+        94.5,
+        "2026-05-30 12:45:17",
+        4.2
+      ],
+      [
+        37.371549,
+        -8.799994,
+        102.8,
+        "2026-05-30 13:01:17",
+        0.0
+      ],
+      [
+        37.371581,
+        -8.799983,
+        87.0,
+        "2026-05-30 13:17:15",
+        1.8
+      ],
+      [
+        37.355712,
+        -8.800463,
+        46.6,
+        "2026-05-30 13:33:15",
+        11.5
+      ],
+      [
+        37.336214,
+        -8.795416,
+        57.5,
+        "2026-05-30 13:49:17",
+        8.1
+      ],
+      [
+        37.316554,
+        -8.799623,
+        11.7,
+        "2026-05-30 14:05:18",
+        5.7
+      ],
+      [
+        37.297626,
+        -8.799247,
+        -5.9,
+        "2026-05-30 14:22:23",
+        0.3
+      ],
+      [
+        37.285751,
+        -8.799974,
+        -1.1,
+        "2026-05-30 14:38:15",
+        2.2
+      ],
+      [
+        37.271065,
+        -8.808633,
+        -55.6,
+        "2026-05-30 14:54:20",
+        6.9
+      ],
+      [
+        37.255874,
+        -8.81596,
+        108.8,
+        "2026-05-30 15:10:14",
+        2.2
+      ],
+      [
+        37.241295,
+        -8.824765,
+        116.2,
+        "2026-05-30 15:26:15",
+        3.8
+      ],
+      [
+        37.227158,
+        -8.831901,
+        107.2,
+        "2026-05-30 15:42:17",
+        0.9
+      ],
+      [
+        37.219587,
+        -8.834554,
+        109.6,
+        "2026-05-30 15:59:15",
         4.3
       ],
       [
-        37.258433,
-        -8.814899,
-        -59.0,
-        "2026-05-30 15:06:08",
-        0.0
+        37.204803,
+        -8.840429,
+        82.6,
+        "2026-05-30 16:16:18",
+        6.0
       ],
       [
-        37.244907,
-        -8.823328,
-        93.6,
-        "2026-05-30 15:23:14",
-        3.4
-      ],
-      [
-        37.228342,
-        -8.830947,
-        123.2,
-        "2026-05-30 15:39:13",
-        5.3
-      ],
-      [
-        37.223176,
-        -8.83362,
-        99.7,
-        "2026-05-30 15:56:14",
-        10.5
-      ],
-      [
-        37.206425,
-        -8.838685,
-        88.4,
-        "2026-05-30 16:13:29",
-        5.1
-      ],
-      [
-        37.199283,
-        -8.850694,
-        47.5,
-        "2026-05-30 16:29:19",
-        7.7
-      ],
-      [
-        37.199939,
-        -8.869943,
-        -25.3,
-        "2026-05-30 16:45:15",
+        37.198628,
+        -8.85576,
+        5.2,
+        "2026-05-30 16:32:17",
         4.5
       ],
       [
-        37.19689,
-        -8.888957,
-        -27.3,
-        "2026-05-30 17:02:17",
-        7.9
+        37.199411,
+        -8.874927,
+        -40.7,
+        "2026-05-30 16:48:16",
+        8.5
       ],
       [
-        37.19265,
-        -8.889975,
-        0.4,
-        "2026-05-30 17:18:14",
-        0.0
+        37.194351,
+        -8.889442,
+        -18.0,
+        "2026-05-30 17:05:17",
+        4.1
+      ],
+      [
+        37.190335,
+        -8.89032,
+        32.1,
+        "2026-05-30 17:21:14",
+        9.8
       ]
     ],
     "categorySegments": [
@@ -67443,6 +67451,25 @@
           [
             37.199795,
             -8.887419
+          ]
+        ]
+      },
+      {
+        "km": 618,
+        "fromKm": 618,
+        "toKm": 618,
+        "kms": [
+          618
+        ],
+        "color": "#f59e0b",
+        "category": "paragem",
+        "categoryLabel": "Paragem",
+        "pace": "20:21/km",
+        "segment": "20:21",
+        "points": [
+          [
+            37.199795,
+            -8.887419
           ],
           [
             37.198527,
@@ -67515,6 +67542,18 @@
           [
             37.19265,
             -8.889975
+          ],
+          [
+            37.192541,
+            -8.889794
+          ],
+          [
+            37.191645,
+            -8.890003
+          ],
+          [
+            37.190335,
+            -8.89032
           ]
         ]
       }
@@ -76774,1342 +76813,1344 @@
         "category": "corrida_leve",
         "categoryLabel": "Corrida leve",
         "categoryColor": "#38bdf8"
+      },
+      {
+        "km": 618,
+        "lat": 37.19065,
+        "lng": -8.890256,
+        "alt": 12.6,
+        "time": "2026-05-30 17:21:00",
+        "pace": "20:21/km",
+        "segment": "20:21",
+        "elapsed": "150:21:00",
+        "segment_s": 1221.482651,
+        "partial": false,
+        "category": "paragem",
+        "categoryLabel": "Paragem",
+        "categoryColor": "#f59e0b"
       }
     ],
     "current": {
-      "lat": 37.19265,
-      "lng": -8.889975,
-      "alt": 0.4,
-      "time": "2026-05-30 18:18:14",
+      "lat": 37.191645,
+      "lng": -8.890003,
+      "alt": 0.6,
+      "time": "2026-05-30 18:20:17",
       "battery": "57%",
       "batteryPct": 57.0,
-      "speed": 0.0,
+      "speed": 7.9,
       "status": "OK",
-      "alongRouteKm": 617.8,
+      "alongRouteKm": 617.9,
       "source": "position_new",
-      "lagMinutes": 0.7,
-      "logTime": "2026-05-30 17:18:14"
+      "lagMinutes": 1.4,
+      "logTime": "2026-05-30 17:21:14"
     },
     "recordPace": {
-      "km": 445.0,
-      "lat": 38.473058,
-      "lng": -8.506848,
-      "alt": 57.8,
-      "time": "2026-05-30 18:20:20"
+      "km": 445.1,
+      "lat": 38.471938,
+      "lng": -8.507419,
+      "alt": 46.4,
+      "time": "2026-05-30 18:23:05"
     },
     "calendarPace": {
-      "km": 537.1,
-      "lat": 37.751937,
-      "lng": -8.660331,
-      "alt": 164.8,
-      "time": "2026-05-30 18:20:20",
+      "km": 537.3,
+      "lat": 37.750644,
+      "lng": -8.659576,
+      "alt": 163.3,
+      "time": "2026-05-30 18:23:05",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
-      "km": 617.0,
-      "lat": 37.199378,
-      "lng": -8.887822,
-      "alt": 16.6,
-      "time": "2026-05-30 18:20:20",
+      "km": 618.0,
+      "lat": 37.19065,
+      "lng": -8.890256,
+      "alt": 12.6,
+      "time": "2026-05-30 18:23:05",
       "deadline": "2026-05-31 23:59:59",
       "scenario": "main"
     },
     "futureRoute": {
       "points": [
         {
-          "lat": 37.19243,
-          "lng": -8.88993,
-          "km": 617.8,
-          "time": "2026-05-30 18:18",
-          "timeIso": "2026-05-30 18:18:14",
-          "timeShort": "Sat 30/05 · 18:18",
+          "lat": 37.19154,
+          "lng": -8.89009,
+          "km": 617.9,
+          "time": "2026-05-30 18:20",
+          "timeIso": "2026-05-30 18:20:17",
+          "timeShort": "Sat 30/05 · 18:20",
           "secondsFromProjection": 0
         },
         {
-          "lat": 37.1902,
-          "lng": -8.89034,
-          "km": 618.0,
-          "time": "2026-05-30 18:20",
-          "timeIso": "2026-05-30 18:20:32",
-          "timeShort": "Sat 30/05 · 18:20",
-          "secondsFromProjection": 138
+          "lat": 37.18932,
+          "lng": -8.8905,
+          "km": 618.1,
+          "time": "2026-05-30 18:21",
+          "timeIso": "2026-05-30 18:21:37",
+          "timeShort": "Sat 30/05 · 18:21",
+          "secondsFromProjection": 80
         },
         {
-          "lat": 37.18819,
-          "lng": -8.89136,
-          "km": 618.3,
-          "time": "2026-05-30 18:23",
-          "timeIso": "2026-05-30 18:23:13",
-          "timeShort": "Sat 30/05 · 18:23",
-          "secondsFromProjection": 300
+          "lat": 37.18756,
+          "lng": -8.89217,
+          "km": 618.4,
+          "time": "2026-05-30 18:24",
+          "timeIso": "2026-05-30 18:24:19",
+          "timeShort": "Sat 30/05 · 18:24",
+          "secondsFromProjection": 242
         },
         {
-          "lat": 37.18662,
+          "lat": 37.18599,
+          "lng": -8.89419,
+          "km": 618.6,
+          "time": "2026-05-30 18:27",
+          "timeIso": "2026-05-30 18:27:01",
+          "timeShort": "Sat 30/05 · 18:27",
+          "secondsFromProjection": 404
+        },
+        {
+          "lat": 37.18423,
+          "lng": -8.89576,
+          "km": 618.9,
+          "time": "2026-05-30 18:29",
+          "timeIso": "2026-05-30 18:29:43",
+          "timeShort": "Sat 30/05 · 18:29",
+          "secondsFromProjection": 566
+        },
+        {
+          "lat": 37.18219,
+          "lng": -8.89461,
+          "km": 619.1,
+          "time": "2026-05-30 18:32",
+          "timeIso": "2026-05-30 18:32:25",
+          "timeShort": "Sat 30/05 · 18:32",
+          "secondsFromProjection": 728
+        },
+        {
+          "lat": 37.18094,
+          "lng": -8.89227,
+          "km": 619.4,
+          "time": "2026-05-30 18:35",
+          "timeIso": "2026-05-30 18:35:07",
+          "timeShort": "Sat 30/05 · 18:35",
+          "secondsFromProjection": 890
+        },
+        {
+          "lat": 37.17975,
+          "lng": -8.88988,
+          "km": 619.6,
+          "time": "2026-05-30 18:37",
+          "timeIso": "2026-05-30 18:37:49",
+          "timeShort": "Sat 30/05 · 18:37",
+          "secondsFromProjection": 1052
+        },
+        {
+          "lat": 37.17806,
+          "lng": -8.88803,
+          "km": 619.9,
+          "time": "2026-05-30 18:40",
+          "timeIso": "2026-05-30 18:40:31",
+          "timeShort": "Sat 30/05 · 18:40",
+          "secondsFromProjection": 1214
+        },
+        {
+          "lat": 37.17614,
+          "lng": -8.88658,
+          "km": 620.1,
+          "time": "2026-05-30 18:43",
+          "timeIso": "2026-05-30 18:43:13",
+          "timeShort": "Sat 30/05 · 18:43",
+          "secondsFromProjection": 1376
+        },
+        {
+          "lat": 37.17422,
+          "lng": -8.88511,
+          "km": 620.4,
+          "time": "2026-05-30 18:45",
+          "timeIso": "2026-05-30 18:45:55",
+          "timeShort": "Sat 30/05 · 18:45",
+          "secondsFromProjection": 1538
+        },
+        {
+          "lat": 37.17244,
+          "lng": -8.88344,
+          "km": 620.6,
+          "time": "2026-05-30 18:48",
+          "timeIso": "2026-05-30 18:48:37",
+          "timeShort": "Sat 30/05 · 18:48",
+          "secondsFromProjection": 1700
+        },
+        {
+          "lat": 37.17133,
+          "lng": -8.88098,
+          "km": 620.9,
+          "time": "2026-05-30 18:51",
+          "timeIso": "2026-05-30 18:51:19",
+          "timeShort": "Sat 30/05 · 18:51",
+          "secondsFromProjection": 1862
+        },
+        {
+          "lat": 37.1694,
+          "lng": -8.87967,
+          "km": 621.1,
+          "time": "2026-05-30 18:54",
+          "timeIso": "2026-05-30 18:54:01",
+          "timeShort": "Sat 30/05 · 18:54",
+          "secondsFromProjection": 2024
+        },
+        {
+          "lat": 37.16773,
+          "lng": -8.8778,
+          "km": 621.4,
+          "time": "2026-05-30 18:56",
+          "timeIso": "2026-05-30 18:56:43",
+          "timeShort": "Sat 30/05 · 18:56",
+          "secondsFromProjection": 2186
+        },
+        {
+          "lat": 37.1661,
+          "lng": -8.87593,
+          "km": 621.6,
+          "time": "2026-05-30 18:59",
+          "timeIso": "2026-05-30 18:59:25",
+          "timeShort": "Sat 30/05 · 18:59",
+          "secondsFromProjection": 2348
+        },
+        {
+          "lat": 37.16411,
+          "lng": -8.87488,
+          "km": 621.9,
+          "time": "2026-05-30 19:02",
+          "timeIso": "2026-05-30 19:02:07",
+          "timeShort": "Sat 30/05 · 19:02",
+          "secondsFromProjection": 2510
+        },
+        {
+          "lat": 37.16233,
+          "lng": -8.87339,
+          "km": 622.1,
+          "time": "2026-05-30 19:04",
+          "timeIso": "2026-05-30 19:04:49",
+          "timeShort": "Sat 30/05 · 19:04",
+          "secondsFromProjection": 2672
+        },
+        {
+          "lat": 37.16073,
+          "lng": -8.87156,
+          "km": 622.4,
+          "time": "2026-05-30 19:07",
+          "timeIso": "2026-05-30 19:07:31",
+          "timeShort": "Sat 30/05 · 19:07",
+          "secondsFromProjection": 2834
+        },
+        {
+          "lat": 37.15912,
+          "lng": -8.86969,
+          "km": 622.6,
+          "time": "2026-05-30 19:10",
+          "timeIso": "2026-05-30 19:10:13",
+          "timeShort": "Sat 30/05 · 19:10",
+          "secondsFromProjection": 2996
+        },
+        {
+          "lat": 37.15699,
+          "lng": -8.86942,
+          "km": 622.9,
+          "time": "2026-05-30 19:12",
+          "timeIso": "2026-05-30 19:12:55",
+          "timeShort": "Sat 30/05 · 19:12",
+          "secondsFromProjection": 3158
+        },
+        {
+          "lat": 37.15478,
+          "lng": -8.86912,
+          "km": 623.1,
+          "time": "2026-05-30 19:15",
+          "timeIso": "2026-05-30 19:15:37",
+          "timeShort": "Sat 30/05 · 19:15",
+          "secondsFromProjection": 3320
+        },
+        {
+          "lat": 37.15299,
+          "lng": -8.86986,
+          "km": 623.4,
+          "time": "2026-05-30 19:18",
+          "timeIso": "2026-05-30 19:18:19",
+          "timeShort": "Sat 30/05 · 19:18",
+          "secondsFromProjection": 3482
+        },
+        {
+          "lat": 37.15137,
+          "lng": -8.87166,
+          "km": 623.6,
+          "time": "2026-05-30 19:21",
+          "timeIso": "2026-05-30 19:21:01",
+          "timeShort": "Sat 30/05 · 19:21",
+          "secondsFromProjection": 3644
+        },
+        {
+          "lat": 37.14913,
+          "lng": -8.87154,
+          "km": 623.9,
+          "time": "2026-05-30 19:23",
+          "timeIso": "2026-05-30 19:23:43",
+          "timeShort": "Sat 30/05 · 19:23",
+          "secondsFromProjection": 3806
+        },
+        {
+          "lat": 37.14703,
+          "lng": -8.87224,
+          "km": 624.1,
+          "time": "2026-05-30 19:26",
+          "timeIso": "2026-05-30 19:26:25",
+          "timeShort": "Sat 30/05 · 19:26",
+          "secondsFromProjection": 3968
+        },
+        {
+          "lat": 37.14521,
+          "lng": -8.87387,
+          "km": 624.4,
+          "time": "2026-05-30 19:29",
+          "timeIso": "2026-05-30 19:29:07",
+          "timeShort": "Sat 30/05 · 19:29",
+          "secondsFromProjection": 4130
+        },
+        {
+          "lat": 37.14305,
+          "lng": -8.87467,
+          "km": 624.6,
+          "time": "2026-05-30 19:31",
+          "timeIso": "2026-05-30 19:31:49",
+          "timeShort": "Sat 30/05 · 19:31",
+          "secondsFromProjection": 4292
+        },
+        {
+          "lat": 37.14099,
+          "lng": -8.87577,
+          "km": 624.9,
+          "time": "2026-05-30 19:34",
+          "timeIso": "2026-05-30 19:34:31",
+          "timeShort": "Sat 30/05 · 19:34",
+          "secondsFromProjection": 4454
+        },
+        {
+          "lat": 37.13898,
+          "lng": -8.87704,
+          "km": 625.1,
+          "time": "2026-05-30 19:37",
+          "timeIso": "2026-05-30 19:37:13",
+          "timeShort": "Sat 30/05 · 19:37",
+          "secondsFromProjection": 4616
+        },
+        {
+          "lat": 37.13696,
+          "lng": -8.87829,
+          "km": 625.4,
+          "time": "2026-05-30 19:39",
+          "timeIso": "2026-05-30 19:39:55",
+          "timeShort": "Sat 30/05 · 19:39",
+          "secondsFromProjection": 4778
+        },
+        {
+          "lat": 37.13495,
+          "lng": -8.87954,
+          "km": 625.6,
+          "time": "2026-05-30 19:42",
+          "timeIso": "2026-05-30 19:42:37",
+          "timeShort": "Sat 30/05 · 19:42",
+          "secondsFromProjection": 4940
+        },
+        {
+          "lat": 37.13294,
+          "lng": -8.88079,
+          "km": 625.9,
+          "time": "2026-05-30 19:45",
+          "timeIso": "2026-05-30 19:45:19",
+          "timeShort": "Sat 30/05 · 19:45",
+          "secondsFromProjection": 5102
+        },
+        {
+          "lat": 37.13092,
+          "lng": -8.88204,
+          "km": 626.1,
+          "time": "2026-05-30 19:48",
+          "timeIso": "2026-05-30 19:48:01",
+          "timeShort": "Sat 30/05 · 19:48",
+          "secondsFromProjection": 5264
+        },
+        {
+          "lat": 37.12891,
+          "lng": -8.8833,
+          "km": 626.4,
+          "time": "2026-05-30 19:50",
+          "timeIso": "2026-05-30 19:50:43",
+          "timeShort": "Sat 30/05 · 19:50",
+          "secondsFromProjection": 5426
+        },
+        {
+          "lat": 37.12689,
+          "lng": -8.88455,
+          "km": 626.6,
+          "time": "2026-05-30 19:53",
+          "timeIso": "2026-05-30 19:53:25",
+          "timeShort": "Sat 30/05 · 19:53",
+          "secondsFromProjection": 5588
+        },
+        {
+          "lat": 37.12509,
+          "lng": -8.88617,
+          "km": 626.9,
+          "time": "2026-05-30 19:56",
+          "timeIso": "2026-05-30 19:56:07",
+          "timeShort": "Sat 30/05 · 19:56",
+          "secondsFromProjection": 5750
+        },
+        {
+          "lat": 37.12345,
+          "lng": -8.8881,
+          "km": 627.1,
+          "time": "2026-05-30 19:58",
+          "timeIso": "2026-05-30 19:58:49",
+          "timeShort": "Sat 30/05 · 19:58",
+          "secondsFromProjection": 5912
+        },
+        {
+          "lat": 37.12177,
+          "lng": -8.88997,
+          "km": 627.4,
+          "time": "2026-05-30 20:01",
+          "timeIso": "2026-05-30 20:01:31",
+          "timeShort": "Sat 30/05 · 20:01",
+          "secondsFromProjection": 6074
+        },
+        {
+          "lat": 37.11999,
+          "lng": -8.89169,
+          "km": 627.6,
+          "time": "2026-05-30 20:04",
+          "timeIso": "2026-05-30 20:04:13",
+          "timeShort": "Sat 30/05 · 20:04",
+          "secondsFromProjection": 6236
+        },
+        {
+          "lat": 37.1182,
           "lng": -8.89339,
-          "km": 618.5,
-          "time": "2026-05-30 18:25",
-          "timeIso": "2026-05-30 18:25:54",
-          "timeShort": "Sat 30/05 · 18:25",
-          "secondsFromProjection": 461
+          "km": 627.9,
+          "time": "2026-05-30 20:06",
+          "timeIso": "2026-05-30 20:06:55",
+          "timeShort": "Sat 30/05 · 20:06",
+          "secondsFromProjection": 6398
         },
         {
-          "lat": 37.18504,
-          "lng": -8.89539,
-          "km": 618.8,
-          "time": "2026-05-30 18:28",
-          "timeIso": "2026-05-30 18:28:36",
-          "timeShort": "Sat 30/05 · 18:28",
-          "secondsFromProjection": 622
+          "lat": 37.11641,
+          "lng": -8.8951,
+          "km": 628.1,
+          "time": "2026-05-30 20:09",
+          "timeIso": "2026-05-30 20:09:35",
+          "timeShort": "Sat 30/05 · 20:09",
+          "secondsFromProjection": 6558
         },
         {
-          "lat": 37.18298,
-          "lng": -8.89513,
-          "km": 619.0,
-          "time": "2026-05-30 18:31",
-          "timeIso": "2026-05-30 18:31:17",
-          "timeShort": "Sat 30/05 · 18:31",
-          "secondsFromProjection": 783
+          "lat": 37.11463,
+          "lng": -8.89681,
+          "km": 628.4,
+          "time": "2026-05-30 20:12",
+          "timeIso": "2026-05-30 20:12:14",
+          "timeShort": "Sat 30/05 · 20:12",
+          "secondsFromProjection": 6717
         },
         {
-          "lat": 37.18141,
-          "lng": -8.89324,
-          "km": 619.3,
-          "time": "2026-05-30 18:33",
-          "timeIso": "2026-05-30 18:33:58",
-          "timeShort": "Sat 30/05 · 18:33",
-          "secondsFromProjection": 944
+          "lat": 37.11284,
+          "lng": -8.89853,
+          "km": 628.6,
+          "time": "2026-05-30 20:14",
+          "timeIso": "2026-05-30 20:14:53",
+          "timeShort": "Sat 30/05 · 20:14",
+          "secondsFromProjection": 6876
         },
         {
-          "lat": 37.18025,
-          "lng": -8.89082,
-          "km": 619.5,
-          "time": "2026-05-30 18:36",
-          "timeIso": "2026-05-30 18:36:39",
-          "timeShort": "Sat 30/05 · 18:36",
-          "secondsFromProjection": 1106
+          "lat": 37.11104,
+          "lng": -8.90022,
+          "km": 628.9,
+          "time": "2026-05-30 20:17",
+          "timeIso": "2026-05-30 20:17:32",
+          "timeShort": "Sat 30/05 · 20:17",
+          "secondsFromProjection": 7035
         },
         {
-          "lat": 37.17878,
-          "lng": -8.8887,
-          "km": 619.8,
-          "time": "2026-05-30 18:39",
-          "timeIso": "2026-05-30 18:39:21",
-          "timeShort": "Sat 30/05 · 18:39",
-          "secondsFromProjection": 1267
+          "lat": 37.10925,
+          "lng": -8.90193,
+          "km": 629.1,
+          "time": "2026-05-30 20:20",
+          "timeIso": "2026-05-30 20:20:11",
+          "timeShort": "Sat 30/05 · 20:20",
+          "secondsFromProjection": 7194
         },
         {
-          "lat": 37.17692,
-          "lng": -8.88713,
-          "km": 620.0,
-          "time": "2026-05-30 18:42",
-          "timeIso": "2026-05-30 18:42:02",
-          "timeShort": "Sat 30/05 · 18:42",
-          "secondsFromProjection": 1428
+          "lat": 37.10748,
+          "lng": -8.90366,
+          "km": 629.4,
+          "time": "2026-05-30 20:22",
+          "timeIso": "2026-05-30 20:22:50",
+          "timeShort": "Sat 30/05 · 20:22",
+          "secondsFromProjection": 7353
         },
         {
-          "lat": 37.17498,
-          "lng": -8.8857,
-          "km": 620.3,
-          "time": "2026-05-30 18:44",
-          "timeIso": "2026-05-30 18:44:43",
-          "timeShort": "Sat 30/05 · 18:44",
-          "secondsFromProjection": 1590
+          "lat": 37.10571,
+          "lng": -8.90539,
+          "km": 629.6,
+          "time": "2026-05-30 20:25",
+          "timeIso": "2026-05-30 20:25:29",
+          "timeShort": "Sat 30/05 · 20:25",
+          "secondsFromProjection": 7512
         },
         {
-          "lat": 37.17307,
-          "lng": -8.88422,
-          "km": 620.5,
-          "time": "2026-05-30 18:47",
-          "timeIso": "2026-05-30 18:47:24",
-          "timeShort": "Sat 30/05 · 18:47",
-          "secondsFromProjection": 1751
+          "lat": 37.10392,
+          "lng": -8.90711,
+          "km": 629.9,
+          "time": "2026-05-30 20:28",
+          "timeIso": "2026-05-30 20:28:08",
+          "timeShort": "Sat 30/05 · 20:28",
+          "secondsFromProjection": 7671
         },
         {
-          "lat": 37.17178,
-          "lng": -8.88195,
-          "km": 620.8,
-          "time": "2026-05-30 18:50",
-          "timeIso": "2026-05-30 18:50:06",
-          "timeShort": "Sat 30/05 · 18:50",
-          "secondsFromProjection": 1912
+          "lat": 37.10212,
+          "lng": -8.9088,
+          "km": 630.1,
+          "time": "2026-05-30 20:30",
+          "timeIso": "2026-05-30 20:30:47",
+          "timeShort": "Sat 30/05 · 20:30",
+          "secondsFromProjection": 7830
         },
         {
-          "lat": 37.17024,
-          "lng": -8.88009,
-          "km": 621.0,
-          "time": "2026-05-30 18:52",
-          "timeIso": "2026-05-30 18:52:47",
-          "timeShort": "Sat 30/05 · 18:52",
-          "secondsFromProjection": 2073
+          "lat": 37.10007,
+          "lng": -8.90993,
+          "km": 630.4,
+          "time": "2026-05-30 20:33",
+          "timeIso": "2026-05-30 20:33:26",
+          "timeShort": "Sat 30/05 · 20:33",
+          "secondsFromProjection": 7989
         },
         {
-          "lat": 37.16837,
-          "lng": -8.8786,
-          "km": 621.3,
-          "time": "2026-05-30 18:55",
-          "timeIso": "2026-05-30 18:55:28",
-          "timeShort": "Sat 30/05 · 18:55",
-          "secondsFromProjection": 2234
+          "lat": 37.09793,
+          "lng": -8.91081,
+          "km": 630.6,
+          "time": "2026-05-30 20:36",
+          "timeIso": "2026-05-30 20:36:05",
+          "timeShort": "Sat 30/05 · 20:36",
+          "secondsFromProjection": 8148
         },
         {
-          "lat": 37.16679,
-          "lng": -8.8766,
-          "km": 621.5,
-          "time": "2026-05-30 18:58",
-          "timeIso": "2026-05-30 18:58:09",
-          "timeShort": "Sat 30/05 · 18:58",
-          "secondsFromProjection": 2396
-        },
-        {
-          "lat": 37.16479,
-          "lng": -8.87557,
-          "km": 621.8,
-          "time": "2026-05-30 19:00",
-          "timeIso": "2026-05-30 19:00:51",
-          "timeShort": "Sat 30/05 · 19:00",
-          "secondsFromProjection": 2557
-        },
-        {
-          "lat": 37.16319,
-          "lng": -8.87368,
-          "km": 622.0,
-          "time": "2026-05-30 19:03",
-          "timeIso": "2026-05-30 19:03:32",
-          "timeShort": "Sat 30/05 · 19:03",
-          "secondsFromProjection": 2718
-        },
-        {
-          "lat": 37.16123,
-          "lng": -8.8725,
-          "km": 622.3,
-          "time": "2026-05-30 19:06",
-          "timeIso": "2026-05-30 19:06:14",
-          "timeShort": "Sat 30/05 · 19:06",
-          "secondsFromProjection": 2880
-        },
-        {
-          "lat": 37.1599,
-          "lng": -8.87025,
-          "km": 622.5,
-          "time": "2026-05-30 19:08",
-          "timeIso": "2026-05-30 19:08:56",
-          "timeShort": "Sat 30/05 · 19:08",
-          "secondsFromProjection": 3042
-        },
-        {
-          "lat": 37.15787,
-          "lng": -8.86915,
-          "km": 622.8,
-          "time": "2026-05-30 19:11",
-          "timeIso": "2026-05-30 19:11:38",
-          "timeShort": "Sat 30/05 · 19:11",
-          "secondsFromProjection": 3204
-        },
-        {
-          "lat": 37.15566,
-          "lng": -8.86935,
-          "km": 623.0,
-          "time": "2026-05-30 19:14",
-          "timeIso": "2026-05-30 19:14:20",
-          "timeShort": "Sat 30/05 · 19:14",
-          "secondsFromProjection": 3366
-        },
-        {
-          "lat": 37.15346,
-          "lng": -8.86894,
-          "km": 623.3,
-          "time": "2026-05-30 19:17",
-          "timeIso": "2026-05-30 19:17:02",
-          "timeShort": "Sat 30/05 · 19:17",
-          "secondsFromProjection": 3528
-        },
-        {
-          "lat": 37.15214,
-          "lng": -8.87114,
-          "km": 623.5,
-          "time": "2026-05-30 19:19",
-          "timeIso": "2026-05-30 19:19:44",
-          "timeShort": "Sat 30/05 · 19:19",
-          "secondsFromProjection": 3690
-        },
-        {
-          "lat": 37.15003,
-          "lng": -8.8716,
-          "km": 623.8,
-          "time": "2026-05-30 19:22",
-          "timeIso": "2026-05-30 19:22:26",
-          "timeShort": "Sat 30/05 · 19:22",
-          "secondsFromProjection": 3852
-        },
-        {
-          "lat": 37.1478,
-          "lng": -8.87165,
-          "km": 624.0,
-          "time": "2026-05-30 19:25",
-          "timeIso": "2026-05-30 19:25:08",
-          "timeShort": "Sat 30/05 · 19:25",
-          "secondsFromProjection": 4014
-        },
-        {
-          "lat": 37.14597,
-          "lng": -8.87328,
-          "km": 624.3,
-          "time": "2026-05-30 19:27",
-          "timeIso": "2026-05-30 19:27:50",
-          "timeShort": "Sat 30/05 · 19:27",
-          "secondsFromProjection": 4176
-        },
-        {
-          "lat": 37.14392,
-          "lng": -8.87437,
-          "km": 624.5,
-          "time": "2026-05-30 19:30",
-          "timeIso": "2026-05-30 19:30:32",
-          "timeShort": "Sat 30/05 · 19:30",
-          "secondsFromProjection": 4338
-        },
-        {
-          "lat": 37.1418,
-          "lng": -8.87527,
-          "km": 624.8,
-          "time": "2026-05-30 19:33",
-          "timeIso": "2026-05-30 19:33:14",
-          "timeShort": "Sat 30/05 · 19:33",
-          "secondsFromProjection": 4500
-        },
-        {
-          "lat": 37.13978,
-          "lng": -8.87653,
-          "km": 625.0,
-          "time": "2026-05-30 19:35",
-          "timeIso": "2026-05-30 19:35:56",
-          "timeShort": "Sat 30/05 · 19:35",
-          "secondsFromProjection": 4662
-        },
-        {
-          "lat": 37.13777,
-          "lng": -8.87779,
-          "km": 625.3,
-          "time": "2026-05-30 19:38",
-          "timeIso": "2026-05-30 19:38:38",
-          "timeShort": "Sat 30/05 · 19:38",
-          "secondsFromProjection": 4824
-        },
-        {
-          "lat": 37.13576,
-          "lng": -8.87904,
-          "km": 625.5,
-          "time": "2026-05-30 19:41",
-          "timeIso": "2026-05-30 19:41:20",
-          "timeShort": "Sat 30/05 · 19:41",
-          "secondsFromProjection": 4986
-        },
-        {
-          "lat": 37.13374,
-          "lng": -8.88029,
-          "km": 625.8,
-          "time": "2026-05-30 19:44",
-          "timeIso": "2026-05-30 19:44:02",
-          "timeShort": "Sat 30/05 · 19:44",
-          "secondsFromProjection": 5148
-        },
-        {
-          "lat": 37.13173,
-          "lng": -8.88154,
-          "km": 626.0,
-          "time": "2026-05-30 19:46",
-          "timeIso": "2026-05-30 19:46:44",
-          "timeShort": "Sat 30/05 · 19:46",
-          "secondsFromProjection": 5310
-        },
-        {
-          "lat": 37.12971,
-          "lng": -8.8828,
-          "km": 626.3,
-          "time": "2026-05-30 19:49",
-          "timeIso": "2026-05-30 19:49:26",
-          "timeShort": "Sat 30/05 · 19:49",
-          "secondsFromProjection": 5472
-        },
-        {
-          "lat": 37.1277,
-          "lng": -8.88405,
-          "km": 626.5,
-          "time": "2026-05-30 19:52",
-          "timeIso": "2026-05-30 19:52:08",
-          "timeShort": "Sat 30/05 · 19:52",
-          "secondsFromProjection": 5634
-        },
-        {
-          "lat": 37.12576,
-          "lng": -8.88542,
-          "km": 626.8,
-          "time": "2026-05-30 19:54",
-          "timeIso": "2026-05-30 19:54:50",
-          "timeShort": "Sat 30/05 · 19:54",
-          "secondsFromProjection": 5796
-        },
-        {
-          "lat": 37.12411,
-          "lng": -8.88733,
-          "km": 627.0,
-          "time": "2026-05-30 19:57",
-          "timeIso": "2026-05-30 19:57:32",
-          "timeShort": "Sat 30/05 · 19:57",
-          "secondsFromProjection": 5958
-        },
-        {
-          "lat": 37.12246,
-          "lng": -8.88923,
-          "km": 627.3,
-          "time": "2026-05-30 20:00",
-          "timeIso": "2026-05-30 20:00:14",
-          "timeShort": "Sat 30/05 · 20:00",
-          "secondsFromProjection": 6120
-        },
-        {
-          "lat": 37.12071,
-          "lng": -8.891,
-          "km": 627.5,
-          "time": "2026-05-30 20:02",
-          "timeIso": "2026-05-30 20:02:56",
-          "timeShort": "Sat 30/05 · 20:02",
-          "secondsFromProjection": 6282
-        },
-        {
-          "lat": 37.11891,
-          "lng": -8.8927,
-          "km": 627.8,
-          "time": "2026-05-30 20:05",
-          "timeIso": "2026-05-30 20:05:38",
-          "timeShort": "Sat 30/05 · 20:05",
-          "secondsFromProjection": 6444
-        },
-        {
-          "lat": 37.11713,
-          "lng": -8.89442,
-          "km": 628.0,
-          "time": "2026-05-30 20:08",
-          "timeIso": "2026-05-30 20:08:20",
-          "timeShort": "Sat 30/05 · 20:08",
-          "secondsFromProjection": 6606
-        },
-        {
-          "lat": 37.11534,
-          "lng": -8.89614,
-          "km": 628.3,
-          "time": "2026-05-30 20:11",
-          "timeIso": "2026-05-30 20:11:02",
-          "timeShort": "Sat 30/05 · 20:11",
-          "secondsFromProjection": 6768
-        },
-        {
-          "lat": 37.11356,
-          "lng": -8.89785,
-          "km": 628.5,
-          "time": "2026-05-30 20:13",
-          "timeIso": "2026-05-30 20:13:44",
-          "timeShort": "Sat 30/05 · 20:13",
-          "secondsFromProjection": 6930
-        },
-        {
-          "lat": 37.11176,
-          "lng": -8.89954,
-          "km": 628.8,
-          "time": "2026-05-30 20:16",
-          "timeIso": "2026-05-30 20:16:26",
-          "timeShort": "Sat 30/05 · 20:16",
-          "secondsFromProjection": 7092
-        },
-        {
-          "lat": 37.10996,
-          "lng": -8.90124,
-          "km": 629.0,
-          "time": "2026-05-30 20:19",
-          "timeIso": "2026-05-30 20:19:08",
-          "timeShort": "Sat 30/05 · 20:19",
-          "secondsFromProjection": 7254
-        },
-        {
-          "lat": 37.10819,
-          "lng": -8.90297,
-          "km": 629.3,
-          "time": "2026-05-30 20:21",
-          "timeIso": "2026-05-30 20:21:50",
-          "timeShort": "Sat 30/05 · 20:21",
-          "secondsFromProjection": 7416
-        },
-        {
-          "lat": 37.10642,
-          "lng": -8.9047,
-          "km": 629.5,
-          "time": "2026-05-30 20:24",
-          "timeIso": "2026-05-30 20:24:32",
-          "timeShort": "Sat 30/05 · 20:24",
-          "secondsFromProjection": 7578
-        },
-        {
-          "lat": 37.10463,
-          "lng": -8.90642,
-          "km": 629.8,
-          "time": "2026-05-30 20:27",
-          "timeIso": "2026-05-30 20:27:14",
-          "timeShort": "Sat 30/05 · 20:27",
-          "secondsFromProjection": 7740
-        },
-        {
-          "lat": 37.10285,
-          "lng": -8.90814,
-          "km": 630.0,
-          "time": "2026-05-30 20:29",
-          "timeIso": "2026-05-30 20:29:56",
-          "timeShort": "Sat 30/05 · 20:29",
-          "secondsFromProjection": 7902
-        },
-        {
-          "lat": 37.10092,
-          "lng": -8.90955,
-          "km": 630.3,
-          "time": "2026-05-30 20:32",
-          "timeIso": "2026-05-30 20:32:38",
-          "timeShort": "Sat 30/05 · 20:32",
-          "secondsFromProjection": 8064
-        },
-        {
-          "lat": 37.09879,
-          "lng": -8.91047,
-          "km": 630.5,
-          "time": "2026-05-30 20:35",
-          "timeIso": "2026-05-30 20:35:20",
-          "timeShort": "Sat 30/05 · 20:35",
-          "secondsFromProjection": 8226
-        },
-        {
-          "lat": 37.09664,
-          "lng": -8.91127,
-          "km": 630.8,
+          "lat": 37.09577,
+          "lng": -8.91155,
+          "km": 630.9,
           "time": "2026-05-30 20:38",
-          "timeIso": "2026-05-30 20:38:02",
+          "timeIso": "2026-05-30 20:38:44",
           "timeShort": "Sat 30/05 · 20:38",
-          "secondsFromProjection": 8388
+          "secondsFromProjection": 8307
         },
         {
-          "lat": 37.09445,
-          "lng": -8.91194,
-          "km": 631.0,
-          "time": "2026-05-30 20:40",
-          "timeIso": "2026-05-30 20:40:44",
-          "timeShort": "Sat 30/05 · 20:40",
-          "secondsFromProjection": 8550
+          "lat": 37.09358,
+          "lng": -8.91222,
+          "km": 631.1,
+          "time": "2026-05-30 20:41",
+          "timeIso": "2026-05-30 20:41:23",
+          "timeShort": "Sat 30/05 · 20:41",
+          "secondsFromProjection": 8466
         },
         {
-          "lat": 37.09224,
-          "lng": -8.91231,
-          "km": 631.3,
-          "time": "2026-05-30 20:43",
-          "timeIso": "2026-05-30 20:43:26",
-          "timeShort": "Sat 30/05 · 20:43",
-          "secondsFromProjection": 8712
+          "lat": 37.09135,
+          "lng": -8.91215,
+          "km": 631.4,
+          "time": "2026-05-30 20:44",
+          "timeIso": "2026-05-30 20:44:02",
+          "timeShort": "Sat 30/05 · 20:44",
+          "secondsFromProjection": 8625
         },
         {
-          "lat": 37.09002,
-          "lng": -8.91185,
-          "km": 631.5,
+          "lat": 37.08914,
+          "lng": -8.91165,
+          "km": 631.6,
           "time": "2026-05-30 20:46",
-          "timeIso": "2026-05-30 20:46:08",
+          "timeIso": "2026-05-30 20:46:41",
           "timeShort": "Sat 30/05 · 20:46",
-          "secondsFromProjection": 8874
+          "secondsFromProjection": 8784
         },
         {
-          "lat": 37.08781,
-          "lng": -8.91135,
-          "km": 631.8,
-          "time": "2026-05-30 20:48",
-          "timeIso": "2026-05-30 20:48:50",
-          "timeShort": "Sat 30/05 · 20:48",
-          "secondsFromProjection": 9036
+          "lat": 37.08697,
+          "lng": -8.91131,
+          "km": 631.9,
+          "time": "2026-05-30 20:49",
+          "timeIso": "2026-05-30 20:49:20",
+          "timeShort": "Sat 30/05 · 20:49",
+          "secondsFromProjection": 8943
         },
         {
-          "lat": 37.08562,
-          "lng": -8.91114,
-          "km": 632.0,
+          "lat": 37.08472,
+          "lng": -8.91108,
+          "km": 632.1,
           "time": "2026-05-30 20:51",
-          "timeIso": "2026-05-30 20:51:31",
+          "timeIso": "2026-05-30 20:51:59",
           "timeShort": "Sat 30/05 · 20:51",
-          "secondsFromProjection": 9198
+          "secondsFromProjection": 9102
         },
         {
-          "lat": 37.08399,
-          "lng": -8.91204,
-          "km": 632.3,
+          "lat": 37.08316,
+          "lng": -8.91214,
+          "km": 632.4,
           "time": "2026-05-30 20:54",
-          "timeIso": "2026-05-30 20:54:10",
+          "timeIso": "2026-05-30 20:54:38",
           "timeShort": "Sat 30/05 · 20:54",
-          "secondsFromProjection": 9357
+          "secondsFromProjection": 9261
         },
         {
-          "lat": 37.08183,
-          "lng": -8.91186,
-          "km": 632.5,
-          "time": "2026-05-30 20:56",
-          "timeIso": "2026-05-30 20:56:49",
-          "timeShort": "Sat 30/05 · 20:56",
-          "secondsFromProjection": 9516
+          "lat": 37.08095,
+          "lng": -8.91172,
+          "km": 632.6,
+          "time": "2026-05-30 20:57",
+          "timeIso": "2026-05-30 20:57:17",
+          "timeShort": "Sat 30/05 · 20:57",
+          "secondsFromProjection": 9420
         },
         {
-          "lat": 37.07996,
-          "lng": -8.91134,
-          "km": 632.8,
+          "lat": 37.07936,
+          "lng": -8.91218,
+          "km": 632.9,
           "time": "2026-05-30 20:59",
-          "timeIso": "2026-05-30 20:59:28",
+          "timeIso": "2026-05-30 20:59:56",
           "timeShort": "Sat 30/05 · 20:59",
-          "secondsFromProjection": 9675
+          "secondsFromProjection": 9579
         },
         {
-          "lat": 37.07842,
-          "lng": -8.91339,
-          "km": 633.0,
+          "lat": 37.07769,
+          "lng": -8.91404,
+          "km": 633.1,
           "time": "2026-05-30 21:02",
-          "timeIso": "2026-05-30 21:02:07",
+          "timeIso": "2026-05-30 21:02:37",
           "timeShort": "Sat 30/05 · 21:02",
-          "secondsFromProjection": 9834
+          "secondsFromProjection": 9740
         },
         {
-          "lat": 37.07651,
-          "lng": -8.91485,
-          "km": 633.3,
-          "time": "2026-05-30 21:04",
-          "timeIso": "2026-05-30 21:04:46",
-          "timeShort": "Sat 30/05 · 21:04",
-          "secondsFromProjection": 9993
+          "lat": 37.07571,
+          "lng": -8.91538,
+          "km": 633.4,
+          "time": "2026-05-30 21:05",
+          "timeIso": "2026-05-30 21:05:19",
+          "timeShort": "Sat 30/05 · 21:05",
+          "secondsFromProjection": 9902
         },
         {
-          "lat": 37.07452,
-          "lng": -8.91616,
-          "km": 633.5,
-          "time": "2026-05-30 21:07",
-          "timeIso": "2026-05-30 21:07:25",
-          "timeShort": "Sat 30/05 · 21:07",
-          "secondsFromProjection": 10152
+          "lat": 37.07372,
+          "lng": -8.91668,
+          "km": 633.6,
+          "time": "2026-05-30 21:08",
+          "timeIso": "2026-05-30 21:08:01",
+          "timeShort": "Sat 30/05 · 21:08",
+          "secondsFromProjection": 10064
         },
         {
-          "lat": 37.07253,
-          "lng": -8.91747,
-          "km": 633.8,
+          "lat": 37.07173,
+          "lng": -8.918,
+          "km": 633.9,
           "time": "2026-05-30 21:10",
-          "timeIso": "2026-05-30 21:10:04",
+          "timeIso": "2026-05-30 21:10:43",
           "timeShort": "Sat 30/05 · 21:10",
-          "secondsFromProjection": 10311
+          "secondsFromProjection": 10226
         },
         {
-          "lat": 37.07058,
-          "lng": -8.91889,
-          "km": 634.0,
-          "time": "2026-05-30 21:12",
-          "timeIso": "2026-05-30 21:12:43",
-          "timeShort": "Sat 30/05 · 21:12",
-          "secondsFromProjection": 10470
+          "lat": 37.06985,
+          "lng": -8.91955,
+          "km": 634.1,
+          "time": "2026-05-30 21:13",
+          "timeIso": "2026-05-30 21:13:25",
+          "timeShort": "Sat 30/05 · 21:13",
+          "secondsFromProjection": 10388
         },
         {
-          "lat": 37.06878,
-          "lng": -8.92057,
-          "km": 634.3,
-          "time": "2026-05-30 21:15",
-          "timeIso": "2026-05-30 21:15:22",
-          "timeShort": "Sat 30/05 · 21:15",
-          "secondsFromProjection": 10629
+          "lat": 37.06806,
+          "lng": -8.92125,
+          "km": 634.4,
+          "time": "2026-05-30 21:16",
+          "timeIso": "2026-05-30 21:16:07",
+          "timeShort": "Sat 30/05 · 21:16",
+          "secondsFromProjection": 10550
         },
         {
-          "lat": 37.06693,
-          "lng": -8.92216,
-          "km": 634.5,
+          "lat": 37.06609,
+          "lng": -8.92257,
+          "km": 634.6,
           "time": "2026-05-30 21:18",
-          "timeIso": "2026-05-30 21:18:01",
+          "timeIso": "2026-05-30 21:18:49",
           "timeShort": "Sat 30/05 · 21:18",
-          "secondsFromProjection": 10788
+          "secondsFromProjection": 10712
         },
         {
-          "lat": 37.06476,
-          "lng": -8.92284,
-          "km": 634.8,
-          "time": "2026-05-30 21:20",
-          "timeIso": "2026-05-30 21:20:40",
-          "timeShort": "Sat 30/05 · 21:20",
-          "secondsFromProjection": 10947
+          "lat": 37.06387,
+          "lng": -8.92287,
+          "km": 634.9,
+          "time": "2026-05-30 21:21",
+          "timeIso": "2026-05-30 21:21:31",
+          "timeShort": "Sat 30/05 · 21:21",
+          "secondsFromProjection": 10874
         },
         {
-          "lat": 37.06252,
-          "lng": -8.9229,
-          "km": 635.0,
-          "time": "2026-05-30 21:23",
-          "timeIso": "2026-05-30 21:23:19",
-          "timeShort": "Sat 30/05 · 21:23",
-          "secondsFromProjection": 11106
+          "lat": 37.06162,
+          "lng": -8.92292,
+          "km": 635.1,
+          "time": "2026-05-30 21:24",
+          "timeIso": "2026-05-30 21:24:13",
+          "timeShort": "Sat 30/05 · 21:24",
+          "secondsFromProjection": 11036
         },
         {
-          "lat": 37.06027,
-          "lng": -8.92296,
-          "km": 635.3,
-          "time": "2026-05-30 21:25",
-          "timeIso": "2026-05-30 21:25:58",
-          "timeShort": "Sat 30/05 · 21:25",
-          "secondsFromProjection": 11265
+          "lat": 37.05937,
+          "lng": -8.92298,
+          "km": 635.4,
+          "time": "2026-05-30 21:26",
+          "timeIso": "2026-05-30 21:26:55",
+          "timeShort": "Sat 30/05 · 21:26",
+          "secondsFromProjection": 11198
         },
         {
-          "lat": 37.05802,
-          "lng": -8.92302,
-          "km": 635.5,
-          "time": "2026-05-30 21:28",
-          "timeIso": "2026-05-30 21:28:37",
-          "timeShort": "Sat 30/05 · 21:28",
-          "secondsFromProjection": 11424
+          "lat": 37.05712,
+          "lng": -8.92305,
+          "km": 635.6,
+          "time": "2026-05-30 21:29",
+          "timeIso": "2026-05-30 21:29:37",
+          "timeShort": "Sat 30/05 · 21:29",
+          "secondsFromProjection": 11360
         },
         {
-          "lat": 37.05578,
-          "lng": -8.92311,
-          "km": 635.8,
-          "time": "2026-05-30 21:31",
-          "timeIso": "2026-05-30 21:31:16",
-          "timeShort": "Sat 30/05 · 21:31",
-          "secondsFromProjection": 11583
+          "lat": 37.05489,
+          "lng": -8.92333,
+          "km": 635.9,
+          "time": "2026-05-30 21:32",
+          "timeIso": "2026-05-30 21:32:19",
+          "timeShort": "Sat 30/05 · 21:32",
+          "secondsFromProjection": 11522
         },
         {
-          "lat": 37.05365,
-          "lng": -8.92396,
-          "km": 636.0,
-          "time": "2026-05-30 21:33",
-          "timeIso": "2026-05-30 21:33:55",
-          "timeShort": "Sat 30/05 · 21:33",
-          "secondsFromProjection": 11742
+          "lat": 37.0529,
+          "lng": -8.92459,
+          "km": 636.1,
+          "time": "2026-05-30 21:35",
+          "timeIso": "2026-05-30 21:35:01",
+          "timeShort": "Sat 30/05 · 21:35",
+          "secondsFromProjection": 11684
         },
         {
-          "lat": 37.05182,
-          "lng": -8.92561,
-          "km": 636.3,
-          "time": "2026-05-30 21:36",
-          "timeIso": "2026-05-30 21:36:34",
-          "timeShort": "Sat 30/05 · 21:36",
-          "secondsFromProjection": 11901
+          "lat": 37.05111,
+          "lng": -8.92629,
+          "km": 636.4,
+          "time": "2026-05-30 21:37",
+          "timeIso": "2026-05-30 21:37:43",
+          "timeShort": "Sat 30/05 · 21:37",
+          "secondsFromProjection": 11846
         },
         {
-          "lat": 37.05003,
-          "lng": -8.92731,
-          "km": 636.5,
-          "time": "2026-05-30 21:39",
-          "timeIso": "2026-05-30 21:39:13",
-          "timeShort": "Sat 30/05 · 21:39",
-          "secondsFromProjection": 12060
+          "lat": 37.04931,
+          "lng": -8.92798,
+          "km": 636.6,
+          "time": "2026-05-30 21:40",
+          "timeIso": "2026-05-30 21:40:25",
+          "timeShort": "Sat 30/05 · 21:40",
+          "secondsFromProjection": 12008
         },
         {
-          "lat": 37.04816,
-          "lng": -8.92885,
-          "km": 636.8,
-          "time": "2026-05-30 21:41",
-          "timeIso": "2026-05-30 21:41:52",
-          "timeShort": "Sat 30/05 · 21:41",
-          "secondsFromProjection": 12219
+          "lat": 37.04732,
+          "lng": -8.92925,
+          "km": 636.9,
+          "time": "2026-05-30 21:43",
+          "timeIso": "2026-05-30 21:43:07",
+          "timeShort": "Sat 30/05 · 21:43",
+          "secondsFromProjection": 12170
         },
         {
-          "lat": 37.04604,
-          "lng": -8.92978,
-          "km": 637.0,
-          "time": "2026-05-30 21:44",
-          "timeIso": "2026-05-30 21:44:36",
-          "timeShort": "Sat 30/05 · 21:44",
-          "secondsFromProjection": 12383
+          "lat": 37.04518,
+          "lng": -8.93013,
+          "km": 637.1,
+          "time": "2026-05-30 21:45",
+          "timeIso": "2026-05-30 21:45:49",
+          "timeShort": "Sat 30/05 · 21:45",
+          "secondsFromProjection": 12332
         },
         {
-          "lat": 37.0439,
-          "lng": -8.93065,
-          "km": 637.3,
-          "time": "2026-05-30 21:47",
-          "timeIso": "2026-05-30 21:47:39",
-          "timeShort": "Sat 30/05 · 21:47",
-          "secondsFromProjection": 12566
+          "lat": 37.04305,
+          "lng": -8.931,
+          "km": 637.4,
+          "time": "2026-05-30 21:48",
+          "timeIso": "2026-05-30 21:48:31",
+          "timeShort": "Sat 30/05 · 21:48",
+          "secondsFromProjection": 12494
         },
         {
-          "lat": 37.04176,
-          "lng": -8.93153,
-          "km": 637.5,
-          "time": "2026-05-30 21:50",
-          "timeIso": "2026-05-30 21:50:42",
-          "timeShort": "Sat 30/05 · 21:50",
-          "secondsFromProjection": 12749
+          "lat": 37.04091,
+          "lng": -8.93188,
+          "km": 637.6,
+          "time": "2026-05-30 21:51",
+          "timeIso": "2026-05-30 21:51:13",
+          "timeShort": "Sat 30/05 · 21:51",
+          "secondsFromProjection": 12656
         },
         {
-          "lat": 37.03963,
-          "lng": -8.93241,
-          "km": 637.8,
+          "lat": 37.03877,
+          "lng": -8.93276,
+          "km": 637.9,
           "time": "2026-05-30 21:53",
-          "timeIso": "2026-05-30 21:53:45",
+          "timeIso": "2026-05-30 21:53:55",
           "timeShort": "Sat 30/05 · 21:53",
-          "secondsFromProjection": 12932
+          "secondsFromProjection": 12818
         },
         {
-          "lat": 37.03749,
-          "lng": -8.93328,
-          "km": 638.0,
+          "lat": 37.03664,
+          "lng": -8.93364,
+          "km": 638.1,
           "time": "2026-05-30 21:56",
-          "timeIso": "2026-05-30 21:56:48",
+          "timeIso": "2026-05-30 21:56:52",
           "timeShort": "Sat 30/05 · 21:56",
-          "secondsFromProjection": 13115
+          "secondsFromProjection": 12996
         },
         {
-          "lat": 37.03535,
-          "lng": -8.93416,
-          "km": 638.3,
-          "time": "2026-05-30 21:59",
-          "timeIso": "2026-05-30 21:59:51",
-          "timeShort": "Sat 30/05 · 21:59",
-          "secondsFromProjection": 13298
+          "lat": 37.0345,
+          "lng": -8.93451,
+          "km": 638.4,
+          "time": "2026-05-30 22:00",
+          "timeIso": "2026-05-30 22:00:00",
+          "timeShort": "Sat 30/05 · 22:00",
+          "secondsFromProjection": 13183
         },
         {
-          "lat": 37.03322,
-          "lng": -8.93504,
-          "km": 638.5,
-          "time": "2026-05-30 22:02",
-          "timeIso": "2026-05-30 22:02:54",
-          "timeShort": "Sat 30/05 · 22:02",
-          "secondsFromProjection": 13481
+          "lat": 37.03236,
+          "lng": -8.93539,
+          "km": 638.6,
+          "time": "2026-05-30 22:03",
+          "timeIso": "2026-05-30 22:03:07",
+          "timeShort": "Sat 30/05 · 22:03",
+          "secondsFromProjection": 13370
         },
         {
-          "lat": 37.03108,
-          "lng": -8.93591,
-          "km": 638.8,
-          "time": "2026-05-30 22:05",
-          "timeIso": "2026-05-30 22:05:57",
-          "timeShort": "Sat 30/05 · 22:05",
-          "secondsFromProjection": 13664
+          "lat": 37.03022,
+          "lng": -8.93623,
+          "km": 638.9,
+          "time": "2026-05-30 22:06",
+          "timeIso": "2026-05-30 22:06:15",
+          "timeShort": "Sat 30/05 · 22:06",
+          "secondsFromProjection": 13558
         },
         {
-          "lat": 37.02891,
-          "lng": -8.93665,
-          "km": 639.0,
+          "lat": 37.02803,
+          "lng": -8.93691,
+          "km": 639.1,
           "time": "2026-05-30 22:09",
-          "timeIso": "2026-05-30 22:09:00",
+          "timeIso": "2026-05-30 22:09:22",
           "timeShort": "Sat 30/05 · 22:09",
-          "secondsFromProjection": 13847
+          "secondsFromProjection": 13746
         },
         {
-          "lat": 37.02672,
-          "lng": -8.93731,
-          "km": 639.3,
+          "lat": 37.02585,
+          "lng": -8.93757,
+          "km": 639.4,
           "time": "2026-05-30 22:12",
-          "timeIso": "2026-05-30 22:12:03",
+          "timeIso": "2026-05-30 22:12:30",
           "timeShort": "Sat 30/05 · 22:12",
-          "secondsFromProjection": 14030
+          "secondsFromProjection": 13933
         },
         {
-          "lat": 37.02451,
-          "lng": -8.93779,
-          "km": 639.5,
+          "lat": 37.02362,
+          "lng": -8.93776,
+          "km": 639.6,
           "time": "2026-05-30 22:15",
-          "timeIso": "2026-05-30 22:15:06",
+          "timeIso": "2026-05-30 22:15:37",
           "timeShort": "Sat 30/05 · 22:15",
-          "secondsFromProjection": 14213
+          "secondsFromProjection": 14120
         },
         {
-          "lat": 37.02229,
-          "lng": -8.93793,
-          "km": 639.8,
+          "lat": 37.02144,
+          "lng": -8.93831,
+          "km": 639.9,
           "time": "2026-05-30 22:18",
-          "timeIso": "2026-05-30 22:18:09",
+          "timeIso": "2026-05-30 22:18:45",
           "timeShort": "Sat 30/05 · 22:18",
-          "secondsFromProjection": 14396
+          "secondsFromProjection": 14308
         },
         {
-          "lat": 37.02018,
-          "lng": -8.93892,
-          "km": 640.0,
+          "lat": 37.01934,
+          "lng": -8.93931,
+          "km": 640.1,
           "time": "2026-05-30 22:21",
-          "timeIso": "2026-05-30 22:21:12",
+          "timeIso": "2026-05-30 22:21:52",
           "timeShort": "Sat 30/05 · 22:21",
-          "secondsFromProjection": 14579
+          "secondsFromProjection": 14496
         },
         {
-          "lat": 37.01808,
-          "lng": -8.93992,
-          "km": 640.3,
-          "time": "2026-05-30 22:24",
-          "timeIso": "2026-05-30 22:24:15",
-          "timeShort": "Sat 30/05 · 22:24",
-          "secondsFromProjection": 14762
+          "lat": 37.01725,
+          "lng": -8.94033,
+          "km": 640.4,
+          "time": "2026-05-30 22:25",
+          "timeIso": "2026-05-30 22:25:00",
+          "timeShort": "Sat 30/05 · 22:25",
+          "secondsFromProjection": 14683
         },
         {
-          "lat": 37.01598,
-          "lng": -8.94093,
-          "km": 640.5,
-          "time": "2026-05-30 22:27",
-          "timeIso": "2026-05-30 22:27:18",
-          "timeShort": "Sat 30/05 · 22:27",
-          "secondsFromProjection": 14945
+          "lat": 37.01515,
+          "lng": -8.94134,
+          "km": 640.6,
+          "time": "2026-05-30 22:28",
+          "timeIso": "2026-05-30 22:28:07",
+          "timeShort": "Sat 30/05 · 22:28",
+          "secondsFromProjection": 14870
         },
         {
-          "lat": 37.01389,
-          "lng": -8.94195,
-          "km": 640.8,
-          "time": "2026-05-30 22:30",
-          "timeIso": "2026-05-30 22:30:21",
-          "timeShort": "Sat 30/05 · 22:30",
-          "secondsFromProjection": 15128
+          "lat": 37.01305,
+          "lng": -8.94234,
+          "km": 640.9,
+          "time": "2026-05-30 22:31",
+          "timeIso": "2026-05-30 22:31:15",
+          "timeShort": "Sat 30/05 · 22:31",
+          "secondsFromProjection": 15058
         },
         {
-          "lat": 37.01178,
-          "lng": -8.94294,
-          "km": 641.0,
-          "time": "2026-05-30 22:33",
-          "timeIso": "2026-05-30 22:33:24",
-          "timeShort": "Sat 30/05 · 22:33",
-          "secondsFromProjection": 15311
+          "lat": 37.01094,
+          "lng": -8.94334,
+          "km": 641.1,
+          "time": "2026-05-30 22:34",
+          "timeIso": "2026-05-30 22:34:22",
+          "timeShort": "Sat 30/05 · 22:34",
+          "secondsFromProjection": 15246
         },
         {
-          "lat": 37.00969,
-          "lng": -8.94395,
-          "km": 641.3,
-          "time": "2026-05-30 22:36",
-          "timeIso": "2026-05-30 22:36:27",
-          "timeShort": "Sat 30/05 · 22:36",
-          "secondsFromProjection": 15494
+          "lat": 37.00885,
+          "lng": -8.94435,
+          "km": 641.4,
+          "time": "2026-05-30 22:37",
+          "timeIso": "2026-05-30 22:37:30",
+          "timeShort": "Sat 30/05 · 22:37",
+          "secondsFromProjection": 15433
         },
         {
-          "lat": 37.00758,
-          "lng": -8.94474,
-          "km": 641.5,
-          "time": "2026-05-30 22:39",
-          "timeIso": "2026-05-30 22:39:30",
-          "timeShort": "Sat 30/05 · 22:39",
-          "secondsFromProjection": 15677
+          "lat": 37.00684,
+          "lng": -8.94531,
+          "km": 641.6,
+          "time": "2026-05-30 22:40",
+          "timeIso": "2026-05-30 22:40:37",
+          "timeShort": "Sat 30/05 · 22:40",
+          "secondsFromProjection": 15620
         },
         {
-          "lat": 37.00557,
-          "lng": -8.94591,
-          "km": 641.8,
-          "time": "2026-05-30 22:42",
-          "timeIso": "2026-05-30 22:42:33",
-          "timeShort": "Sat 30/05 · 22:42",
-          "secondsFromProjection": 15860
+          "lat": 37.00474,
+          "lng": -8.94632,
+          "km": 641.9,
+          "time": "2026-05-30 22:43",
+          "timeIso": "2026-05-30 22:43:45",
+          "timeShort": "Sat 30/05 · 22:43",
+          "secondsFromProjection": 15808
         },
         {
-          "lat": 37.00348,
-          "lng": -8.94693,
-          "km": 642.0,
+          "lat": 37.00264,
+          "lng": -8.94733,
+          "km": 642.1,
           "time": "2026-05-30 22:45",
           "timeIso": "2026-05-30 22:45:00",
           "timeShort": "Sat 30/05 · 22:45",
-          "secondsFromProjection": 16006
-        },
-        {
-          "lat": 37.0014,
-          "lng": -8.94781,
-          "km": 642.3,
-          "time": "2026-05-30 22:45",
-          "timeIso": "2026-05-30 22:45:00",
-          "timeShort": "Sat 30/05 · 22:45",
-          "secondsFromProjection": 16006
+          "secondsFromProjection": 15883
         }
       ],
       "line": [
         [
-          37.19243,
-          -8.88993
+          37.19154,
+          -8.89009
         ],
         [
-          37.1902,
-          -8.89034
+          37.18932,
+          -8.8905
         ],
         [
-          37.18819,
-          -8.89136
+          37.18756,
+          -8.89217
         ],
         [
-          37.18662,
+          37.18599,
+          -8.89419
+        ],
+        [
+          37.18423,
+          -8.89576
+        ],
+        [
+          37.18219,
+          -8.89461
+        ],
+        [
+          37.18094,
+          -8.89227
+        ],
+        [
+          37.17975,
+          -8.88988
+        ],
+        [
+          37.17806,
+          -8.88803
+        ],
+        [
+          37.17614,
+          -8.88658
+        ],
+        [
+          37.17422,
+          -8.88511
+        ],
+        [
+          37.17244,
+          -8.88344
+        ],
+        [
+          37.17133,
+          -8.88098
+        ],
+        [
+          37.1694,
+          -8.87967
+        ],
+        [
+          37.16773,
+          -8.8778
+        ],
+        [
+          37.1661,
+          -8.87593
+        ],
+        [
+          37.16411,
+          -8.87488
+        ],
+        [
+          37.16233,
+          -8.87339
+        ],
+        [
+          37.16073,
+          -8.87156
+        ],
+        [
+          37.15912,
+          -8.86969
+        ],
+        [
+          37.15699,
+          -8.86942
+        ],
+        [
+          37.15478,
+          -8.86912
+        ],
+        [
+          37.15299,
+          -8.86986
+        ],
+        [
+          37.15137,
+          -8.87166
+        ],
+        [
+          37.14913,
+          -8.87154
+        ],
+        [
+          37.14703,
+          -8.87224
+        ],
+        [
+          37.14521,
+          -8.87387
+        ],
+        [
+          37.14305,
+          -8.87467
+        ],
+        [
+          37.14099,
+          -8.87577
+        ],
+        [
+          37.13898,
+          -8.87704
+        ],
+        [
+          37.13696,
+          -8.87829
+        ],
+        [
+          37.13495,
+          -8.87954
+        ],
+        [
+          37.13294,
+          -8.88079
+        ],
+        [
+          37.13092,
+          -8.88204
+        ],
+        [
+          37.12891,
+          -8.8833
+        ],
+        [
+          37.12689,
+          -8.88455
+        ],
+        [
+          37.12509,
+          -8.88617
+        ],
+        [
+          37.12345,
+          -8.8881
+        ],
+        [
+          37.12177,
+          -8.88997
+        ],
+        [
+          37.11999,
+          -8.89169
+        ],
+        [
+          37.1182,
           -8.89339
         ],
         [
-          37.18504,
-          -8.89539
+          37.11641,
+          -8.8951
         ],
         [
-          37.18298,
-          -8.89513
+          37.11463,
+          -8.89681
         ],
         [
-          37.18141,
-          -8.89324
+          37.11284,
+          -8.89853
         ],
         [
-          37.18025,
-          -8.89082
+          37.11104,
+          -8.90022
         ],
         [
-          37.17878,
-          -8.8887
+          37.10925,
+          -8.90193
         ],
         [
-          37.17692,
-          -8.88713
+          37.10748,
+          -8.90366
         ],
         [
-          37.17498,
-          -8.8857
+          37.10571,
+          -8.90539
         ],
         [
-          37.17307,
-          -8.88422
+          37.10392,
+          -8.90711
         ],
         [
-          37.17178,
-          -8.88195
+          37.10212,
+          -8.9088
         ],
         [
-          37.17024,
-          -8.88009
+          37.10007,
+          -8.90993
         ],
         [
-          37.16837,
-          -8.8786
+          37.09793,
+          -8.91081
         ],
         [
-          37.16679,
-          -8.8766
+          37.09577,
+          -8.91155
         ],
         [
-          37.16479,
-          -8.87557
+          37.09358,
+          -8.91222
         ],
         [
-          37.16319,
-          -8.87368
+          37.09135,
+          -8.91215
         ],
         [
-          37.16123,
-          -8.8725
+          37.08914,
+          -8.91165
         ],
         [
-          37.1599,
-          -8.87025
+          37.08697,
+          -8.91131
         ],
         [
-          37.15787,
-          -8.86915
+          37.08472,
+          -8.91108
         ],
         [
-          37.15566,
-          -8.86935
+          37.08316,
+          -8.91214
         ],
         [
-          37.15346,
-          -8.86894
+          37.08095,
+          -8.91172
         ],
         [
-          37.15214,
-          -8.87114
+          37.07936,
+          -8.91218
         ],
         [
-          37.15003,
-          -8.8716
+          37.07769,
+          -8.91404
         ],
         [
-          37.1478,
-          -8.87165
+          37.07571,
+          -8.91538
         ],
         [
-          37.14597,
-          -8.87328
+          37.07372,
+          -8.91668
         ],
         [
-          37.14392,
-          -8.87437
+          37.07173,
+          -8.918
         ],
         [
-          37.1418,
-          -8.87527
+          37.06985,
+          -8.91955
         ],
         [
-          37.13978,
-          -8.87653
+          37.06806,
+          -8.92125
         ],
         [
-          37.13777,
-          -8.87779
+          37.06609,
+          -8.92257
         ],
         [
-          37.13576,
-          -8.87904
+          37.06387,
+          -8.92287
         ],
         [
-          37.13374,
-          -8.88029
+          37.06162,
+          -8.92292
         ],
         [
-          37.13173,
-          -8.88154
+          37.05937,
+          -8.92298
         ],
         [
-          37.12971,
-          -8.8828
+          37.05712,
+          -8.92305
         ],
         [
-          37.1277,
-          -8.88405
+          37.05489,
+          -8.92333
         ],
         [
-          37.12576,
-          -8.88542
+          37.0529,
+          -8.92459
         ],
         [
-          37.12411,
-          -8.88733
+          37.05111,
+          -8.92629
         ],
         [
-          37.12246,
-          -8.88923
+          37.04931,
+          -8.92798
         ],
         [
-          37.12071,
-          -8.891
+          37.04732,
+          -8.92925
         ],
         [
-          37.11891,
-          -8.8927
+          37.04518,
+          -8.93013
         ],
         [
-          37.11713,
-          -8.89442
+          37.04305,
+          -8.931
         ],
         [
-          37.11534,
-          -8.89614
+          37.04091,
+          -8.93188
         ],
         [
-          37.11356,
-          -8.89785
+          37.03877,
+          -8.93276
         ],
         [
-          37.11176,
-          -8.89954
+          37.03664,
+          -8.93364
         ],
         [
-          37.10996,
-          -8.90124
+          37.0345,
+          -8.93451
         ],
         [
-          37.10819,
-          -8.90297
+          37.03236,
+          -8.93539
         ],
         [
-          37.10642,
-          -8.9047
+          37.03022,
+          -8.93623
         ],
         [
-          37.10463,
-          -8.90642
+          37.02803,
+          -8.93691
         ],
         [
-          37.10285,
-          -8.90814
+          37.02585,
+          -8.93757
         ],
         [
-          37.10092,
-          -8.90955
+          37.02362,
+          -8.93776
         ],
         [
-          37.09879,
-          -8.91047
+          37.02144,
+          -8.93831
         ],
         [
-          37.09664,
-          -8.91127
+          37.01934,
+          -8.93931
         ],
         [
-          37.09445,
-          -8.91194
+          37.01725,
+          -8.94033
         ],
         [
-          37.09224,
-          -8.91231
+          37.01515,
+          -8.94134
         ],
         [
-          37.09002,
-          -8.91185
+          37.01305,
+          -8.94234
         ],
         [
-          37.08781,
-          -8.91135
+          37.01094,
+          -8.94334
         ],
         [
-          37.08562,
-          -8.91114
+          37.00885,
+          -8.94435
         ],
         [
-          37.08399,
-          -8.91204
+          37.00684,
+          -8.94531
         ],
         [
-          37.08183,
-          -8.91186
+          37.00474,
+          -8.94632
         ],
         [
-          37.07996,
-          -8.91134
-        ],
-        [
-          37.07842,
-          -8.91339
-        ],
-        [
-          37.07651,
-          -8.91485
-        ],
-        [
-          37.07452,
-          -8.91616
-        ],
-        [
-          37.07253,
-          -8.91747
-        ],
-        [
-          37.07058,
-          -8.91889
-        ],
-        [
-          37.06878,
-          -8.92057
-        ],
-        [
-          37.06693,
-          -8.92216
-        ],
-        [
-          37.06476,
-          -8.92284
-        ],
-        [
-          37.06252,
-          -8.9229
-        ],
-        [
-          37.06027,
-          -8.92296
-        ],
-        [
-          37.05802,
-          -8.92302
-        ],
-        [
-          37.05578,
-          -8.92311
-        ],
-        [
-          37.05365,
-          -8.92396
-        ],
-        [
-          37.05182,
-          -8.92561
-        ],
-        [
-          37.05003,
-          -8.92731
-        ],
-        [
-          37.04816,
-          -8.92885
-        ],
-        [
-          37.04604,
-          -8.92978
-        ],
-        [
-          37.0439,
-          -8.93065
-        ],
-        [
-          37.04176,
-          -8.93153
-        ],
-        [
-          37.03963,
-          -8.93241
-        ],
-        [
-          37.03749,
-          -8.93328
-        ],
-        [
-          37.03535,
-          -8.93416
-        ],
-        [
-          37.03322,
-          -8.93504
-        ],
-        [
-          37.03108,
-          -8.93591
-        ],
-        [
-          37.02891,
-          -8.93665
-        ],
-        [
-          37.02672,
-          -8.93731
-        ],
-        [
-          37.02451,
-          -8.93779
-        ],
-        [
-          37.02229,
-          -8.93793
-        ],
-        [
-          37.02018,
-          -8.93892
-        ],
-        [
-          37.01808,
-          -8.93992
-        ],
-        [
-          37.01598,
-          -8.94093
-        ],
-        [
-          37.01389,
-          -8.94195
-        ],
-        [
-          37.01178,
-          -8.94294
-        ],
-        [
-          37.00969,
-          -8.94395
-        ],
-        [
-          37.00758,
-          -8.94474
-        ],
-        [
-          37.00557,
-          -8.94591
-        ],
-        [
-          37.00348,
-          -8.94693
-        ],
-        [
-          37.0014,
-          -8.94781
+          37.00264,
+          -8.94733
         ]
       ],
       "scenario": "main",
-      "fromKm": 617.8,
-      "projectionKm": 617.8,
-      "projectionTime": "2026-05-30 18:18:14",
+      "fromKm": 617.9,
+      "projectionKm": 617.9,
+      "projectionTime": "2026-05-30 18:20:17",
       "finishTime": "2026-05-30 22:45"
     },
     "bounds": [
@@ -78159,7 +78200,7 @@
       "categoryColor": "#f59e0b"
     },
     "movingCount": 540,
-    "gpsPoints": 8487,
+    "gpsPoints": 8490,
     "gpsSkipped": 406
   }
 }
