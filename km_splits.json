@@ -10121,5 +10121,22 @@
     "categoryLabel": "Corrida",
     "categoryShort": "Corrida",
     "categoryColor": "#3d8bfd"
+  },
+  {
+    "km": 597,
+    "unavailable": false,
+    "crossing_time": "2026-05-30 14:00:09",
+    "segment_time_s": 346.927724,
+    "segment_time": "5:47",
+    "pace": "5:47/km",
+    "elapsed_time_s": 529209.987867,
+    "elapsed_time": "147:00:10",
+    "battery_pct": 62.0,
+    "battery": "62%",
+    "partial": false,
+    "category": "corrida_forte",
+    "categoryLabel": "Corrida forte",
+    "categoryShort": "Forte",
+    "categoryColor": "#22c55e"
   }
 ]
