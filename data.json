@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-31 22:33:03",
+  "updatedAt": "2026-05-31 22:36:34",
   "athlete": {
     "name": "Nuno Faria",
     "bib": 1,
@@ -18748,7 +18748,7 @@
   },
   "predictionEvolution": {
     "ok": true,
-    "count": 1976,
+    "count": 1977,
     "timeline": [
       {
         "recordedAt": "2026-05-26 04:05:02",
@@ -23228,7 +23228,7 @@
         "modelVersion": 4
       },
       {
-        "recordedAt": "2026-05-31 22:33:04",
+        "recordedAt": "2026-05-31 22:36:36",
         "km": 642.4,
         "finishMain": "2026-05-30 23:03:02",
         "finishOptimistic": null,
@@ -23250,7 +23250,7 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 5.6,
+        "hoursSince": 5.7,
         "actualKmPerDay": 1.7
       },
       {
@@ -23263,7 +23263,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 5.2,
-        "actualKmPerDay": 1.9
+        "actualKmPerDay": 1.8
       },
       {
         "recordedAt": "2026-05-31 17:51:05",
@@ -23274,7 +23274,7 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 4.7,
+        "hoursSince": 4.8,
         "actualKmPerDay": 2.0
       },
       {
@@ -23286,8 +23286,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 4.2,
-        "actualKmPerDay": 2.3
+        "hoursSince": 4.3,
+        "actualKmPerDay": 2.2
       },
       {
         "recordedAt": "2026-05-31 18:45:34",
@@ -23298,7 +23298,7 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 3.8,
+        "hoursSince": 3.9,
         "actualKmPerDay": 2.5
       },
       {
@@ -23310,7 +23310,7 @@
         "marginThenMin": 1497,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 3.4,
+        "hoursSince": 3.5,
         "actualKmPerDay": 2.8
       },
       {
@@ -23322,8 +23322,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 3.2,
-        "actualKmPerDay": 3.0
+        "hoursSince": 3.3,
+        "actualKmPerDay": 2.9
       },
       {
         "recordedAt": "2026-05-31 20:46:55",
@@ -23335,7 +23335,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 1.8,
-        "actualKmPerDay": 5.4
+        "actualKmPerDay": 5.3
       },
       {
         "recordedAt": "2026-05-31 21:12:50",
@@ -23346,8 +23346,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 1.3,
-        "actualKmPerDay": 7.2
+        "hoursSince": 1.4,
+        "actualKmPerDay": 6.9
       },
       {
         "recordedAt": "2026-05-31 21:38:13",
@@ -23358,8 +23358,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 0.9,
-        "actualKmPerDay": 10.5
+        "hoursSince": 1.0,
+        "actualKmPerDay": 9.9
       },
       {
         "recordedAt": "2026-05-31 22:03:22",
@@ -23370,8 +23370,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 0.5,
-        "actualKmPerDay": 19.4
+        "hoursSince": 0.6,
+        "actualKmPerDay": 17.3
       },
       {
         "recordedAt": "2026-05-31 22:21:54",
@@ -23383,7 +23383,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 0.2,
-        "actualKmPerDay": 51.5
+        "actualKmPerDay": 39.2
       }
     ],
     "forecastAccuracy": {
@@ -23606,10 +23606,10 @@
       ]
     },
     "summary": {
-      "snapshots": 1976,
+      "snapshots": 1977,
       "points": 408,
       "firstAt": "2026-05-26 04:05:02",
-      "lastAt": "2026-05-31 22:33:04",
+      "lastAt": "2026-05-31 22:36:36",
       "firstFinish": "2026-05-31 17:01:35",
       "currentFinish": "2026-05-30 23:03:02",
       "finishSwingHours": 100.7,
@@ -23618,7 +23618,7 @@
       "marginCurrentMin": 1497,
       "marginSwingMin": 6044
     },
-    "label": "408 pontos · 1976 snapshots gravados",
+    "label": "408 pontos · 1977 snapshots gravados",
     "calendarDeadline": "2026-05-31 23:59:59"
   },
   "live": {
