@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-31 23:50:04",
+  "updatedAt": "2026-05-31 23:54:36",
   "athlete": {
     "name": "Nuno Faria",
     "bib": 1,
@@ -18,27 +18,27 @@
       "recordCurrent": "9d 2h 29m",
       "recordDeadlineFromStart": "2026-06-02 13:29:00",
       "calendarDeadline": "2026-05-31 23:59:59",
-      "requiredPaceRecord": "5807:01/km",
-      "requiredPaceCalendar": "25:29/km",
-      "requiredClockPaceRecord": "5807:01/km",
-      "requiredClockPaceCalendar": "25:29/km",
-      "hoursLeftCalendar": 0.2,
-      "kmPerDayCalendar": 56.5,
-      "kmPerHourCalendar": 2.35,
+      "requiredPaceRecord": "5795:22/km",
+      "requiredPaceCalendar": "13:50/km",
+      "requiredClockPaceRecord": "5795:22/km",
+      "requiredClockPaceCalendar": "13:50/km",
+      "hoursLeftCalendar": 0.1,
+      "kmPerDayCalendar": 104.1,
+      "kmPerHourCalendar": 4.34,
       "remainingKm": 0.4,
       "recordPaceNow": {
-        "km": 531.7,
-        "lat": 37.796671,
-        "lng": -8.663282,
-        "alt": 159.6,
-        "time": "2026-05-31 23:50:04"
+        "km": 531.9,
+        "lat": 37.795617,
+        "lng": -8.665351,
+        "alt": 163.8,
+        "time": "2026-05-31 23:54:36"
       },
       "calendarPaceNow": {
-        "km": 641.8,
-        "lat": 37.005552,
-        "lng": -8.945918,
-        "alt": 24.9,
-        "time": "2026-05-31 23:50:04",
+        "km": 642.1,
+        "lat": 37.003308,
+        "lng": -8.947012,
+        "alt": 25.1,
+        "time": "2026-05-31 23:54:36",
         "deadline": "2026-05-31 23:59:59"
       },
       "calendarPaceNowRealistic": {
@@ -46,7 +46,7 @@
         "lat": 37.003904,
         "lng": -8.946733,
         "alt": 23.4,
-        "time": "2026-05-31 23:50:04",
+        "time": "2026-05-31 23:54:36",
         "deadline": "2026-05-31 23:59:59",
         "scenario": "main"
       },
@@ -16903,7 +16903,7 @@
         },
         "splitsFromKm": 11,
         "splitsToKm": 97,
-        "vsGoalKmDay": 133.2,
+        "vsGoalKmDay": 85.6,
         "tempMinC": 17.5,
         "tempMaxC": 23.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16942,7 +16942,7 @@
         },
         "splitsFromKm": 98,
         "splitsToKm": 185,
-        "vsGoalKmDay": 70.9,
+        "vsGoalKmDay": 23.3,
         "tempMinC": 15.6,
         "tempMaxC": 20.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -16980,7 +16980,7 @@
         },
         "splitsFromKm": 186,
         "splitsToKm": 269,
-        "vsGoalKmDay": 58.4,
+        "vsGoalKmDay": 10.8,
         "tempMinC": 13.1,
         "tempMaxC": 30.1,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17018,7 +17018,7 @@
         },
         "splitsFromKm": 270,
         "splitsToKm": 379,
-        "vsGoalKmDay": 50.5,
+        "vsGoalKmDay": 2.9,
         "tempMinC": 16.0,
         "tempMaxC": 34.8,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17055,7 +17055,7 @@
         },
         "splitsFromKm": 380,
         "splitsToKm": 438,
-        "vsGoalKmDay": 59.9,
+        "vsGoalKmDay": 12.3,
         "tempMinC": 21.2,
         "tempMaxC": 34.5,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17093,7 +17093,7 @@
         },
         "splitsFromKm": 439,
         "splitsToKm": 546,
-        "vsGoalKmDay": 64.5,
+        "vsGoalKmDay": 16.9,
         "tempMinC": 14.9,
         "tempMaxC": 32.8,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17126,7 +17126,7 @@
         "nightAfter": null,
         "splitsFromKm": 547,
         "splitsToKm": 642,
-        "vsGoalKmDay": 86.7,
+        "vsGoalKmDay": 39.1,
         "tempMinC": 17.4,
         "tempMaxC": 20.8,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17216,7 +17216,7 @@
         },
         "splitsFromKm": 11,
         "splitsToKm": 125,
-        "vsGoalKmDay": 126.5,
+        "vsGoalKmDay": 78.9,
         "tempMinC": 15.0,
         "tempMaxC": 25.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17256,7 +17256,7 @@
         },
         "splitsFromKm": 126,
         "splitsToKm": 215,
-        "vsGoalKmDay": 65.4,
+        "vsGoalKmDay": 17.8,
         "tempMinC": 14.0,
         "tempMaxC": 26.7,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17295,7 +17295,7 @@
         },
         "splitsFromKm": 216,
         "splitsToKm": 300,
-        "vsGoalKmDay": 61.7,
+        "vsGoalKmDay": 14.1,
         "tempMinC": 18.5,
         "tempMaxC": 34.2,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17334,7 +17334,7 @@
         },
         "splitsFromKm": 301,
         "splitsToKm": 385,
-        "vsGoalKmDay": 48.6,
+        "vsGoalKmDay": 1.0,
         "tempMinC": 17.0,
         "tempMaxC": 36.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17373,7 +17373,7 @@
         },
         "splitsFromKm": 386,
         "splitsToKm": 473,
-        "vsGoalKmDay": 66.8,
+        "vsGoalKmDay": 19.2,
         "tempMinC": 14.6,
         "tempMaxC": 34.0,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17412,7 +17412,7 @@
         },
         "splitsFromKm": 474,
         "splitsToKm": 580,
-        "vsGoalKmDay": 73.3,
+        "vsGoalKmDay": 25.7,
         "tempMinC": 14.6,
         "tempMaxC": 32.2,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -17445,7 +17445,7 @@
         "nightAfter": null,
         "splitsFromKm": 581,
         "splitsToKm": 642,
-        "vsGoalKmDay": 77.4,
+        "vsGoalKmDay": 29.8,
         "tempMinC": 18.0,
         "tempMaxC": 23.2,
         "tempSource": "Open-Meteo (2 m, horas em movimento)"
@@ -18067,8 +18067,8 @@
       {
         "km": 270,
         "time": "2026-05-27 05:06:40",
-        "calendarPct": 53,
-        "calendarBasePct": 58,
+        "calendarPct": 45,
+        "calendarBasePct": 49,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18076,8 +18076,8 @@
       {
         "km": 275,
         "time": "2026-05-27 06:03:20",
-        "calendarPct": 53,
-        "calendarBasePct": 58,
+        "calendarPct": 45,
+        "calendarBasePct": 49,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18085,8 +18085,8 @@
       {
         "km": 280,
         "time": "2026-05-27 07:00:17",
-        "calendarPct": 53,
-        "calendarBasePct": 58,
+        "calendarPct": 45,
+        "calendarBasePct": 49,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18094,8 +18094,8 @@
       {
         "km": 285,
         "time": "2026-05-27 07:54:50",
-        "calendarPct": 53,
-        "calendarBasePct": 58,
+        "calendarPct": 45,
+        "calendarBasePct": 49,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18103,8 +18103,8 @@
       {
         "km": 290,
         "time": "2026-05-27 08:45:06",
-        "calendarPct": 53,
-        "calendarBasePct": 58,
+        "calendarPct": 45,
+        "calendarBasePct": 49,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18112,8 +18112,8 @@
       {
         "km": 295,
         "time": "2026-05-27 09:43:35",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18121,8 +18121,8 @@
       {
         "km": 300,
         "time": "2026-05-27 10:48:49",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18130,8 +18130,8 @@
       {
         "km": 305,
         "time": "2026-05-27 11:59:39",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18139,8 +18139,8 @@
       {
         "km": 310,
         "time": "2026-05-27 13:00:15",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18148,8 +18148,8 @@
       {
         "km": 315,
         "time": "2026-05-27 13:40:24",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18157,8 +18157,8 @@
       {
         "km": 320,
         "time": "2026-05-27 15:52:31",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18166,8 +18166,8 @@
       {
         "km": 325,
         "time": "2026-05-27 16:48:46",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18175,8 +18175,8 @@
       {
         "km": 330,
         "time": "2026-05-27 18:00:29",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18184,8 +18184,8 @@
       {
         "km": 335,
         "time": "2026-05-27 19:16:26",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 29,
+        "calendarBasePct": 32,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18193,8 +18193,8 @@
       {
         "km": 340,
         "time": "2026-05-27 20:41:47",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 29,
+        "calendarBasePct": 32,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18202,8 +18202,8 @@
       {
         "km": 345,
         "time": "2026-05-27 22:47:21",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 29,
+        "calendarBasePct": 32,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18211,8 +18211,8 @@
       {
         "km": 350,
         "time": "2026-05-28 00:06:43",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18220,8 +18220,8 @@
       {
         "km": 355,
         "time": "2026-05-28 01:20:26",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18229,8 +18229,8 @@
       {
         "km": 360,
         "time": "2026-05-28 02:36:24",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18238,8 +18238,8 @@
       {
         "km": 365,
         "time": "2026-05-28 03:52:02",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18247,8 +18247,8 @@
       {
         "km": 370,
         "time": "2026-05-28 05:09:08",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18256,8 +18256,8 @@
       {
         "km": 375,
         "time": "2026-05-28 06:16:42",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18265,8 +18265,8 @@
       {
         "km": 380,
         "time": "2026-05-28 09:59:24",
-        "calendarPct": 46,
-        "calendarBasePct": 50,
+        "calendarPct": 32,
+        "calendarBasePct": 35,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18274,8 +18274,8 @@
       {
         "km": 385,
         "time": "2026-05-28 10:53:22",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18283,8 +18283,8 @@
       {
         "km": 390,
         "time": "2026-05-28 11:45:57",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18292,8 +18292,8 @@
       {
         "km": 395,
         "time": "2026-05-28 12:48:19",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18301,8 +18301,8 @@
       {
         "km": 400,
         "time": "2026-05-28 14:09:17",
-        "calendarPct": 63,
-        "calendarBasePct": 69,
+        "calendarPct": 58,
+        "calendarBasePct": 63,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18310,8 +18310,8 @@
       {
         "km": 405,
         "time": "2026-05-28 15:57:11",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 43,
+        "calendarBasePct": 47,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18319,8 +18319,8 @@
       {
         "km": 410,
         "time": "2026-05-28 16:52:08",
-        "calendarPct": 63,
-        "calendarBasePct": 69,
+        "calendarPct": 58,
+        "calendarBasePct": 63,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18328,8 +18328,8 @@
       {
         "km": 415,
         "time": "2026-05-28 17:50:16",
-        "calendarPct": 63,
-        "calendarBasePct": 69,
+        "calendarPct": 58,
+        "calendarBasePct": 63,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18337,8 +18337,8 @@
       {
         "km": 420,
         "time": "2026-05-28 18:35:33",
-        "calendarPct": 73,
-        "calendarBasePct": 80,
+        "calendarPct": 56,
+        "calendarBasePct": 61,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18346,8 +18346,8 @@
       {
         "km": 425,
         "time": "2026-05-28 19:56:11",
-        "calendarPct": 73,
-        "calendarBasePct": 80,
+        "calendarPct": 60,
+        "calendarBasePct": 66,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18355,8 +18355,8 @@
       {
         "km": 430,
         "time": "2026-05-28 21:04:19",
-        "calendarPct": 74,
-        "calendarBasePct": 81,
+        "calendarPct": 66,
+        "calendarBasePct": 72,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18364,8 +18364,8 @@
       {
         "km": 435,
         "time": "2026-05-28 22:33:34",
-        "calendarPct": 74,
-        "calendarBasePct": 81,
+        "calendarPct": 66,
+        "calendarBasePct": 72,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18373,8 +18373,8 @@
       {
         "km": 440,
         "time": "2026-05-29 05:02:40",
-        "calendarPct": 48,
-        "calendarBasePct": 53,
+        "calendarPct": 34,
+        "calendarBasePct": 37,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18382,8 +18382,8 @@
       {
         "km": 445,
         "time": "2026-05-29 05:53:34",
-        "calendarPct": 63,
-        "calendarBasePct": 69,
+        "calendarPct": 48,
+        "calendarBasePct": 53,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18391,8 +18391,8 @@
       {
         "km": 450,
         "time": "2026-05-29 06:37:31",
-        "calendarPct": 63,
-        "calendarBasePct": 69,
+        "calendarPct": 48,
+        "calendarBasePct": 53,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18400,8 +18400,8 @@
       {
         "km": 455,
         "time": "2026-05-29 07:30:41",
-        "calendarPct": 73,
-        "calendarBasePct": 80,
+        "calendarPct": 51,
+        "calendarBasePct": 56,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18409,8 +18409,8 @@
       {
         "km": 460,
         "time": "2026-05-29 08:37:27",
-        "calendarPct": 73,
-        "calendarBasePct": 80,
+        "calendarPct": 58,
+        "calendarBasePct": 63,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18418,8 +18418,8 @@
       {
         "km": 465,
         "time": "2026-05-29 09:39:53",
-        "calendarPct": 77,
-        "calendarBasePct": 84,
+        "calendarPct": 61,
+        "calendarBasePct": 67,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18427,8 +18427,8 @@
       {
         "km": 470,
         "time": "2026-05-29 10:27:51",
-        "calendarPct": 80,
-        "calendarBasePct": 88,
+        "calendarPct": 65,
+        "calendarBasePct": 71,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18436,8 +18436,8 @@
       {
         "km": 475,
         "time": "2026-05-29 11:19:53",
-        "calendarPct": 83,
-        "calendarBasePct": 91,
+        "calendarPct": 68,
+        "calendarBasePct": 74,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18445,8 +18445,8 @@
       {
         "km": 480,
         "time": "2026-05-29 12:15:19",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 69,
+        "calendarBasePct": 75,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18454,8 +18454,8 @@
       {
         "km": 485,
         "time": "2026-05-29 13:28:06",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 69,
+        "calendarBasePct": 76,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18463,8 +18463,8 @@
       {
         "km": 490,
         "time": "2026-05-29 14:27:21",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 70,
+        "calendarBasePct": 77,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18472,8 +18472,8 @@
       {
         "km": 495,
         "time": "2026-05-29 15:15:12",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 74,
+        "calendarBasePct": 81,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18481,8 +18481,8 @@
       {
         "km": 500,
         "time": "2026-05-29 16:17:09",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 81,
+        "calendarBasePct": 89,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18490,8 +18490,8 @@
       {
         "km": 505,
         "time": "2026-05-29 17:29:54",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 82,
+        "calendarBasePct": 90,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18499,8 +18499,8 @@
       {
         "km": 510,
         "time": "2026-05-29 18:09:46",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 83,
+        "calendarBasePct": 91,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18508,8 +18508,8 @@
       {
         "km": 515,
         "time": "2026-05-29 19:30:36",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 83,
+        "calendarBasePct": 91,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18571,8 +18571,8 @@
       {
         "km": 550,
         "time": "2026-05-30 06:23:39",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 78,
+        "calendarBasePct": 85,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18580,8 +18580,8 @@
       {
         "km": 555,
         "time": "2026-05-30 07:02:42",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 81,
+        "calendarBasePct": 89,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18589,8 +18589,8 @@
       {
         "km": 560,
         "time": "2026-05-30 07:39:20",
-        "calendarPct": 84,
-        "calendarBasePct": 92,
+        "calendarPct": 82,
+        "calendarBasePct": 90,
         "recordPct": 84,
         "modelReliabilityPct": 76.0,
         "isCurrent": false
@@ -18759,7 +18759,7 @@
   },
   "predictionEvolution": {
     "ok": true,
-    "count": 1995,
+    "count": 1996,
     "timeline": [
       {
         "recordedAt": "2026-05-26 04:05:02",
@@ -23283,7 +23283,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 5.5,
+        "hoursSince": 5.6,
         "actualKmPerDay": null
       },
       {
@@ -23295,7 +23295,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 5.1,
+        "hoursSince": 5.2,
         "actualKmPerDay": null
       },
       {
@@ -23307,7 +23307,7 @@
         "marginThenMin": 1497,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 4.7,
+        "hoursSince": 4.8,
         "actualKmPerDay": null
       },
       {
@@ -23319,7 +23319,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 4.5,
+        "hoursSince": 4.6,
         "actualKmPerDay": null
       },
       {
@@ -23343,7 +23343,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 2.6,
+        "hoursSince": 2.7,
         "actualKmPerDay": null
       },
       {
@@ -23355,7 +23355,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 2.2,
+        "hoursSince": 2.3,
         "actualKmPerDay": null
       },
       {
@@ -23367,7 +23367,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 1.8,
+        "hoursSince": 1.9,
         "actualKmPerDay": null
       },
       {
@@ -23391,7 +23391,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 1.1,
+        "hoursSince": 1.2,
         "actualKmPerDay": null
       },
       {
@@ -23415,7 +23415,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 0.2,
+        "hoursSince": 0.3,
         "actualKmPerDay": null
       }
     ],
@@ -23639,7 +23639,7 @@
       ]
     },
     "summary": {
-      "snapshots": 1995,
+      "snapshots": 1996,
       "points": 410,
       "firstAt": "2026-05-26 04:05:02",
       "lastAt": "2026-05-31 23:38:25",
@@ -23651,7 +23651,7 @@
       "marginCurrentMin": 776,
       "marginSwingMin": 6044
     },
-    "label": "410 pontos · 1995 snapshots gravados",
+    "label": "410 pontos · 1996 snapshots gravados",
     "calendarDeadline": "2026-05-31 23:59:59"
   },
   "live": {
@@ -23664,7 +23664,7 @@
     "battery": "47%",
     "gpsTime": "2026-05-31 11:03:46",
     "gpsTimeUtc": "2026-05-31 10:03:46",
-    "lagMinutes": 763.9,
+    "lagMinutes": 768.6,
     "alongRouteKm": 610.6,
     "offRouteM": 16935.0,
     "source": "position_new",
@@ -80818,22 +80818,22 @@
       "status": "OK",
       "alongRouteKm": 610.6,
       "source": "position_new",
-      "lagMinutes": 763.9,
+      "lagMinutes": 768.6,
       "logTime": "2026-05-31 10:03:46"
     },
     "recordPace": {
-      "km": 531.7,
-      "lat": 37.796671,
-      "lng": -8.663282,
-      "alt": 159.6,
-      "time": "2026-05-31 23:50:04"
+      "km": 531.9,
+      "lat": 37.795617,
+      "lng": -8.665351,
+      "alt": 163.8,
+      "time": "2026-05-31 23:54:36"
     },
     "calendarPace": {
-      "km": 641.8,
-      "lat": 37.005552,
-      "lng": -8.945918,
-      "alt": 24.9,
-      "time": "2026-05-31 23:50:04",
+      "km": 642.1,
+      "lat": 37.003308,
+      "lng": -8.947012,
+      "alt": 25.1,
+      "time": "2026-05-31 23:54:36",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": {
@@ -80841,7 +80841,7 @@
       "lat": 37.003904,
       "lng": -8.946733,
       "alt": 23.4,
-      "time": "2026-05-31 23:50:04",
+      "time": "2026-05-31 23:54:36",
       "deadline": "2026-05-31 23:59:59",
       "scenario": "main"
     },
