@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-31 19:09:40",
+  "updatedAt": "2026-05-31 19:12:37",
   "athlete": {
     "name": "Nuno Faria",
     "bib": 1,
@@ -18748,7 +18748,7 @@
   },
   "predictionEvolution": {
     "ok": true,
-    "count": 1931,
+    "count": 1932,
     "timeline": [
       {
         "recordedAt": "2026-05-26 04:05:02",
@@ -23162,7 +23162,7 @@
         "modelVersion": 4
       },
       {
-        "recordedAt": "2026-05-31 19:09:41",
+        "recordedAt": "2026-05-31 19:12:38",
         "km": 642.4,
         "finishMain": "2026-05-30 23:03:02",
         "finishOptimistic": null,
@@ -23208,8 +23208,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 4.0,
-        "actualKmPerDay": 2.4
+        "hoursSince": 4.1,
+        "actualKmPerDay": 2.3
       },
       {
         "recordedAt": "2026-05-31 15:34:09",
@@ -23221,7 +23221,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 3.6,
-        "actualKmPerDay": 2.7
+        "actualKmPerDay": 2.6
       },
       {
         "recordedAt": "2026-05-31 16:01:44",
@@ -23232,8 +23232,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 3.1,
-        "actualKmPerDay": 3.1
+        "hoursSince": 3.2,
+        "actualKmPerDay": 3.0
       },
       {
         "recordedAt": "2026-05-31 16:29:12",
@@ -23245,7 +23245,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 2.7,
-        "actualKmPerDay": 3.6
+        "actualKmPerDay": 3.5
       },
       {
         "recordedAt": "2026-05-31 16:56:35",
@@ -23256,8 +23256,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 2.2,
-        "actualKmPerDay": 4.3
+        "hoursSince": 2.3,
+        "actualKmPerDay": 4.2
       },
       {
         "recordedAt": "2026-05-31 17:23:46",
@@ -23269,7 +23269,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 1.8,
-        "actualKmPerDay": 5.4
+        "actualKmPerDay": 5.3
       },
       {
         "recordedAt": "2026-05-31 17:51:05",
@@ -23280,8 +23280,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 1.3,
-        "actualKmPerDay": 7.3
+        "hoursSince": 1.4,
+        "actualKmPerDay": 7.1
       },
       {
         "recordedAt": "2026-05-31 18:18:16",
@@ -23293,7 +23293,7 @@
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
         "hoursSince": 0.9,
-        "actualKmPerDay": 11.2
+        "actualKmPerDay": 10.6
       },
       {
         "recordedAt": "2026-05-31 18:45:34",
@@ -23304,8 +23304,8 @@
         "marginThenMin": 776,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 0.4,
-        "actualKmPerDay": 23.9
+        "hoursSince": 0.5,
+        "actualKmPerDay": 21.3
       },
       {
         "recordedAt": "2026-05-31 19:07:25",
@@ -23316,8 +23316,8 @@
         "marginThenMin": 1497,
         "marginNowMin": 1497,
         "kmSince": 0.39999999999997726,
-        "hoursSince": 0.0,
-        "actualKmPerDay": 252.8
+        "hoursSince": 0.1,
+        "actualKmPerDay": 110.2
       }
     ],
     "forecastAccuracy": {
@@ -23540,10 +23540,10 @@
       ]
     },
     "summary": {
-      "snapshots": 1931,
+      "snapshots": 1932,
       "points": 402,
       "firstAt": "2026-05-26 04:05:02",
-      "lastAt": "2026-05-31 19:09:41",
+      "lastAt": "2026-05-31 19:12:38",
       "firstFinish": "2026-05-31 17:01:35",
       "currentFinish": "2026-05-30 23:03:02",
       "finishSwingHours": 100.7,
@@ -23552,7 +23552,7 @@
       "marginCurrentMin": 1497,
       "marginSwingMin": 6044
     },
-    "label": "402 pontos · 1931 snapshots gravados",
+    "label": "402 pontos · 1932 snapshots gravados",
     "calendarDeadline": "2026-05-31 23:59:59"
   },
   "live": {
