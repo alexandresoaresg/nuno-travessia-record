@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-01 09:20:26",
+  "updatedAt": "2026-06-01 10:12:42",
   "athlete": {
     "name": "Nuno Faria",
     "bib": 1,
@@ -18,27 +18,27 @@
       "recordCurrent": "9d 2h 29m",
       "recordDeadlineFromStart": "2026-06-02 13:29:00",
       "calendarDeadline": "2026-05-31 23:59:59",
-      "requiredPaceRecord": "4340:47/km",
+      "requiredPaceRecord": "4206:24/km",
       "requiredPaceCalendar": "—",
-      "requiredClockPaceRecord": "4340:47/km",
+      "requiredClockPaceRecord": "4206:24/km",
       "requiredClockPaceCalendar": "—",
       "hoursLeftCalendar": 0.0,
       "kmPerDayCalendar": 33609.6,
       "kmPerHourCalendar": 1400.4,
       "remainingKm": 0.4,
       "recordPaceNow": {
-        "km": 559.6,
-        "lat": 37.589114,
-        "lng": -8.654861,
-        "alt": 81.9,
-        "time": "2026-06-01 09:20:26"
+        "km": 562.2,
+        "lat": 37.571539,
+        "lng": -8.667457,
+        "alt": 126.8,
+        "time": "2026-06-01 10:12:42"
       },
       "calendarPaceNow": {
         "km": 642.4,
         "lat": 37.00068,
         "lng": -8.94824,
         "alt": 30.2,
-        "time": "2026-06-01 09:20:26",
+        "time": "2026-06-01 10:12:42",
         "deadline": "2026-05-31 23:59:59"
       },
       "predFinish": "2026-05-31 11:03:00",
@@ -18750,7 +18750,7 @@
   },
   "predictionEvolution": {
     "ok": true,
-    "count": 2017,
+    "count": 2018,
     "timeline": [
       {
         "recordedAt": "2026-05-26 04:05:02",
@@ -23392,23 +23392,22 @@
         "marginMainMin": 776,
         "calendarConfPct": 64,
         "kmPerDayMain": 0,
+        "modelVersion": 4
+      },
+      {
+        "recordedAt": "2026-06-01 09:38:39",
+        "km": 642,
+        "finishMain": "2026-05-31 11:03:46",
+        "finishOptimistic": "2026-05-31 11:03:46",
+        "finishPessimistic": "2026-05-31 11:03:46",
+        "marginMainMin": 776,
+        "calendarConfPct": 64,
+        "kmPerDayMain": 0,
         "modelVersion": 4,
         "isCurrent": true
       }
     ],
     "backtest": [
-      {
-        "recordedAt": "2026-06-01 00:05:38",
-        "kmThen": 642,
-        "finishThen": "2026-05-31 11:03:46",
-        "finishNow": "2026-05-31 11:03:46",
-        "revisionMin": 0,
-        "marginThenMin": 776,
-        "marginNowMin": 776,
-        "kmSince": 0,
-        "hoursSince": 9.2,
-        "actualKmPerDay": null
-      },
       {
         "recordedAt": "2026-06-01 00:30:47",
         "kmThen": 642,
@@ -23418,7 +23417,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 8.8,
+        "hoursSince": 9.7,
         "actualKmPerDay": null
       },
       {
@@ -23430,7 +23429,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 8.2,
+        "hoursSince": 9.1,
         "actualKmPerDay": null
       },
       {
@@ -23442,7 +23441,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 7.4,
+        "hoursSince": 8.2,
         "actualKmPerDay": null
       },
       {
@@ -23454,7 +23453,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 6.3,
+        "hoursSince": 7.1,
         "actualKmPerDay": null
       },
       {
@@ -23466,7 +23465,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 5.2,
+        "hoursSince": 6.1,
         "actualKmPerDay": null
       },
       {
@@ -23478,7 +23477,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 4.7,
+        "hoursSince": 5.6,
         "actualKmPerDay": null
       },
       {
@@ -23490,7 +23489,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 4.1,
+        "hoursSince": 5.0,
         "actualKmPerDay": null
       },
       {
@@ -23502,7 +23501,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 3.5,
+        "hoursSince": 4.4,
         "actualKmPerDay": null
       },
       {
@@ -23514,7 +23513,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 2.5,
+        "hoursSince": 3.4,
         "actualKmPerDay": null
       },
       {
@@ -23526,7 +23525,7 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 1.9,
+        "hoursSince": 2.8,
         "actualKmPerDay": null
       },
       {
@@ -23538,7 +23537,19 @@
         "marginThenMin": 776,
         "marginNowMin": 776,
         "kmSince": 0,
-        "hoursSince": 0.5,
+        "hoursSince": 1.3,
+        "actualKmPerDay": null
+      },
+      {
+        "recordedAt": "2026-06-01 09:38:39",
+        "kmThen": 642,
+        "finishThen": "2026-05-31 11:03:46",
+        "finishNow": "2026-05-31 11:03:46",
+        "revisionMin": 0,
+        "marginThenMin": 776,
+        "marginNowMin": 776,
+        "kmSince": 0,
+        "hoursSince": 0.6,
         "actualKmPerDay": null
       }
     ],
@@ -23762,10 +23773,10 @@
       ]
     },
     "summary": {
-      "snapshots": 2017,
-      "points": 422,
+      "snapshots": 2018,
+      "points": 423,
       "firstAt": "2026-05-26 04:05:02",
-      "lastAt": "2026-06-01 08:52:46",
+      "lastAt": "2026-06-01 09:38:39",
       "firstFinish": "2026-05-31 17:01:35",
       "currentFinish": "2026-05-31 11:03:46",
       "finishSwingHours": 100.7,
@@ -23774,7 +23785,7 @@
       "marginCurrentMin": 776,
       "marginSwingMin": 6044
     },
-    "label": "422 pontos · 2017 snapshots gravados",
+    "label": "423 pontos · 2018 snapshots gravados",
     "calendarDeadline": "2026-05-31 23:59:59"
   },
   "live": {
@@ -23787,7 +23798,7 @@
     "battery": "47%",
     "gpsTime": "2026-05-31 11:03:46",
     "gpsTimeUtc": "2026-05-31 10:03:46",
-    "lagMinutes": 1309.0,
+    "lagMinutes": 1354.9,
     "alongRouteKm": 610.6,
     "offRouteM": 16935.0,
     "source": "position_new",
@@ -80941,22 +80952,22 @@
       "status": "OK",
       "alongRouteKm": 610.6,
       "source": "position_new",
-      "lagMinutes": 1309.0,
+      "lagMinutes": 1354.9,
       "logTime": "2026-05-31 10:03:46"
     },
     "recordPace": {
-      "km": 559.6,
-      "lat": 37.589114,
-      "lng": -8.654861,
-      "alt": 81.9,
-      "time": "2026-06-01 09:20:26"
+      "km": 562.2,
+      "lat": 37.571539,
+      "lng": -8.667457,
+      "alt": 126.8,
+      "time": "2026-06-01 10:12:42"
     },
     "calendarPace": {
       "km": 642.4,
       "lat": 37.00068,
       "lng": -8.94824,
       "alt": 30.2,
-      "time": "2026-06-01 09:20:26",
+      "time": "2026-06-01 10:12:42",
       "deadline": "2026-05-31 23:59:59"
     },
     "calendarPaceRealistic": null,
